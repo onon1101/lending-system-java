@@ -37,6 +37,20 @@ public abstract class Enumeration<K extends Comparable<K>, V>
     }
 
     @Override
+    public final boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        Enumeration<?, ?> other = (Enumeration<?, ?>) object;
+        return key.equals(other.key);
+    }
+
+    @Override
     public final int hashCode() {
         return Objects.hash(getClass(), key);
     }
