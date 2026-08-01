@@ -1,6 +1,7 @@
 package onon1101.lendingsystem.auth.login;
 
 import java.util.Optional;
+
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +16,7 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
 
     @Override
     public Optional<LoginAccount> findByUsername(String username) {
-        String sql =
-                """
+        String sql = """
                 SELECT
                     id,
                     username,
@@ -28,7 +28,9 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
 
         return jdbcClient
                 .sql(sql)
-                .param("username", username)
+                .param(
+                        "username",
+                        username)
                 .query(
                         (resultSet, rowNumber) ->
                                 new LoginAccount(

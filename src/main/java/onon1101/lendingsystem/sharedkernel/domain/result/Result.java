@@ -13,7 +13,7 @@ public sealed interface Result<T> permits Result.Success, Result.Failure {
 
     <R> R match(
             Function<? super T, ? extends R> onSuccess,
-            Function<? super DomainError, ? extends R> onFailure);
+            Function<? super String, ? extends R> onFailure);
 
     static <T> Result<T> success(T value) {
         return new Success<>(value);
@@ -37,7 +37,7 @@ public sealed interface Result<T> permits Result.Success, Result.Failure {
         @Override
         public <R> R match(
                 Function<? super T, ? extends R> onSuccess,
-                Function<? super DomainError, ? extends R> onFailure) {
+                Function<? super String, ? extends R> onFailure) {
             return onSuccess.apply(value);
         }
     }
@@ -56,8 +56,8 @@ public sealed interface Result<T> permits Result.Success, Result.Failure {
         @Override
         public <R> R match(
                 Function<? super T, ? extends R> onSuccess,
-                Function<? super DomainError, ? extends R> onFailure) {
-            return onFailure.apply(error);
+                Function<? super String, ? extends R> onFailure) {
+            return onFailure.apply(error.code());
         }
     }
 }
