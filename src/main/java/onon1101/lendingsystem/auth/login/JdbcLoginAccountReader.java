@@ -5,6 +5,9 @@ import java.util.Optional;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import onon1101.lendingsystem.auth.user.IdentityProvider;
+import onon1101.lendingsystem.auth.user.UserStatus;
+
 @Repository
 public class JdbcLoginAccountReader implements LoginAccountReader {
 
@@ -18,25 +21,27 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
     public Optional<LoginAccount> findByUsername(String username) {
         String sql = """
                 SELECT
-                    id,
-                    username,
-                    password_hash
+                    users.id,
+                    users.username,
+                    credentials.password_hash
                 FROM users
-                WHERE username = :username
+                JOIN user_auth_identities identities
+                    ON identities.user_id = users.id
+                    AND identities.provider = :provider
+                JOIN user_password_credentials credentials
+                    ON credentials.auth_identity_id = identities.id
+                WHERE users.username = :username
+                    AND users.status = :active
                 LIMIT 1
                 """;
 
         return jdbcClient
                 .sql(sql)
-                .param(
-                        "username",
-                        username)
-                .query(
-                        (resultSet, rowNumber) ->
-                                new LoginAccount(
-                                        resultSet.getLong("id"),
-                                        resultSet.getString("username"),
-                                        resultSet.getString("password_hash")))
+                .param("username", username)
+                .param("provider", IdentityProvider.PASSWORD.value())
+                .param("active", UserStatus.ACTIVE.value())
+                .query((resultSet, rowNumber) -> new LoginAccount(resultSet.getLong("id"),
+                        resultSet.getString("username"), resultSet.getString("password_hash")))
                 .optional();
     }
 }

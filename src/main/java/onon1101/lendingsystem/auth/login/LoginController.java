@@ -23,20 +23,22 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
-        return loginService.login(
-                request.username(),
-                request.password()).match(
-                result -> {
-                    LoginResponse data = new LoginResponse(
-                            result.accessToken(),
-                            "Bearer",
-                            result.expiresIn());
-                    return ResponseEntity.ok(ApiResponse.success(
-                            HttpStatus.OK,
-                            data));
-                },
-                errorCode -> ResponseEntity.ok(ApiResponse.failure(
-                        HttpStatus.OK,
-                        errorCode)));
+        return loginService
+                .login(
+                        request.username(),
+                        request.password())
+                .match(
+                        result -> {
+                            LoginResponse data = new LoginResponse(
+                                    result.accessToken(),
+                                    "Bearer",
+                                    result.expiresIn());
+                            return ResponseEntity.ok(ApiResponse.success(
+                                    HttpStatus.OK,
+                                    data));
+                        },
+                        errorCode -> ResponseEntity.ok(ApiResponse.failure(
+                                HttpStatus.OK,
+                                errorCode)));
     }
 }

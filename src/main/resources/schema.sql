@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS users
     username VARCHAR(50) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active',
 
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT uq_users_username UNIQUE (username),
 
@@ -42,12 +42,12 @@ CREATE TABLE IF NOT EXISTS user_auth_identities
     provider VARCHAR(30) NOT NULL,
     provider_subject VARCHAR(255) NOT NULL,
 
-    email VARCHAR(255),
+    email VARCHAR(255) DEFAULT NULL,
     email_verified BOOLEAN NOT NULL DEFAULT FALSE,
 
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_login_at TIMESTAMPTZ,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login_at TIMESTAMP WITH TIME ZONE,
 
     CONSTRAINT fk_user_auth_identities_user
         FOREIGN KEY (user_id)
@@ -55,16 +55,19 @@ CREATE TABLE IF NOT EXISTS user_auth_identities
         ON DELETE CASCADE,
 
     CONSTRAINT uq_user_auth_identites_provider_subject
-        UNIQUE (provider, provider_subject)
+        UNIQUE (provider, provider_subject),
 
     CONSTRAINT uq_user_auth_identites_user_provider
         UNIQUE (user_id, provider),
+
+    CONSTRAINT ck_identity_email_verified
+        CHECK (email IS NOT NULL OR email_verified = FALSE),
 
     CONSTRAINT ck_user_auth_identities_provider
         CHECK (provider IN ('password', 'google', 'apple', 'github'))
 );
 
-CREATE INDEX idx_user_auth_identities_user_id
+CREATE INDEX IF NOT EXISTS idx_user_auth_identities_user_id
     ON user_auth_identities(user_id);
 
 
@@ -75,9 +78,9 @@ CREATE TABLE IF NOT EXISTS user_password_credentials
 
     password_hash VARCHAR(255) NOT NULL,
 
-    password_changed_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    password_changed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     failed_attempts INTEGER NOT NULL DEFAULT 0,
-    localed_until TIMESTAMPTZ,
+    localed_until TIMESTAMP WITH TIME ZONE,
 
     CONSTRAINT fk_user_password_credentials_identity
         FOREIGN KEY (auth_identity_id)
