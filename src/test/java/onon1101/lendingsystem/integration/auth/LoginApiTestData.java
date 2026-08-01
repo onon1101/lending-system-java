@@ -1,10 +1,9 @@
 package onon1101.lendingsystem.integration.auth;
 
+import onon1101.lendingsystem.integration.support.ApiTestData;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import onon1101.lendingsystem.integration.support.ApiTestData;
 
 @Component
 public final class LoginApiTestData implements ApiTestData {
@@ -23,14 +22,16 @@ public final class LoginApiTestData implements ApiTestData {
                 .param("username", username)
                 .update();
 
-        long userId = jdbcClient
-                .sql("SELECT id FROM users WHERE username = :username")
-                .param("username", username)
-                .query(Long.class)
-                .single();
+        long userId =
+                jdbcClient
+                        .sql("SELECT id FROM users WHERE username = :username")
+                        .param("username", username)
+                        .query(Long.class)
+                        .single();
 
         jdbcClient
-                .sql("""
+                .sql(
+                        """
                         INSERT INTO user_auth_identities
                             (user_id, provider, provider_subject, email_verified)
                         VALUES
@@ -40,18 +41,21 @@ public final class LoginApiTestData implements ApiTestData {
                 .param("username", username)
                 .update();
 
-        long identityId = jdbcClient
-                .sql("""
+        long identityId =
+                jdbcClient
+                        .sql(
+                                """
                         SELECT id
                         FROM user_auth_identities
                         WHERE user_id = :userId AND provider = 'password'
                         """)
-                .param("userId", userId)
-                .query(Long.class)
-                .single();
+                        .param("userId", userId)
+                        .query(Long.class)
+                        .single();
 
         jdbcClient
-                .sql("""
+                .sql(
+                        """
                         INSERT INTO user_password_credentials (auth_identity_id, password_hash)
                         VALUES (:identityId, :passwordHash)
                         """)
@@ -59,6 +63,6 @@ public final class LoginApiTestData implements ApiTestData {
                 .param("passwordHash", passwordEncoder.encode(rawPassword))
                 .update();
 
-//        return userId;
+        //        return userId;
     }
 }

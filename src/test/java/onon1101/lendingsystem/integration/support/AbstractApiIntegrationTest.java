@@ -17,19 +17,15 @@ public abstract class AbstractApiIntegrationTest {
 
     private static final String DATABASE_NAME = TestSchema.name();
 
-    @Autowired
-    protected TestRestTemplate http;
+    @Autowired protected TestRestTemplate http;
 
-    @Autowired
-    private DatabaseCleaner databaseCleaner;
+    @Autowired private DatabaseCleaner databaseCleaner;
 
     @DynamicPropertySource
     static void isolatedDatabase(DynamicPropertyRegistry registry) {
         registry.add(
                 "spring.datasource.url",
-                () -> "jdbc:h2:mem:"
-                        + DATABASE_NAME
-                        + ";MODE=PostgreSQL;DB_CLOSE_DELAY=-1");
+                () -> "jdbc:h2:mem:" + DATABASE_NAME + ";MODE=PostgreSQL;DB_CLOSE_DELAY=-1");
     }
 
     @BeforeEach

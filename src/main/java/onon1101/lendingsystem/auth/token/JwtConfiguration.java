@@ -1,10 +1,8 @@
 package onon1101.lendingsystem.auth.token;
 
 import java.nio.charset.StandardCharsets;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -24,9 +22,7 @@ public class JwtConfiguration {
             throw new IllegalStateException("JWT secret must contain at least 32 bytes");
         }
 
-        return new SecretKeySpec(
-                secret,
-                "HmacSHA256");
+        return new SecretKeySpec(secret, "HmacSHA256");
     }
 
     @Bean

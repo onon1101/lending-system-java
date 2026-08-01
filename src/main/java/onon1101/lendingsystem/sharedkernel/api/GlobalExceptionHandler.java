@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,6 +25,12 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse<Void>> handleUnreadableMessageException(
             HttpMessageNotReadableException exception) {
         return failure(HttpStatus.BAD_REQUEST, "Request.MalformedBody");
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(
+            NoResourceFoundException exception) {
+        return failure(HttpStatus.NOT_FOUND, "Resource.NotFound");
     }
 
     @ExceptionHandler(Exception.class)

@@ -9,9 +9,7 @@ public class DatabaseCleaner {
     private final JdbcClient jdbc;
     private final Environment environment;
 
-    public DatabaseCleaner(
-            JdbcClient jdbc,
-            Environment environment) {
+    public DatabaseCleaner(JdbcClient jdbc, Environment environment) {
         this.jdbc = jdbc;
         this.environment = environment;
     }
@@ -24,8 +22,6 @@ public class DatabaseCleaner {
 
         // H2 does not support PostgreSQL's multi-table TRUNCATE syntax. Deleting the aggregate
         // root is fast for test-sized data, and the foreign keys cascade to authentication rows.
-        jdbc
-                .sql("DELETE FROM users")
-                .update();
+        jdbc.sql("DELETE FROM users").update();
     }
 }

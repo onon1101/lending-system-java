@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.user;
+package onon1101.lendingsystem.auth.properties;
 
 import onon1101.lendingsystem.sharedkernel.domain.Enumeration;
 
