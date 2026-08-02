@@ -2,7 +2,6 @@ package onon1101.lendingsystem.auth.token;
 
 import java.time.Instant;
 import java.util.UUID;
-
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -11,12 +10,12 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 @Service
-public final class JwtTokenService {
+public class ForgotPasswordTokenService {
 
     private final JwtEncoder jwtEncoder;
-    private final JwtProperties properties;
+    private final ForgotPasswordProperties properties;
 
-    public JwtTokenService(JwtEncoder jwtEncoder, JwtProperties properties) {
+    public ForgotPasswordTokenService(JwtEncoder jwtEncoder, ForgotPasswordProperties properties) {
         this.jwtEncoder = jwtEncoder;
         this.properties = properties;
     }

@@ -1,14 +1,11 @@
 package onon1101.lendingsystem.auth.forgotPassword;
 
-import onon1101.lendingsystem.auth.properties.IdentityProvider;
-
-import onon1101.lendingsystem.auth.properties.UserStatus;
-
-import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 import java.util.UUID;
+import onon1101.lendingsystem.auth.properties.IdentityProvider;
+import onon1101.lendingsystem.auth.properties.UserStatus;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class JdbcForgotPasswordAccountReader implements ForgotPasswordAccountReader {
@@ -21,7 +18,8 @@ public class JdbcForgotPasswordAccountReader implements ForgotPasswordAccountRea
 
     @Override
     public Optional<ForgotPasswordAccount> findByEmail(String email) {
-        String sql = """
+        String sql =
+                """
                 SELECT
                 	a.public_id,
                 	a.username
@@ -39,9 +37,11 @@ public class JdbcForgotPasswordAccountReader implements ForgotPasswordAccountRea
                 .param("email", email)
                 .param("provider", IdentityProvider.PASSWORD.value())
                 .param("active", UserStatus.ACTIVE.value())
-                .query((resultSet, rowNumber) -> new ForgotPasswordAccount(
-                        resultSet.getObject("public_id", UUID.class),
-                        resultSet.getString("username")))
+                .query(
+                        (resultSet, rowNumber) ->
+                                new ForgotPasswordAccount(
+                                        resultSet.getObject("public_id", UUID.class),
+                                        resultSet.getString("username")))
                 .optional();
     }
 }

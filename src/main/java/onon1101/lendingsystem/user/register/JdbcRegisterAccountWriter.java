@@ -1,7 +1,6 @@
 package onon1101.lendingsystem.user.register;
 
 import com.github.f4b6a3.uuid.UuidCreator;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,9 +36,10 @@ public class JdbcRegisterAccountWriter implements RegisterAccountWriter {
                     .param("publicId", publicId)
                     .update(userKey, "id");
 
-            long userId = Objects.requireNonNull(
-                    userKey.getKeyAs(Long.class),
-                    "Database did not return the generated user.id");
+            long userId =
+                    Objects.requireNonNull(
+                            userKey.getKeyAs(Long.class),
+                            "Database did not return the generated user.id");
 
             RegisterAccount account = new RegisterAccount(userId, publicId);
 
@@ -58,9 +58,10 @@ public class JdbcRegisterAccountWriter implements RegisterAccountWriter {
                     .param("email", email)
                     .update(identityKey, "id");
 
-            long identityId = Objects.requireNonNull(
-                    identityKey.getKeyAs(Long.class),
-                    "Database did not return the generated identity.id");
+            long identityId =
+                    Objects.requireNonNull(
+                            identityKey.getKeyAs(Long.class),
+                            "Database did not return the generated identity.id");
 
             jdbcClient
                     .sql(

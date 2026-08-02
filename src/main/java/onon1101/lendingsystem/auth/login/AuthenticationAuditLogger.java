@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.auth.login;
 
-import onon1101.lendingsystem.sharedkernel.AccountReferenceEncoder;
+import onon1101.lendingsystem.security.AccountReferenceEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

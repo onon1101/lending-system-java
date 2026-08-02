@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 public class JwtConfiguration {
 
     @Bean
-    SecretKey jwtSecretKey(JwtProperties properties) {
+    SecretKey jwtSecretKey(AccessTokenProperties properties) {
         byte[] secret = properties.secret().getBytes(StandardCharsets.UTF_8);
 
         if (secret.length < 32) {

@@ -2,7 +2,7 @@ package onon1101.lendingsystem.auth.login;
 
 import java.util.Locale;
 import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditPolicy;
-import onon1101.lendingsystem.auth.token.JwtTokenService;
+import onon1101.lendingsystem.auth.token.AccessTokenService;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
@@ -18,12 +18,12 @@ public class LoginService {
 
     private final LoginAccountReader accountReader;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenService tokenService;
+    private final AccessTokenService tokenService;
 
     public LoginService(
             LoginAccountReader accountReader,
             PasswordEncoder passwordEncoder,
-            JwtTokenService tokenService) {
+            AccessTokenService tokenService) {
         this.accountReader = accountReader;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
@@ -40,7 +40,7 @@ public class LoginService {
 
         if (account == null || !passwordEncoder.matches(password, account.passwordHash())) {
 
-            //todo: 需要將失敗次數寫入資料庫
+            // todo: 需要將失敗次數寫入資料庫
             return Result.failure(INVALID_CREDENTIALS);
         }
 
