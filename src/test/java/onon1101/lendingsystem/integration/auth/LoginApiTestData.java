@@ -1,5 +1,6 @@
 package onon1101.lendingsystem.integration.auth;
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import onon1101.lendingsystem.integration.support.ApiTestData;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,8 +19,13 @@ public final class LoginApiTestData implements ApiTestData {
 
     public void activePasswordUser(String username, String rawPassword) {
         jdbcClient
-                .sql("INSERT INTO users (username, status) VALUES (:username, 'active')")
+                .sql(
+                        """
+                        INSERT INTO users (username, public_id, status)
+                        VALUES (:username, :publicId, 'active')
+                        """)
                 .param("username", username)
+                .param("publicId", UuidCreator.getTimeOrderedEpoch())
                 .update();
 
         long userId =

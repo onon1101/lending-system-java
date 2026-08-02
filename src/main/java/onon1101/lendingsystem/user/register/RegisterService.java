@@ -13,6 +13,8 @@ public class RegisterService {
 
     private static final DomainError INVALID_REGISTRATION =
             new DomainError("User.InvalidRegistration", "The User cannot be registered.");
+    private static final DomainError INVALID_EMAIL =
+            new DomainError("User.InvalidEmail", "The Invalid Email Address.");
 
     private final RegisterAccountWriter accountWriter;
     private final PasswordEncoder passwordEncoder;
@@ -34,7 +36,7 @@ public class RegisterService {
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
         if (!EmailUtil.validateEmail(normalizedEmail)) {
             auditLogger.registerFailed(normalizedUsername);
-            return Result.failure(INVALID_REGISTRATION);
+            return Result.failure(INVALID_EMAIL);
         }
 
         String passwordEncoded = passwordEncoder.encode(password);
@@ -51,9 +53,7 @@ public class RegisterService {
             return Result.failure(INVALID_REGISTRATION);
         }
 
-        //todo: 轉換流水號成 uuid
-
         auditLogger.registerSuccess(normalizedUsername);
-        return Result.success(new RegisterResult(Long.toString(account.userId())));
+        return Result.success(new RegisterResult(account.publicUserId()));
     }
 }

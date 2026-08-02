@@ -1,3 +1,6 @@
 package onon1101.lendingsystem.user.register;
 
-public record RegisterAccount(long userId) {}
+import java.util.UUID;
+
+public record RegisterAccount(long privateUserId, UUID publicUserId) {
+}
