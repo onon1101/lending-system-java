@@ -1,7 +1,9 @@
 package onon1101.lendingsystem.auth.login;
 
 import java.util.Locale;
+import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditPolicy;
 import onon1101.lendingsystem.auth.token.JwtTokenService;
+import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,21 +20,18 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService tokenService;
 
-    private final AuthenticationAuditLogger auditLogger;
-
     public LoginService(
             LoginAccountReader accountReader,
             PasswordEncoder passwordEncoder,
-            JwtTokenService tokenService,
-            AuthenticationAuditLogger auditLogger) {
+            JwtTokenService tokenService) {
         this.accountReader = accountReader;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
-        this.auditLogger = auditLogger;
     }
 
     // TODO Add refresh token support.
     @Transactional(readOnly = true)
+    @AuditedCommand(AuthenticationAuditPolicy.class)
     public Result<LoginResult> login(String username, String password) {
 
         String normalizedUsername = username.trim().toLowerCase(Locale.ROOT);
@@ -41,13 +40,11 @@ public class LoginService {
 
         if (account == null || !passwordEncoder.matches(password, account.passwordHash())) {
 
-            auditLogger.loginFailed(normalizedUsername);
             return Result.failure(INVALID_CREDENTIALS);
         }
 
         String accessToken = tokenService.createToken(account.userId(), account.username());
 
-        auditLogger.loginSuccess(normalizedUsername);
         return Result.success(new LoginResult(accessToken, tokenService.expiresInSeconds()));
     }
 }

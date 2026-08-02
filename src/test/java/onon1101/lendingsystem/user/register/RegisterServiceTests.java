@@ -1,5 +1,6 @@
 package onon1101.lendingsystem.user.register;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -7,86 +8,66 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.AfterEach;
+import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @ExtendWith(MockitoExtension.class)
 class RegisterServiceTests {
 
     private final RegisterAccountWriter accountWriter = mock(RegisterAccountWriter.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
-    private final RegistrationAuditLogger auditLogger = mock(RegistrationAuditLogger.class);
-    private final RegisterService service =
-            new RegisterService(accountWriter, passwordEncoder, auditLogger);
-
-    @AfterEach
-    void clearTransactionSynchronization() {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.clearSynchronization();
-        }
-    }
+    private final RegisterService service = new RegisterService(accountWriter, passwordEncoder);
 
     @Test
-    void auditsSuccessfulRegistrationOnlyAfterCommit() {
+    void registersNormalizedAccount() {
         UUID userId = UUID.randomUUID();
         when(passwordEncoder.encode("password")).thenReturn("encoded");
         when(accountWriter.registerAccount("alice", "encoded", "alice@example.com"))
                 .thenReturn(Optional.of(new RegisterAccount(1L, userId)));
-        TransactionSynchronizationManager.initSynchronization();
 
-        service.register(" Alice ", "password", "Alice@example.com");
+        Result<RegisterResult> result =
+                service.register(" Alice ", "password", "Alice@example.com");
 
-        verify(auditLogger, never()).registerSuccess("alice", userId);
-        List<TransactionSynchronization> synchronizations =
-                TransactionSynchronizationManager.getSynchronizations();
-        synchronizations.forEach(TransactionSynchronization::afterCommit);
-        verify(auditLogger).registerSuccess("alice", userId);
+        RegisterResult registration = ((Result.Success<RegisterResult>) result).value();
+        assertEquals(userId, registration.userId());
     }
 
     @Test
-    void doesNotAuditSuccessWhenTransactionRollsBack() {
-        UUID userId = UUID.randomUUID();
+    void rejectsInvalidEmailBeforeEncodingPassword() {
+        Result<RegisterResult> result = service.register("Alice", "password", "not-an-email");
+
+        Result.Failure<RegisterResult> failure = (Result.Failure<RegisterResult>) result;
+        assertEquals("User.InvalidEmail", failure.error().code());
+        verify(passwordEncoder, never()).encode("password");
+    }
+
+    @Test
+    void returnsFailureWhenAccountConflicts() {
         when(passwordEncoder.encode("password")).thenReturn("encoded");
         when(accountWriter.registerAccount("alice", "encoded", "alice@example.com"))
-                .thenReturn(Optional.of(new RegisterAccount(1L, userId)));
-        TransactionSynchronizationManager.initSynchronization();
+                .thenReturn(Optional.empty());
 
-        service.register("alice", "password", "alice@example.com");
-        TransactionSynchronizationManager.getSynchronizations()
-                .forEach(
-                        synchronization ->
-                                synchronization.afterCompletion(
-                                        TransactionSynchronization.STATUS_ROLLED_BACK));
+        Result<RegisterResult> result = service.register("Alice", "password", "alice@example.com");
 
-        verify(auditLogger, never()).registerSuccess("alice", userId);
+        Result.Failure<RegisterResult> failure = (Result.Failure<RegisterResult>) result;
+        assertEquals("User.InvalidRegistration", failure.error().code());
     }
 
     @Test
-    void auditsExpectedFailureReason() {
-        service.register(" Alice ", "password", "not-an-email");
+    void propagatesUnexpectedFailure() {
+        RuntimeException expected = new RuntimeException("encoder unavailable");
+        when(passwordEncoder.encode("password")).thenThrow(expected);
 
-        verify(auditLogger).registerFailed("alice", "invalid_email");
-    }
-
-    @Test
-    void auditsUnexpectedFailureAndRethrowsIt() {
-        RuntimeException failure = new RuntimeException("encoder unavailable");
-        when(passwordEncoder.encode("password")).thenThrow(failure);
-
-        RuntimeException thrown =
+        RuntimeException actual =
                 assertThrows(
                         RuntimeException.class,
                         () -> service.register("Alice", "password", "alice@example.com"));
 
-        assertSame(failure, thrown);
-        verify(auditLogger).registerFailed("alice", "system_error");
+        assertSame(expected, actual);
     }
 }
