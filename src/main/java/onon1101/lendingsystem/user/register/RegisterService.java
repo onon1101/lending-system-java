@@ -30,7 +30,7 @@ public class RegisterService {
         this.auditLogger = auditLogger;
     }
 
-    @Transactional(readOnly = false)
+    @Transactional()
     public Result<RegisterResult> register(String username, String password, String email) {
         String normalizedUsername = username.trim().toLowerCase(Locale.ROOT);
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
