@@ -1,11 +1,13 @@
 package onon1101.lendingsystem.user.register;
 
 import java.util.Locale;
+
 import onon1101.lendingsystem.sharedkernel.EmailUtil;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,23 +16,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class RegisterService {
 
     private static final DomainError INVALID_REGISTRATION =
-            new DomainError("User.InvalidRegistration", "The User cannot be registered.");
+            new DomainError("User.InvalidRegistration",
+                    "The User cannot be registered.");
     private static final DomainError INVALID_EMAIL =
             new DomainError("User.InvalidEmail", "The Invalid Email Address.");
 
     private final RegisterAccountWriter accountWriter;
     private final PasswordEncoder passwordEncoder;
 
-    public RegisterService(RegisterAccountWriter accountWriter, PasswordEncoder passwordEncoder) {
+    public RegisterService(RegisterAccountWriter accountWriter,
+                           PasswordEncoder passwordEncoder) {
         this.accountWriter = accountWriter;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     @AuditedCommand(RegistrationAuditPolicy.class)
-    public Result<RegisterResult> register(String username, String password, String email) {
-        String normalizedUsername = username.trim().toLowerCase(Locale.ROOT);
-        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+    public Result<RegisterResult> register(String username, String password,
+                                           String email) {
+        String normalizedUsername = username
+                .trim()
+                .toLowerCase(Locale.ROOT);
+        String normalizedEmail = email
+                .trim()
+                .toLowerCase(Locale.ROOT);
 
         if (!EmailUtil.validateEmail(normalizedEmail)) {
             return Result.failure(INVALID_EMAIL);
@@ -42,7 +51,8 @@ public class RegisterService {
 
         RegisterAccount account =
                 accountWriter
-                        .registerAccount(normalizedUsername, passwordEncoded, normalizedEmail)
+                        .registerAccount(normalizedUsername, passwordEncoded,
+                                normalizedEmail)
                         .orElse(null);
 
         if (account == null) {

@@ -1,3 +1,5 @@
 package onon1101.lendingsystem.auth.login;
 
-public record LoginAccount(long userId, String username, String passwordHash) {}
+import java.util.UUID;
+
+public record LoginAccount(UUID publicUserId, String username, String passwordHash) {}

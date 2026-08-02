@@ -1,6 +1,8 @@
 package onon1101.lendingsystem.auth.token;
 
 import java.time.Instant;
+import java.util.UUID;
+
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -19,7 +21,7 @@ public final class JwtTokenService {
         this.properties = properties;
     }
 
-    public String createToken(long userId, String username) {
+    public String createToken(UUID publicUserId, String username) {
         Instant now = Instant.now();
 
         JwtClaimsSet claims =
@@ -27,7 +29,7 @@ public final class JwtTokenService {
                         .issuer(properties.issuer())
                         .issuedAt(now)
                         .expiresAt(now.plus(properties.expiration()))
-                        .subject(Long.toString(userId))
+                        .subject(publicUserId.toString())
                         .claim("username", username)
                         .build();
 

@@ -1,6 +1,8 @@
 package onon1101.lendingsystem.auth.login;
 
 import java.util.Optional;
+import java.util.UUID;
+
 import onon1101.lendingsystem.auth.properties.IdentityProvider;
 import onon1101.lendingsystem.auth.properties.UserStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -20,7 +22,7 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
         String sql =
                 """
                         SELECT
-                            users.id,
+                            users.public_id,
                             users.username,
                             credentials.password_hash
                         FROM users
@@ -42,7 +44,7 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                 .query(
                         (resultSet, rowNumber) ->
                                 new LoginAccount(
-                                        resultSet.getLong("id"),
+                                        resultSet.getObject("public_id", UUID.class),
                                         resultSet.getString("username"),
                                         resultSet.getString("password_hash")))
                 .optional();

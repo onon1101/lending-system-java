@@ -40,10 +40,11 @@ public class LoginService {
 
         if (account == null || !passwordEncoder.matches(password, account.passwordHash())) {
 
+            //todo: 需要將失敗次數寫入資料庫
             return Result.failure(INVALID_CREDENTIALS);
         }
 
-        String accessToken = tokenService.createToken(account.userId(), account.username());
+        String accessToken = tokenService.createToken(account.publicUserId(), account.username());
 
         return Result.success(new LoginResult(accessToken, tokenService.expiresInSeconds()));
     }
