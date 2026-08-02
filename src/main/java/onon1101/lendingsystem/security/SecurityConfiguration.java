@@ -22,7 +22,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(
                         authorize ->
                                 authorize
-                                        .requestMatchers("/api/v1/auth/login")
+                                        .requestMatchers(
+                                                "/api/v1/auth/login", "/api/v1/user/register")
                                         .permitAll()
                                         .requestMatchers(EndpointRequest.to("health"))
                                         .permitAll()

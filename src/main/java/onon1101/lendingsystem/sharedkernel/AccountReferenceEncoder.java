@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.login;
+package onon1101.lendingsystem.sharedkernel;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;

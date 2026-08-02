@@ -1,12 +1,10 @@
 package onon1101.lendingsystem.auth.login;
 
 import java.util.Optional;
-
-import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
-
 import onon1101.lendingsystem.auth.properties.IdentityProvider;
 import onon1101.lendingsystem.auth.properties.UserStatus;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class JdbcLoginAccountReader implements LoginAccountReader {

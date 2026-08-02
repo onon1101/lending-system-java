@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS user_auth_identities
     provider_subject VARCHAR(255) NOT NULL,
 
     email VARCHAR(255) DEFAULT NULL,
-    email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+    email_verified BOOLEAN NOT NULL DEFAULT FALSE, -- 驗證可否發送 mail
 
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -59,9 +59,6 @@ CREATE TABLE IF NOT EXISTS user_auth_identities
 
     CONSTRAINT uq_user_auth_identites_user_provider
         UNIQUE (user_id, provider),
-
-    CONSTRAINT ck_identity_email_verified
-        CHECK (email IS NOT NULL OR email_verified = FALSE),
 
     CONSTRAINT ck_user_auth_identities_provider
         CHECK (provider IN ('password', 'google', 'apple', 'github'))

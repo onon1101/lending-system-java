@@ -20,7 +20,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  */
 class ApiEndpointCoverageTests extends AbstractApiIntegrationTest {
 
-    private static final Set<String> TESTED_API_INVENTORY = Set.of("POST /api/v1/auth/login");
+    private static final Set<String> TESTED_API_INVENTORY =
+            Set.of("POST /api/v1/auth/login", "POST /api/v1/user/register");
 
     @Autowired
     @Qualifier("requestMappingHandlerMapping") private RequestMappingHandlerMapping mappings;
