@@ -13,6 +13,10 @@ public class AccountReferenceEncoder {
     private final SecretKeySpec secretKey;
 
     public AccountReferenceEncoder(@Value("${lending.audit.hmac-key}") String secret) {
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalArgumentException(
+                    "Audit HMAC key must contain at least 32 characters");
+        }
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
     }
 
