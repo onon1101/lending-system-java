@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Repository
 public class JdbcLoginAccountWriter implements LoginAccountWriter {
@@ -18,8 +20,8 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
 
     @Override
     public FailedAttemptResult recordFailedAttempt(Integer passwordId,
-                                                    int maxAttempts,
-                                                    Instant lockedUntil) {
+                                                   int maxAttempts,
+                                                   Instant lockedUntil) {
 
         String sql = """
                 WITH attempt AS (
@@ -36,9 +38,9 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
                 )
                 UPDATE user_password_credentials c
                 SET
-                	failed_attempt = attempt.next_failed_attempts,
+                	failed_attempts = attempt.next_failed_attempts,
                 	locked_until = CASE
-                		WHEN attempts.next_failed_attempts >= :maxAttempts
+                		WHEN attempt.next_failed_attempts >= :maxAttempts
                 		THEN :newLockedUntil
                 		ELSE NULL
                 	END
@@ -49,14 +51,25 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
                 	c.locked_until
                 """;
 
-        return jdbcClient.sql(sql)
+        OffsetDateTime newLockedUntil =
+                lockedUntil.atOffset(ZoneOffset.UTC);
+
+        return jdbcClient
+                .sql(sql)
                 .param("passwordId", passwordId)
                 .param("maxAttempts", maxAttempts)
-                .param("newLockedUntil", lockedUntil)
-                .query((rs, rowNum) -> new FailedAttemptResult(
-                        rs.getInt("failed_attempts"),
-                        rs.getObject("locked_until", Instant.class)
-                ))
+                .param("newLockedUntil", newLockedUntil)
+                .query((rs, rowNum) -> {
+                    OffsetDateTime resultLockedUntil = rs.getObject(
+                            "locked_until", OffsetDateTime.class);
+
+                    return new FailedAttemptResult(
+                            rs.getInt("failed_attempts"),
+                            resultLockedUntil == null
+                                    ? null
+                                    : resultLockedUntil.toInstant()
+                    );
+                })
                 .single();
     }
 
@@ -75,7 +88,8 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
                 .update();
 
         if (affectedRows != 1) {
-            throw new IllegalStateException("Reset failed attempts failed, passwordId=" + passwordId);
+            throw new IllegalStateException(
+                    "Reset failed attempts failed, passwordId=" + passwordId);
         }
     }
 }

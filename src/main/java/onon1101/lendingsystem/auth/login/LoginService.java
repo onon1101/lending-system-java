@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class LoginService {
 
+    // todo: 1. 泛化所有 DomainError
+    // todo: 2. 泛化稽核日誌
     private static final DomainError INVALID_CREDENTIALS =
             new DomainError("Auth.InvalidCredentials",
                     "Username or password is incorrect.");
@@ -44,12 +46,11 @@ public class LoginService {
     }
 
     // TODO Add refresh token support.
-    @Transactional(readOnly = true)
+    @Transactional()
     @AuditedCommand(AuthenticationAuditPolicy.class)
     public Result<LoginResult> login(String username, String password) {
         Instant now = Instant.now();
 
-        //todo: 新增失敗時效
         String normalizedUsername = username
                 .trim()
                 .toLowerCase(Locale.ROOT);

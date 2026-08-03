@@ -1,6 +1,7 @@
 package onon1101.lendingsystem.auth.login;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import onon1101.lendingsystem.auth.properties.IdentityProvider;
@@ -44,13 +45,17 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                 .param("provider", IdentityProvider.PASSWORD.value())
                 .param("active", UserStatus.ACTIVE.value())
                 .query(
-                        (resultSet, rowNumber) ->
-                                new LoginAccount(
-                                        resultSet.getObject("public_id", UUID.class),
-                                        resultSet.getString("username"),
-                                        resultSet.getString("password_hash"),
-                                        resultSet.getInt("auth_identity_id"),
-                                        resultSet.getObject("locked_until", Instant.class)))
+                        (resultSet, rowNumber) -> {
+                            OffsetDateTime lockedUntil =
+                                    resultSet.getObject("locked_until", OffsetDateTime.class);
+
+                            return new LoginAccount(
+                                    resultSet.getObject("public_id", UUID.class),
+                                    resultSet.getString("username"),
+                                    resultSet.getString("password_hash"),
+                                    resultSet.getInt("auth_identity_id"),
+                                    lockedUntil == null ? null : lockedUntil.toInstant());
+                        })
                 .optional();
     }
 }
