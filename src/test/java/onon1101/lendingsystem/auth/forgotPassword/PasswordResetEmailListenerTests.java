@@ -3,6 +3,9 @@ package onon1101.lendingsystem.auth.forgotPassword;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailListener;
+import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailRequested;
+import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetMailService;
 import org.junit.jupiter.api.Test;
 
 class PasswordResetEmailListenerTests {

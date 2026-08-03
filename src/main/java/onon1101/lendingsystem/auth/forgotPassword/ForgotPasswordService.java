@@ -3,6 +3,7 @@ package onon1101.lendingsystem.auth.forgotPassword;
 import java.util.Locale;
 
 import onon1101.lendingsystem.auth.forgotPassword.audit.ForgotPasswordAuditPolicy;
+import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailRequested;
 import onon1101.lendingsystem.auth.token.ForgotPasswordTokenService;
 import onon1101.lendingsystem.sharedkernel.EmailUtil;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;

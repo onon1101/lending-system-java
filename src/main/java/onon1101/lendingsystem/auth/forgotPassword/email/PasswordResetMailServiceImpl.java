@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.forgotPassword;
+package onon1101.lendingsystem.auth.forgotPassword.email;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;

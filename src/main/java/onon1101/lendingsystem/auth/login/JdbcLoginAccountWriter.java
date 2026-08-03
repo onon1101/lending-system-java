@@ -1,0 +1,81 @@
+package onon1101.lendingsystem.auth.login;
+
+import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditEvent;
+
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
+
+import java.time.Instant;
+
+@Repository
+public class JdbcLoginAccountWriter implements LoginAccountWriter {
+
+    private final JdbcClient jdbcClient;
+
+    public JdbcLoginAccountWriter(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
+    }
+
+    @Override
+    public FailedAttemptResult recordFailedAttempt(Integer passwordId,
+                                                    int maxAttempts,
+                                                    Instant lockedUntil) {
+
+        String sql = """
+                WITH attempt AS (
+                	SELECT
+                		auth_identity_id,
+                		CASE
+                			WHEN locked_until IS NOT NULL
+                				AND locked_until <= CURRENT_TIMESTAMP
+                			THEN 1
+                			ELSE failed_attempts + 1
+                		END AS next_failed_attempts
+                	FROM user_password_credentials
+                	WHERE auth_identity_id = :passwordId
+                )
+                UPDATE user_password_credentials c
+                SET
+                	failed_attempt = attempt.next_failed_attempts,
+                	locked_until = CASE
+                		WHEN attempts.next_failed_attempts >= :maxAttempts
+                		THEN :newLockedUntil
+                		ELSE NULL
+                	END
+                FROM attempt
+                WHERE c.auth_identity_id = attempt.auth_identity_id
+                RETURNING
+                	c.failed_attempts,
+                	c.locked_until
+                """;
+
+        return jdbcClient.sql(sql)
+                .param("passwordId", passwordId)
+                .param("maxAttempts", maxAttempts)
+                .param("newLockedUntil", lockedUntil)
+                .query((rs, rowNum) -> new FailedAttemptResult(
+                        rs.getInt("failed_attempts"),
+                        rs.getObject("locked_until", Instant.class)
+                ))
+                .single();
+    }
+
+    @Override
+    public void resetFailedAttempts(Integer passwordId) {
+        String sql = """
+                UPDATE user_password_credentials
+                SET failed_attempts = 0,
+                    locked_until = NULL
+                WHERE auth_identity_id = :passwordId
+                """;
+
+        int affectedRows = jdbcClient
+                .sql(sql)
+                .param("passwordId", passwordId)
+                .update();
+
+        if (affectedRows != 1) {
+            throw new IllegalStateException("Reset failed attempts failed, passwordId=" + passwordId);
+        }
+    }
+}

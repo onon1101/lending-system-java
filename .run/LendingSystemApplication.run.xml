@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="LendingSystemApplication" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="onon1101.lendingsystem.LendingSystemApplication" />
+    <module name="LendingSystem" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

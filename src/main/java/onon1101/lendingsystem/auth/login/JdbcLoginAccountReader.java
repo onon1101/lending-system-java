@@ -23,7 +23,8 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                         SELECT
                             users.public_id,
                             users.username,
-                            credentials.password_hash
+                            credentials.password_hash,
+                            credentials.auth_identity_id
                         FROM users
                         JOIN user_auth_identities identities
                             ON identities.user_id = users.id
@@ -45,7 +46,8 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                                 new LoginAccount(
                                         resultSet.getObject("public_id", UUID.class),
                                         resultSet.getString("username"),
-                                        resultSet.getString("password_hash")))
+                                        resultSet.getString("password_hash"),
+                                        resultSet.getInt("auth_identity_id")))
                 .optional();
     }
 }

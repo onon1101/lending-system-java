@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.forgotPassword;
+package onon1101.lendingsystem.auth.forgotPassword.email;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
