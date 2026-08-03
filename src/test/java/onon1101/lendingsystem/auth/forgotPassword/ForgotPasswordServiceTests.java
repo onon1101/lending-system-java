@@ -29,7 +29,7 @@ class ForgotPasswordServiceTests {
                 .thenReturn(Optional.of(new ForgotPasswordAccount(publicUserId, "test-user")));
         when(tokenService.createToken(publicUserId, "test-user")).thenReturn("reset-token");
 
-        service.handle(" User@Example.com ");
+        service.handle(new ForgotPasswordCommand(" User@Example.com "));
 
         verify(eventPublisher)
                 .publishEvent(
@@ -41,7 +41,7 @@ class ForgotPasswordServiceTests {
     void doesNotPublishEventWhenAccountDoesNotExist() {
         when(accountReader.findByEmail("missing@example.com")).thenReturn(Optional.empty());
 
-        service.handle("missing@example.com");
+        service.handle(new ForgotPasswordCommand("missing@example.com"));
 
         verify(eventPublisher, never()).publishEvent(any());
     }

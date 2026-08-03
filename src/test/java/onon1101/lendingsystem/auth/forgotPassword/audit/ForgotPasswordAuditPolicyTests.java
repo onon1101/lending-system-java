@@ -2,6 +2,7 @@ package onon1101.lendingsystem.auth.forgotPassword.audit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordCommand;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordResult;
 import onon1101.lendingsystem.auth.forgotPassword.error.InvalidEmailDomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
@@ -15,7 +16,7 @@ class ForgotPasswordAuditPolicyTests {
     void producesRequestedEventForSuccessfulRequest() {
         Object event =
                 policy.onReturned(
-                        new Object[] {" User@Example.com "},
+                        new ForgotPasswordCommand(" User@Example.com "),
                         Result.success(new ForgotPasswordResult()));
 
         assertThat(event).isEqualTo(new ForgotPasswordAuditEvent.Requested("user@example.com"));
@@ -25,17 +26,20 @@ class ForgotPasswordAuditPolicyTests {
     void producesRejectedEventForInvalidEmail() {
         Object event =
                 policy.onReturned(
-                        new Object[] {"invalid"}, Result.failure(new InvalidEmailDomainError()));
+                        new ForgotPasswordCommand("invalid"),
+                        Result.failure(new InvalidEmailDomainError()));
 
         assertThat(event)
-                .isEqualTo(new ForgotPasswordAuditEvent.Rejected("invalid", "invalid_email"));
+                .isEqualTo(
+                        new ForgotPasswordAuditEvent.Rejected(
+                                "invalid", "ForgotPassword.InvalidEmail"));
     }
 
     @Test
     void producesFailedEventWhenCommandThrows() {
         Object event =
                 policy.onThrown(
-                        new Object[] {"User@Example.com"},
+                        new ForgotPasswordCommand("User@Example.com"),
                         new RuntimeException("SMTP unavailable"));
 
         assertThat(event)

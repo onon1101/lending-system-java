@@ -2,6 +2,7 @@ package onon1101.lendingsystem.auth.login.audit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import onon1101.lendingsystem.auth.login.LoginCommand;
 import onon1101.lendingsystem.auth.login.LoginResult;
 import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
 import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
@@ -16,7 +17,7 @@ class AuthenticationAuditPolicyTests {
     void mapsSuccessfulResult() {
         Object event =
                 policy.onReturned(
-                        arguments(" Alice "), Result.success(new LoginResult("token", 300)));
+                        command(" Alice "), Result.success(new LoginResult("token", 300)));
 
         assertEquals(new AuthenticationAuditEvent.Succeeded("alice"), event);
     }
@@ -25,28 +26,30 @@ class AuthenticationAuditPolicyTests {
     void mapsFailedResult() {
         Object event =
                 policy.onReturned(
-                        arguments("Alice"), Result.failure(new InvalidCredentialsDomainError()));
+                        command("Alice"), Result.failure(new InvalidCredentialsDomainError()));
 
-        assertEquals(new AuthenticationAuditEvent.Failed("alice", "invalid_credentials"), event);
+        assertEquals(
+                new AuthenticationAuditEvent.Failed("alice", "Auth.InvalidCredentials"), event);
     }
 
     @Test
     void mapsTooManyAttemptsFailure() {
         Object event =
                 policy.onReturned(
-                        arguments("Alice"), Result.failure(new TooManyAttemptsDomainError()));
+                        command("Alice"), Result.failure(new TooManyAttemptsDomainError()));
 
-        assertEquals(new AuthenticationAuditEvent.Failed("alice", "too_many_attempts"), event);
+        assertEquals(
+                new AuthenticationAuditEvent.Failed("alice", "Auth.TooManyAttempts"), event);
     }
 
     @Test
     void mapsUnexpectedException() {
-        Object event = policy.onThrown(arguments("Alice"), new RuntimeException("failure"));
+        Object event = policy.onThrown(command("Alice"), new RuntimeException("failure"));
 
         assertEquals(new AuthenticationAuditEvent.Failed("alice", "system_error"), event);
     }
 
-    private Object[] arguments(String username) {
-        return new Object[] {username, "password"};
+    private LoginCommand command(String username) {
+        return new LoginCommand(username, "password");
     }
 }

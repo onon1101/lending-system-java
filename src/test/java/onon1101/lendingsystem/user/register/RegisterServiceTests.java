@@ -31,7 +31,7 @@ class RegisterServiceTests {
                 .thenReturn(Optional.of(new RegisterAccount(1L, userId)));
 
         Result<RegisterResult> result =
-                service.register(" Alice ", "password", "Alice@example.com");
+                service.register(new RegisterCommand(" Alice ", "password", "Alice@example.com"));
 
         RegisterResult registration = ((Result.Success<RegisterResult>) result).value();
         assertEquals(userId, registration.userId());
@@ -39,7 +39,8 @@ class RegisterServiceTests {
 
     @Test
     void rejectsInvalidEmailBeforeEncodingPassword() {
-        Result<RegisterResult> result = service.register("Alice", "password", "not-an-email");
+        Result<RegisterResult> result =
+                service.register(new RegisterCommand("Alice", "password", "not-an-email"));
 
         Result.Failure<RegisterResult> failure = (Result.Failure<RegisterResult>) result;
         assertEquals("User.InvalidEmail", failure.error().code());
@@ -52,7 +53,9 @@ class RegisterServiceTests {
         when(accountWriter.registerAccount("alice", "encoded", "alice@example.com"))
                 .thenReturn(Optional.empty());
 
-        Result<RegisterResult> result = service.register("Alice", "password", "alice@example.com");
+        Result<RegisterResult> result =
+                service.register(
+                        new RegisterCommand("Alice", "password", "alice@example.com"));
 
         Result.Failure<RegisterResult> failure = (Result.Failure<RegisterResult>) result;
         assertEquals("User.InvalidRegistration", failure.error().code());
@@ -66,7 +69,10 @@ class RegisterServiceTests {
         RuntimeException actual =
                 assertThrows(
                         RuntimeException.class,
-                        () -> service.register("Alice", "password", "alice@example.com"));
+                        () ->
+                                service.register(
+                                        new RegisterCommand(
+                                                "Alice", "password", "alice@example.com")));
 
         assertSame(expected, actual);
     }

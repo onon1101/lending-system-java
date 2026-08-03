@@ -47,12 +47,13 @@ public class LoginService {
     // TODO Add refresh token support.
     @Transactional()
     @AuditedCommand(AuthenticationAuditPolicy.class)
-    public Result<LoginResult> login(String username, String password) {
+    public Result<LoginResult> login(LoginCommand command) {
         Instant now = Instant.now();
 
-        String normalizedUsername = username.trim().toLowerCase(Locale.ROOT);
+        String username = command.username();
+        String password = command.password();
 
-        LoginAccount account = accountReader.findByUsername(normalizedUsername).orElse(null);
+        LoginAccount account = accountReader.findByUsername(username).orElse(null);
 
         // 帳號不存在
         if (account == null) {

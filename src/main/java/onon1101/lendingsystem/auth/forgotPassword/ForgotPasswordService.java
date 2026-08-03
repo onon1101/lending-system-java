@@ -30,7 +30,8 @@ public class ForgotPasswordService {
 
     @Transactional(readOnly = true)
     @AuditedCommand(ForgotPasswordAuditPolicy.class)
-    public Result<ForgotPasswordResult> handle(String email) {
+    public Result<ForgotPasswordResult> handle(ForgotPasswordCommand command) {
+        String email = command.email();
 
         if (email == null || email.isBlank()) {
             return Result.failure(new InvalidEmailDomainError());

@@ -24,11 +24,12 @@ public class RegisterService {
 
     @Transactional
     @AuditedCommand(RegistrationAuditPolicy.class)
-    public Result<RegisterResult> register(String username, String password, String email) {
-        String normalizedUsername = username.trim().toLowerCase(Locale.ROOT);
-        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+    public Result<RegisterResult> register(RegisterCommand command) {
+        String username = command.username();
+        String email = command.email();
+        String password = command.password();
 
-        if (!EmailUtil.validateEmail(normalizedEmail)) {
+        if (!EmailUtil.validateEmail(email)) {
             return Result.failure(new InvalidEmailDomainError());
         }
 
@@ -38,7 +39,7 @@ public class RegisterService {
 
         RegisterAccount account =
                 accountWriter
-                        .registerAccount(normalizedUsername, passwordEncoded, normalizedEmail)
+                        .registerAccount(username, passwordEncoded, email)
                         .orElse(null);
 
         if (account == null) {

@@ -1,48 +1,37 @@
 package onon1101.lendingsystem.auth.forgotPassword.audit;
 
-import java.util.Locale;
+import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordCommand;
+import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordResult;
 import onon1101.lendingsystem.sharedkernel.audit.CommandAuditPolicy;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ForgotPasswordAuditPolicy implements CommandAuditPolicy<ForgotPasswordAuditEvent> {
+public final class ForgotPasswordAuditPolicy
+        implements CommandAuditPolicy<
+                ForgotPasswordCommand, Result<ForgotPasswordResult>, ForgotPasswordAuditEvent> {
 
     @Override
-    public ForgotPasswordAuditEvent onReturned(Object[] arguments, Object result) {
-        String normalizedEmail = normalizedEmail(arguments);
-        Result<?> commandResult = (Result<?>) result;
+    public ForgotPasswordAuditEvent onReturned(
+            ForgotPasswordCommand command, Result<ForgotPasswordResult> result) {
+        String normalizedEmail = command.email();
 
-        return switch (commandResult) {
+        return switch (result) {
             /*
              * 帳號不存在時 ForgotPasswordService 也會回傳成功，
              * 因此 audit 不會洩漏帳號是否存在。
              */
-            case Result.Success<?> ignored ->
+            case Result.Success<ForgotPasswordResult> ignored ->
                     new ForgotPasswordAuditEvent.Requested(normalizedEmail);
-            case Result.Failure<?> failure ->
+            case Result.Failure<ForgotPasswordResult> failure ->
                     new ForgotPasswordAuditEvent.Rejected(
-                            normalizedEmail, reasonFor(failure.error().code()));
+                            normalizedEmail, failure.error().code());
         };
     }
 
     @Override
-    public ForgotPasswordAuditEvent onThrown(Object[] arguments, Throwable throwable) {
-        return new ForgotPasswordAuditEvent.Failed(normalizedEmail(arguments), "system_error");
-    }
-
-    private String normalizedEmail(Object[] arguments) {
-        if (arguments.length == 0 || !(arguments[0] instanceof String email) || email.isBlank()) {
-            return "invalid";
-        }
-
-        return email.trim().toLowerCase(Locale.ROOT);
-    }
-
-    private String reasonFor(String errorCode) {
-        return switch (errorCode) {
-            case "ForgotPassword.InvalidEmail" -> "invalid_email";
-            default -> "business_error";
-        };
+    public ForgotPasswordAuditEvent onThrown(
+            ForgotPasswordCommand command, Throwable throwable) {
+        return new ForgotPasswordAuditEvent.Failed(command.email(), "system_error");
     }
 }

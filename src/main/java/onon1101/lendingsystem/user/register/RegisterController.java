@@ -23,7 +23,7 @@ public class RegisterController {
     public ResponseEntity<ApiResponse<RegisterResponse>> register(
             @Valid @RequestBody RegisterRequest request) {
         return registerService
-                .register(request.username(), request.password(), request.email())
+                .register(new RegisterCommand(request.username(), request.password(), request.email()))
                 .match(
                         result -> {
                             RegisterResponse data = new RegisterResponse(result.userId());

@@ -1,6 +1,7 @@
 package onon1101.lendingsystem.auth.login.audit;
 
-import java.util.Locale;
+import onon1101.lendingsystem.auth.login.LoginCommand;
+import onon1101.lendingsystem.auth.login.LoginResult;
 import onon1101.lendingsystem.sharedkernel.audit.CommandAuditPolicy;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.springframework.stereotype.Component;
@@ -8,37 +9,23 @@ import org.springframework.stereotype.Component;
 /** Maps authentication command outcomes to authentication audit events. */
 @Component
 public final class AuthenticationAuditPolicy
-        implements CommandAuditPolicy<AuthenticationAuditEvent> {
+        implements CommandAuditPolicy<LoginCommand, Result<LoginResult>, AuthenticationAuditEvent> {
 
     @Override
-    public AuthenticationAuditEvent onReturned(Object[] arguments, Object result) {
-        String normalizedUsername = normalizeUsername(arguments);
-        Result<?> commandResult = (Result<?>) result;
+    public AuthenticationAuditEvent onReturned(LoginCommand command, Result<LoginResult> result) {
+        String normalizedUsername = command.username();
 
-        return switch (commandResult) {
-            case Result.Success<?> success ->
+        return switch (result) {
+            case Result.Success<LoginResult> success ->
                     new AuthenticationAuditEvent.Succeeded(normalizedUsername);
-            case Result.Failure<?> failure ->
+            case Result.Failure<LoginResult> failure ->
                     new AuthenticationAuditEvent.Failed(
-                            normalizedUsername, reasonFor(failure.error().code()));
+                            normalizedUsername, failure.error().code());
         };
     }
 
     @Override
-    public AuthenticationAuditEvent onThrown(Object[] arguments, Throwable throwable) {
-        return new AuthenticationAuditEvent.Failed(normalizeUsername(arguments), "system_error");
-    }
-
-    private String normalizeUsername(Object[] arguments) {
-        String username = (String) arguments[0];
-        return username.trim().toLowerCase(Locale.ROOT);
-    }
-
-    private String reasonFor(String errorCode) {
-        return switch (errorCode) {
-            case "Auth.InvalidCredentials" -> "invalid_credentials";
-            case "Auth.TooManyAttempts" -> "too_many_attempts";
-            default -> "business_error";
-        };
+    public AuthenticationAuditEvent onThrown(LoginCommand command, Throwable throwable) {
+        return new AuthenticationAuditEvent.Failed(command.username(), "system_error");
     }
 }

@@ -23,7 +23,7 @@ public class LoginController {
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request) {
         return loginService
-                .login(request.username(), request.password())
+                .login(new LoginCommand(request.username(), request.password()))
                 .match(
                         result -> {
                             LoginResponse data =

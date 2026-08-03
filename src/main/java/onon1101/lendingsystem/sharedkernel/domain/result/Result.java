@@ -2,8 +2,9 @@ package onon1101.lendingsystem.sharedkernel.domain.result;
 
 import java.util.Objects;
 import java.util.function.Function;
+import onon1101.lendingsystem.sharedkernel.IResult;
 
-public sealed interface Result<T> permits Result.Success, Result.Failure {
+public sealed interface Result<T> extends IResult permits Result.Success, Result.Failure {
 
     boolean isSuccess();
 
