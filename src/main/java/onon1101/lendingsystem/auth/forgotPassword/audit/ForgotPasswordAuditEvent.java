@@ -6,7 +6,8 @@ public sealed interface ForgotPasswordAuditEvent {
 
     String normalizedEmail();
 
-    record Requested(String normalizedEmail) implements ForgotPasswordAuditEvent {
+    record Requested(
+            String normalizedEmail) implements ForgotPasswordAuditEvent {
 
         public Requested {
             Objects.requireNonNull(
@@ -27,7 +28,7 @@ public sealed interface ForgotPasswordAuditEvent {
         }
     }
 
-    record Failed (
+    record Failed(
             String normalizedEmail,
             String reason
     ) implements ForgotPasswordAuditEvent {

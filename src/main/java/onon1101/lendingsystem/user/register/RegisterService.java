@@ -6,17 +6,14 @@ import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
+import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RegisterService {
-
-    private static final DomainError INVALID_REGISTRATION =
-            new DomainError("User.InvalidRegistration", "The User cannot be registered.");
-    private static final DomainError INVALID_EMAIL =
-            new DomainError("User.InvalidEmail", "The Invalid Email Address.");
 
     private final RegisterAccountWriter accountWriter;
     private final PasswordEncoder passwordEncoder;
@@ -33,7 +30,7 @@ public class RegisterService {
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
 
         if (!EmailUtil.validateEmail(normalizedEmail)) {
-            return Result.failure(INVALID_EMAIL);
+            return Result.failure(new InvalidEmailDomainError());
         }
 
         String passwordEncoded = passwordEncoder.encode(password);
@@ -46,7 +43,7 @@ public class RegisterService {
                         .orElse(null);
 
         if (account == null) {
-            return Result.failure(INVALID_REGISTRATION);
+            return Result.failure(new InvalidEmailDomainError());
         }
 
         return Result.success(new RegisterResult(account.publicUserId()));

@@ -5,9 +5,10 @@ import java.time.Instant;
 import java.util.Locale;
 
 import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditPolicy;
+import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
+import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
 import onon1101.lendingsystem.auth.token.AccessTokenService;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
-import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,13 +20,13 @@ public class LoginService {
 
     // todo: 1. 泛化所有 DomainError
     // todo: 2. 泛化稽核日誌
-    private static final DomainError INVALID_CREDENTIALS =
-            new DomainError("Auth.InvalidCredentials",
-                    "Username or password is incorrect.");
-
-    private static final DomainError TOO_MANY_ATTEMPTS =
-            new DomainError("Auth.TooManyAttempts", "This username try too many times.");
-
+//    private static final DomainError INVALID_CREDENTIALS =
+//            new DomainError("Auth.InvalidCredentials",
+//                    "Username or password is incorrect.");
+//
+//    private static final DomainError TOO_MANY_ATTEMPTS =
+//            new DomainError("Auth.TooManyAttempts", "This username try too many times.");
+//
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final Duration LOCK_DURATION = Duration.ofMinutes(15);
 
@@ -61,12 +62,12 @@ public class LoginService {
 
         // 帳號不存在
         if (account == null) {
-            return Result.failure(INVALID_CREDENTIALS);
+            return Result.failure(new InvalidCredentialsDomainError());
         }
 
         // 嘗試太多次
         if (account.lockedUntil() != null && account.lockedUntil().isAfter(Instant.now())) {
-            return Result.failure(TOO_MANY_ATTEMPTS);
+            return Result.failure(new TooManyAttemptsDomainError());
         }
 
         // 輸入密碼錯誤
@@ -80,10 +81,10 @@ public class LoginService {
 
             if (attempt.locked()) {
                 //todo: 稽核日誌
-                return Result.failure(TOO_MANY_ATTEMPTS);
+                return Result.failure(new TooManyAttemptsDomainError());
             }
 
-            return Result.failure(INVALID_CREDENTIALS);
+            return Result.failure(new InvalidCredentialsDomainError());
         }
 
         // 清洗更新次數
