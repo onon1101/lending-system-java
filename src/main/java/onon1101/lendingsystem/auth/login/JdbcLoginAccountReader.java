@@ -1,5 +1,6 @@
 package onon1101.lendingsystem.auth.login;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import onon1101.lendingsystem.auth.properties.IdentityProvider;
@@ -24,7 +25,8 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                             users.public_id,
                             users.username,
                             credentials.password_hash,
-                            credentials.auth_identity_id
+                            credentials.auth_identity_id,
+                            credentials.locked_until
                         FROM users
                         JOIN user_auth_identities identities
                             ON identities.user_id = users.id
@@ -47,7 +49,8 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                                         resultSet.getObject("public_id", UUID.class),
                                         resultSet.getString("username"),
                                         resultSet.getString("password_hash"),
-                                        resultSet.getInt("auth_identity_id")))
+                                        resultSet.getInt("auth_identity_id"),
+                                        resultSet.getObject("locked_until", Instant.class)))
                 .optional();
     }
 }
