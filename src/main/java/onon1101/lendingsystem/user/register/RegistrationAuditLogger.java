@@ -1,49 +1,46 @@
 package onon1101.lendingsystem.user.register;
 
+import java.util.Map;
 import java.util.UUID;
 import onon1101.lendingsystem.security.AccountReferenceEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import onon1101.lendingsystem.sharedkernel.audit.AuditOutcome;
+import onon1101.lendingsystem.sharedkernel.audit.AuditRecord;
+import onon1101.lendingsystem.sharedkernel.audit.AuditSink;
 import org.springframework.stereotype.Component;
 
+/** Maps registration audit facts to infrastructure-neutral records. */
 @Component
 public class RegistrationAuditLogger {
 
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger("SECURITY_AUDIT");
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationAuditLogger.class);
-
     private final AccountReferenceEncoder accountReferenceEncoder;
+    private final AuditSink auditSink;
 
-    public RegistrationAuditLogger(AccountReferenceEncoder accountReferenceEncoder) {
+    public RegistrationAuditLogger(
+            AccountReferenceEncoder accountReferenceEncoder, AuditSink auditSink) {
         this.accountReferenceEncoder = accountReferenceEncoder;
+        this.auditSink = auditSink;
     }
 
-    public void registerFailed(String normalizedUsername, String reason) {
-        String accountRef = encodeAccountReference(normalizedUsername);
-
-        AUDIT_LOGGER.warn(
-                "event=registration_failed accountRef={} outcome=denied reason={}",
-                accountRef,
-                reason);
+    public void registerFailed(String username, String reason) {
+        auditSink.append(
+                new AuditRecord(
+                        "registration_failed",
+                        AuditOutcome.REJECTED,
+                        Map.of("accountRef", encode(username), "reason", reason)));
     }
 
-    public void registerSuccess(String normalizedUsername, UUID publicUserId) {
-        String accountRef = encodeAccountReference(normalizedUsername);
-
-        AUDIT_LOGGER.info(
-                "event=registration_succeeded accountRef={} userId={} outcome=allowed",
-                accountRef,
-                publicUserId);
+    public void registerSuccess(String username, UUID userId) {
+        auditSink.append(
+                new AuditRecord(
+                        "registration_succeeded",
+                        AuditOutcome.SUCCESS,
+                        Map.of("accountRef", encode(username), "userId", userId.toString())));
     }
 
-    private String encodeAccountReference(String normalizedUsername) {
+    private String encode(String account) {
         try {
-            return accountReferenceEncoder.encode(normalizedUsername);
-        } catch (RuntimeException exception) {
-            LOGGER.error("Could not encode account reference for registration audit", exception);
-            AUDIT_LOGGER.error(
-                    "event=registration_audit_degraded accountRef=unavailable outcome=error"
-                            + " reason=account_reference_encoding_failed");
+            return accountReferenceEncoder.encode(account);
+        } catch (RuntimeException ignored) {
             return "unavailable";
         }
     }

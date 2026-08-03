@@ -7,10 +7,11 @@ import org.springframework.stereotype.Component;
 
 /** Maps authentication command outcomes to authentication audit events. */
 @Component
-public class AuthenticationAuditPolicy implements CommandAuditPolicy {
+public final class AuthenticationAuditPolicy
+        implements CommandAuditPolicy<AuthenticationAuditEvent> {
 
     @Override
-    public Object onReturned(Object[] arguments, Object result) {
+    public AuthenticationAuditEvent onReturned(Object[] arguments, Object result) {
         String normalizedUsername = normalizeUsername(arguments);
         Result<?> commandResult = (Result<?>) result;
 
@@ -24,9 +25,8 @@ public class AuthenticationAuditPolicy implements CommandAuditPolicy {
     }
 
     @Override
-    public Object onThrown(Object[] arguments, Throwable throwable) {
-        return new AuthenticationAuditEvent.Failed(
-                normalizeUsername(arguments), "system_error");
+    public AuthenticationAuditEvent onThrown(Object[] arguments, Throwable throwable) {
+        return new AuthenticationAuditEvent.Failed(normalizeUsername(arguments), "system_error");
     }
 
     private String normalizeUsername(Object[] arguments) {

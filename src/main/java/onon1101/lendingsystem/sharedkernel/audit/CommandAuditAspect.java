@@ -30,7 +30,7 @@ public class CommandAuditAspect {
             returning = "result",
             argNames = "joinPoint,auditedCommand,result")
     public void afterReturning(JoinPoint joinPoint, AuditedCommand auditedCommand, Object result) {
-        CommandAuditPolicy policy = applicationContext.getBean(auditedCommand.value());
+        CommandAuditPolicy<?> policy = applicationContext.getBean(auditedCommand.value());
         publish(policy.onReturned(joinPoint.getArgs(), result));
     }
 
@@ -40,11 +40,11 @@ public class CommandAuditAspect {
             argNames = "joinPoint,auditedCommand,throwable")
     public void afterThrowing(
             JoinPoint joinPoint, AuditedCommand auditedCommand, Throwable throwable) {
-        CommandAuditPolicy policy = applicationContext.getBean(auditedCommand.value());
+        CommandAuditPolicy<?> policy = applicationContext.getBean(auditedCommand.value());
         publish(policy.onThrown(joinPoint.getArgs(), throwable));
     }
 
-    private void publish(Object event) {
+    private void publish(AuditEvent event) {
         if (event != null) {
             eventPublisher.publishEvent(event);
         }

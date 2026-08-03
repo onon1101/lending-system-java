@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 
 /** Maps registration command outcomes to registration audit events. */
 @Component
-public class RegistrationAuditPolicy implements CommandAuditPolicy {
+public final class RegistrationAuditPolicy implements CommandAuditPolicy<RegistrationAuditEvent> {
 
     @Override
-    public Object onReturned(Object[] arguments, Object result) {
+    public RegistrationAuditEvent onReturned(Object[] arguments, Object result) {
         String normalizedUsername = normalizeUsername(arguments);
         Result<?> commandResult = (Result<?>) result;
 
@@ -28,7 +28,7 @@ public class RegistrationAuditPolicy implements CommandAuditPolicy {
     }
 
     @Override
-    public Object onThrown(Object[] arguments, Throwable throwable) {
+    public RegistrationAuditEvent onThrown(Object[] arguments, Throwable throwable) {
         return new RegistrationAuditEvent.Failed(normalizeUsername(arguments), "system_error");
     }
 

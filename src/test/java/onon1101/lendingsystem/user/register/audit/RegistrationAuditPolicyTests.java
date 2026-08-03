@@ -3,9 +3,9 @@ package onon1101.lendingsystem.user.register.audit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
-import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import onon1101.lendingsystem.user.register.RegisterResult;
+import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;
 import org.junit.jupiter.api.Test;
 
 class RegistrationAuditPolicyTests {
@@ -26,8 +26,7 @@ class RegistrationAuditPolicyTests {
     void mapsKnownBusinessFailure() {
         Object event =
                 policy.onReturned(
-                        arguments("Alice"),
-                        Result.failure(new DomainError("User.InvalidEmail", "Invalid")));
+                        arguments("Alice"), Result.failure(new InvalidEmailDomainError()));
 
         assertEquals(new RegistrationAuditEvent.Failed("alice", "invalid_email"), event);
     }

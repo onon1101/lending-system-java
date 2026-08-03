@@ -1,7 +1,6 @@
 package onon1101.lendingsystem.auth.forgotPassword.audit;
 
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordAuditLogger;
-
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +9,7 @@ public class ForgotPasswordAuditEventListener {
 
     private final ForgotPasswordAuditLogger auditLogger;
 
-    public ForgotPasswordAuditEventListener(
-            ForgotPasswordAuditLogger auditLogger) {
+    public ForgotPasswordAuditEventListener(ForgotPasswordAuditLogger auditLogger) {
         this.auditLogger = auditLogger;
     }
 
@@ -22,13 +20,11 @@ public class ForgotPasswordAuditEventListener {
 
     @EventListener
     public void onRejected(ForgotPasswordAuditEvent.Rejected event) {
-        auditLogger.passwordResetRejected(event.normalizedEmail(),
-                event.reason());
+        auditLogger.passwordResetRejected(event.normalizedEmail(), event.reason());
     }
 
     @EventListener
     public void onFailed(ForgotPasswordAuditEvent.Failed event) {
-        auditLogger.passwordResetFailed(event.normalizedEmail(),
-                event.reason());
+        auditLogger.passwordResetFailed(event.normalizedEmail(), event.reason());
     }
 }

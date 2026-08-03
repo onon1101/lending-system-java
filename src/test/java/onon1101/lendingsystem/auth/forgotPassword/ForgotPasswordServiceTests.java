@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.UUID;
-
 import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailRequested;
 import onon1101.lendingsystem.auth.token.ForgotPasswordTokenService;
 import org.junit.jupiter.api.Test;

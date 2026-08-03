@@ -15,6 +15,9 @@ public abstract class DomainError {
         if (message.isBlank()) {
             throw new IllegalArgumentException("message must not be blank.");
         }
+
+        this.code = code;
+        this.message = message;
     }
 
     private String code;
@@ -28,7 +31,7 @@ public abstract class DomainError {
         return message;
     }
 }
-//public record DomainError(String code, String message) {
+// public record DomainError(String code, String message) {
 //    public DomainError {
 //        Objects.requireNonNull(code, "Code must not be null.");
 //        Objects.requireNonNull(message, "Message must not be null.");
@@ -41,4 +44,4 @@ public abstract class DomainError {
 //            throw new IllegalArgumentException("message must not be blank.");
 //        }
 //    }
-//}
+// }

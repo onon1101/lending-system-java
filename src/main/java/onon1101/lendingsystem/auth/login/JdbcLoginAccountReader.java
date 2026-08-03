@@ -1,6 +1,5 @@
 package onon1101.lendingsystem.auth.login;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;

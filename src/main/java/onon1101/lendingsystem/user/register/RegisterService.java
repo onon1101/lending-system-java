@@ -3,11 +3,10 @@ package onon1101.lendingsystem.user.register;
 import java.util.Locale;
 import onon1101.lendingsystem.sharedkernel.EmailUtil;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
-import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
 import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;
-
+import onon1101.lendingsystem.user.register.error.InvalidRegistrationDomainError;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +42,7 @@ public class RegisterService {
                         .orElse(null);
 
         if (account == null) {
-            return Result.failure(new InvalidEmailDomainError());
+            return Result.failure(new InvalidRegistrationDomainError());
         }
 
         return Result.success(new RegisterResult(account.publicUserId()));

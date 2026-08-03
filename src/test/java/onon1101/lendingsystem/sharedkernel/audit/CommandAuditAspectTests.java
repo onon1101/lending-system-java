@@ -23,7 +23,7 @@ class CommandAuditAspectTests {
     void publishesReturnedEventSelectedByAnnotationPolicy() {
         Object[] arguments = {"command"};
         Object result = new Object();
-        Object event = new Object();
+        TestEvent event = new TestEvent();
         when(annotation.value()).thenAnswer(ignored -> TestPolicy.class);
         when(applicationContext.getBean(TestPolicy.class)).thenReturn(policy);
         when(joinPoint.getArgs()).thenReturn(arguments);
@@ -38,7 +38,7 @@ class CommandAuditAspectTests {
     void publishesThrownEventSelectedByAnnotationPolicy() {
         Object[] arguments = {"command"};
         RuntimeException failure = new RuntimeException("failure");
-        Object event = new Object();
+        TestEvent event = new TestEvent();
         when(annotation.value()).thenAnswer(ignored -> TestPolicy.class);
         when(applicationContext.getBean(TestPolicy.class)).thenReturn(policy);
         when(joinPoint.getArgs()).thenReturn(arguments);
@@ -49,16 +49,28 @@ class CommandAuditAspectTests {
         verify(eventPublisher).publishEvent(event);
     }
 
-    private static final class TestPolicy implements CommandAuditPolicy {
+    private static final class TestPolicy implements CommandAuditPolicy<TestEvent> {
 
         @Override
-        public Object onReturned(Object[] arguments, Object result) {
+        public TestEvent onReturned(Object[] arguments, Object result) {
             return null;
         }
 
         @Override
-        public Object onThrown(Object[] arguments, Throwable throwable) {
+        public TestEvent onThrown(Object[] arguments, Throwable throwable) {
             return null;
+        }
+    }
+
+    private record TestEvent() implements AuditEvent {
+        @Override
+        public String eventType() {
+            return "test";
+        }
+
+        @Override
+        public AuditOutcome outcome() {
+            return AuditOutcome.SUCCESS;
         }
     }
 }

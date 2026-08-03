@@ -1,6 +1,5 @@
 package onon1101.lendingsystem.auth.forgotPassword.error;
 
-import io.micrometer.core.instrument.config.validate.Validated;
 import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 
 public class InvalidEmailDomainError extends DomainError {

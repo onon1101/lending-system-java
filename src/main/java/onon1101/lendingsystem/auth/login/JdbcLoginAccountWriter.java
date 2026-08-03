@@ -1,13 +1,10 @@
 package onon1101.lendingsystem.auth.login;
 
-import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditEvent;
-
-import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
-
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class JdbcLoginAccountWriter implements LoginAccountWriter {
@@ -19,11 +16,11 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
     }
 
     @Override
-    public FailedAttemptResult recordFailedAttempt(Integer passwordId,
-                                                   int maxAttempts,
-                                                   Instant lockedUntil) {
+    public FailedAttemptResult recordFailedAttempt(
+            Integer passwordId, int maxAttempts, Instant lockedUntil) {
 
-        String sql = """
+        String sql =
+                """
                 WITH attempt AS (
                 	SELECT
                 		auth_identity_id,
@@ -51,41 +48,38 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
                 	c.locked_until
                 """;
 
-        OffsetDateTime newLockedUntil =
-                lockedUntil.atOffset(ZoneOffset.UTC);
+        OffsetDateTime newLockedUntil = lockedUntil.atOffset(ZoneOffset.UTC);
 
         return jdbcClient
                 .sql(sql)
                 .param("passwordId", passwordId)
                 .param("maxAttempts", maxAttempts)
                 .param("newLockedUntil", newLockedUntil)
-                .query((rs, rowNum) -> {
-                    OffsetDateTime resultLockedUntil = rs.getObject(
-                            "locked_until", OffsetDateTime.class);
+                .query(
+                        (rs, rowNum) -> {
+                            OffsetDateTime resultLockedUntil =
+                                    rs.getObject("locked_until", OffsetDateTime.class);
 
-                    return new FailedAttemptResult(
-                            rs.getInt("failed_attempts"),
-                            resultLockedUntil == null
-                                    ? null
-                                    : resultLockedUntil.toInstant()
-                    );
-                })
+                            return new FailedAttemptResult(
+                                    rs.getInt("failed_attempts"),
+                                    resultLockedUntil == null
+                                            ? null
+                                            : resultLockedUntil.toInstant());
+                        })
                 .single();
     }
 
     @Override
     public void resetFailedAttempts(Integer passwordId) {
-        String sql = """
+        String sql =
+                """
                 UPDATE user_password_credentials
                 SET failed_attempts = 0,
                     locked_until = NULL
                 WHERE auth_identity_id = :passwordId
                 """;
 
-        int affectedRows = jdbcClient
-                .sql(sql)
-                .param("passwordId", passwordId)
-                .update();
+        int affectedRows = jdbcClient.sql(sql).param("passwordId", passwordId).update();
 
         if (affectedRows != 1) {
             throw new IllegalStateException(

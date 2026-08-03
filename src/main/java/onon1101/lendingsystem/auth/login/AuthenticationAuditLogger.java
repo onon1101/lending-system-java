@@ -1,43 +1,45 @@
 package onon1101.lendingsystem.auth.login;
 
+import java.util.Map;
 import onon1101.lendingsystem.security.AccountReferenceEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import onon1101.lendingsystem.sharedkernel.audit.AuditOutcome;
+import onon1101.lendingsystem.sharedkernel.audit.AuditRecord;
+import onon1101.lendingsystem.sharedkernel.audit.AuditSink;
 import org.springframework.stereotype.Component;
 
+/** Maps authentication audit facts to infrastructure-neutral records. */
 @Component
 public class AuthenticationAuditLogger {
 
-    private static final Logger AUDIT_LOGGER = LoggerFactory.getLogger("SECURITY_AUDIT");
-    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationAuditLogger.class);
-
     private final AccountReferenceEncoder accountReferenceEncoder;
+    private final AuditSink auditSink;
 
-    public AuthenticationAuditLogger(AccountReferenceEncoder accountReferenceEncoder) {
+    public AuthenticationAuditLogger(
+            AccountReferenceEncoder accountReferenceEncoder, AuditSink auditSink) {
         this.accountReferenceEncoder = accountReferenceEncoder;
+        this.auditSink = auditSink;
     }
 
-    public void loginFailed(String normalizedUsername, String reason) {
-        String accountRef = encodeAccountReference(normalizedUsername);
-
-        AUDIT_LOGGER.warn(
-                "event=authentication_failed accountRef={} outcome=denied reason={}",
-                accountRef,
-                reason);
+    public void loginFailed(String username, String reason) {
+        auditSink.append(
+                new AuditRecord(
+                        "authentication_failed",
+                        AuditOutcome.REJECTED,
+                        Map.of("accountRef", encode(username), "reason", reason)));
     }
 
-    public void loginSuccess(String normalizedUsername) {
-        String accountRef = encodeAccountReference(normalizedUsername);
-
-        AUDIT_LOGGER.info(
-                "event=authentication_succeeded accountRef={} outcome=allowed", accountRef);
+    public void loginSuccess(String username) {
+        auditSink.append(
+                new AuditRecord(
+                        "authentication_succeeded",
+                        AuditOutcome.SUCCESS,
+                        Map.of("accountRef", encode(username))));
     }
 
-    private String encodeAccountReference(String normalizedUsername) {
+    private String encode(String account) {
         try {
-            return accountReferenceEncoder.encode(normalizedUsername);
-        } catch (RuntimeException exception) {
-            LOGGER.error("Could not encode account reference for authentication audit", exception);
+            return accountReferenceEncoder.encode(account);
+        } catch (RuntimeException ignored) {
             return "unavailable";
         }
     }

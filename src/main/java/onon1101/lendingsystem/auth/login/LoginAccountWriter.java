@@ -4,10 +4,7 @@ import java.time.Instant;
 
 public interface LoginAccountWriter {
     FailedAttemptResult recordFailedAttempt(
-            Integer passwordId,
-            int maxAttempts,
-            Instant lockedUntil
-    );
+            Integer passwordId, int maxAttempts, Instant lockedUntil);
 
     void resetFailedAttempts(Integer passwordId);
 }
