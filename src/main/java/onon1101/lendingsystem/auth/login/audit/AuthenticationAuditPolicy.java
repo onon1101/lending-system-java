@@ -14,18 +14,31 @@ public class AuthenticationAuditPolicy implements CommandAuditPolicy {
         String normalizedUsername = normalizeUsername(arguments);
         Result<?> commandResult = (Result<?>) result;
 
-        return commandResult.isSuccess()
-                ? new AuthenticationAuditEvent.Succeeded(normalizedUsername)
-                : new AuthenticationAuditEvent.Failed(normalizedUsername);
+        return switch (commandResult) {
+            case Result.Success<?> success ->
+                    new AuthenticationAuditEvent.Succeeded(normalizedUsername);
+            case Result.Failure<?> failure ->
+                    new AuthenticationAuditEvent.Failed(
+                            normalizedUsername, reasonFor(failure.error().code()));
+        };
     }
 
     @Override
     public Object onThrown(Object[] arguments, Throwable throwable) {
-        return new AuthenticationAuditEvent.Failed(normalizeUsername(arguments));
+        return new AuthenticationAuditEvent.Failed(
+                normalizeUsername(arguments), "system_error");
     }
 
     private String normalizeUsername(Object[] arguments) {
         String username = (String) arguments[0];
         return username.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String reasonFor(String errorCode) {
+        return switch (errorCode) {
+            case "Auth.InvalidCredentials" -> "invalid_credentials";
+            case "Auth.TooManyAttempts" -> "too_many_attempts";
+            default -> "business_error";
+        };
     }
 }

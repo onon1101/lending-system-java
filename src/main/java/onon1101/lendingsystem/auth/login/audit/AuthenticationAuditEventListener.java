@@ -21,6 +21,6 @@ public class AuthenticationAuditEventListener {
 
     @EventListener
     public void onFailed(AuthenticationAuditEvent.Failed event) {
-        auditLogger.loginFailed(event.normalizedUsername());
+        auditLogger.loginFailed(event.normalizedUsername(), event.reason());
     }
 }

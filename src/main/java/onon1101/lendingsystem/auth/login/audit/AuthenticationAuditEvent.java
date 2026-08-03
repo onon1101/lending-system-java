@@ -14,10 +14,11 @@ public sealed interface AuthenticationAuditEvent {
         }
     }
 
-    record Failed(String normalizedUsername) implements AuthenticationAuditEvent {
+    record Failed(String normalizedUsername, String reason) implements AuthenticationAuditEvent {
 
         public Failed {
             Objects.requireNonNull(normalizedUsername, "Normalized username must not be null");
+            Objects.requireNonNull(reason, "Failure reason must not be null");
         }
     }
 }

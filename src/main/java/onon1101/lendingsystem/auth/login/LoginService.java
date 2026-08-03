@@ -78,6 +78,7 @@ public class LoginService {
                     );
 
             if (attempt.locked()) {
+                //todo: 稽核日誌
                 return Result.failure(TOO_MANY_ATTEMPTS);
             }
 

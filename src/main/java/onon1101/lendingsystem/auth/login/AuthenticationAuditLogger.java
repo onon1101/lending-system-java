@@ -17,10 +17,13 @@ public class AuthenticationAuditLogger {
         this.accountReferenceEncoder = accountReferenceEncoder;
     }
 
-    public void loginFailed(String normalizedUsername) {
+    public void loginFailed(String normalizedUsername, String reason) {
         String accountRef = encodeAccountReference(normalizedUsername);
 
-        AUDIT_LOGGER.warn("event=authentication_failed accountRef={} outcome=denied", accountRef);
+        AUDIT_LOGGER.warn(
+                "event=authentication_failed accountRef={} outcome=denied reason={}",
+                accountRef,
+                reason);
     }
 
     public void loginSuccess(String normalizedUsername) {
