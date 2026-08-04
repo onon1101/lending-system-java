@@ -85,15 +85,5 @@ class CommandAuditAspectTests {
 
     private record TestResult() implements IResult {}
 
-    private record TestEvent() implements AuditEvent {
-        @Override
-        public String eventType() {
-            return "test";
-        }
-
-        @Override
-        public AuditOutcome outcome() {
-            return AuditOutcome.SUCCESS;
-        }
-    }
+    private record TestEvent() implements AuditEvent {}
 }
