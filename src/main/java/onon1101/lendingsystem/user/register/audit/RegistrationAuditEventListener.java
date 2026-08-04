@@ -1,6 +1,5 @@
 package onon1101.lendingsystem.user.register.audit;
 
-import onon1101.lendingsystem.user.register.RegistrationAuditLogger;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

@@ -28,18 +28,12 @@ public class ResetPasswordService {
     }
 
     @Transactional
-    public Result<Void> execute(
+    public Result<ResetPasswordResult> execute(
             ResetPasswordCommand command
     ) {
-        TokenPayload payload;
-
-        try {
-            payload =
-                    tokenService.decode(
-                            command.resetToken());
-        } catch (JwtException | IllegalArgumentException exception) {
-            return Result.failure(new InvalidResetTokenDomainError());
-        }
+        TokenPayload payload =
+                tokenService.decode(
+                        command.resetToken());
 
         String encodedPassword = passwordEncoder.encode(command.newPassword());
 

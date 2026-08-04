@@ -1,40 +1,47 @@
-package onon1101.lendingsystem.user.register;
+package onon1101.lendingsystem.auth.resetPassword.audit;
 
-import java.util.Map;
-import java.util.UUID;
 import onon1101.lendingsystem.security.AccountReferenceEncoder;
+
 import onon1101.lendingsystem.sharedkernel.audit.AuditOutcome;
 import onon1101.lendingsystem.sharedkernel.audit.AuditRecord;
 import onon1101.lendingsystem.sharedkernel.audit.AuditSink;
+
 import org.springframework.stereotype.Component;
 
-/** Maps registration audit facts to infrastructure-neutral records. */
+import java.util.Map;
+
 @Component
-public class RegistrationAuditLogger {
+public class ResetPasswordAuditLogger {
 
     private final AccountReferenceEncoder accountReferenceEncoder;
     private final AuditSink auditSink;
 
-    public RegistrationAuditLogger(
-            AccountReferenceEncoder accountReferenceEncoder, AuditSink auditSink) {
+    public ResetPasswordAuditLogger(
+            AccountReferenceEncoder accountReferenceEncoder,
+            AuditSink auditSink
+    ) {
         this.accountReferenceEncoder = accountReferenceEncoder;
         this.auditSink = auditSink;
     }
 
-    public void registerFailed(String username, String reason) {
+    public void resetPasswordSuccess(String email) {
         auditSink.append(
                 new AuditRecord(
-                        "registration_failed",
-                        AuditOutcome.REJECTED,
-                        Map.of("accountRef", encode(username), "reason", reason)));
+                        "password_reset_receiver_successed",
+                        AuditOutcome.SUCCESS,
+                        Map.of("accountRef", encode(email))
+                ));
     }
 
-    public void registerSuccess(String username, UUID userId) {
+    public void resetPasswordFailed(String email, String reason) {
         auditSink.append(
                 new AuditRecord(
-                        "registration_succeeded",
-                        AuditOutcome.SUCCESS,
-                        Map.of("accountRef", encode(username), "userId", userId.toString())));
+                        "password_reset_receiver_failed",
+                        AuditOutcome.ERROR,
+                        Map.of("accountRef", encode(email),
+                                "reason", reason)
+                )
+        );
     }
 
     private String encode(String account) {

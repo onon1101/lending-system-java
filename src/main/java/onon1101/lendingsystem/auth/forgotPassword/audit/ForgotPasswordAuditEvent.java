@@ -16,7 +16,7 @@ public sealed interface ForgotPasswordAuditEvent extends AuditEvent {
 
         @Override
         public String eventType() {
-            return "password_reset_requested";
+            return "password_reset_sender_requested";
         }
 
         @Override
@@ -34,7 +34,7 @@ public sealed interface ForgotPasswordAuditEvent extends AuditEvent {
 
         @Override
         public String eventType() {
-            return "password_reset_rejected";
+            return "password_reset_sender_rejected";
         }
 
         @Override
@@ -52,7 +52,7 @@ public sealed interface ForgotPasswordAuditEvent extends AuditEvent {
 
         @Override
         public String eventType() {
-            return "password_reset_failed";
+            return "password_reset_sender_failed";
         }
 
         @Override

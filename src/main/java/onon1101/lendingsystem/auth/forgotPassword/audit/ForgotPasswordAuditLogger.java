@@ -21,15 +21,15 @@ public class ForgotPasswordAuditLogger {
     }
 
     public void passwordResetRequested(String email) {
-        append("password_reset_requested", AuditOutcome.SUCCESS, email, null);
+        append("password_reset_sender_requested", AuditOutcome.SUCCESS, email, null);
     }
 
     public void passwordResetRejected(String email, String reason) {
-        append("password_reset_rejected", AuditOutcome.REJECTED, email, reason);
+        append("password_reset_sender_rejected", AuditOutcome.REJECTED, email, reason);
     }
 
     public void passwordResetFailed(String email, String reason) {
-        append("password_reset_failed", AuditOutcome.ERROR, email, reason);
+        append("password_reset_sender_failed", AuditOutcome.ERROR, email, reason);
     }
 
     private void append(String eventType, AuditOutcome outcome, String account, String reason) {
