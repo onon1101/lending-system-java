@@ -2,6 +2,9 @@ package onon1101.lendingsystem.auth.login.token;
 
 import java.time.Instant;
 import java.util.UUID;
+
+import onon1101.lendingsystem.auth.token.JwtTokenIssuer;
+
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -12,33 +15,25 @@ import org.springframework.stereotype.Service;
 @Service
 public final class AccessTokenService {
 
-    private final JwtEncoder jwtEncoder;
+    private final JwtTokenIssuer tokenIssuer;
     private final AccessTokenProperties properties;
 
-    public AccessTokenService(JwtEncoder jwtEncoder, AccessTokenProperties properties) {
-        this.jwtEncoder = jwtEncoder;
+    public AccessTokenService(
+            JwtTokenIssuer tokenIssuer,
+            AccessTokenProperties properties
+    ) {
+        this.tokenIssuer = tokenIssuer;
         this.properties = properties;
     }
 
     public String createToken(UUID publicUserId, String username) {
-        Instant now = Instant.now();
-
-        JwtClaimsSet claims =
-                JwtClaimsSet.builder()
-                        .issuer(properties.issuer())
-                        .issuedAt(now)
-                        .expiresAt(now.plus(properties.expiration()))
-                        .subject(publicUserId.toString())
-                        .claim("username", username)
-                        .claim("purpose", "access-token")
-                        .build();
-
-        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
-
-        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
+        return tokenIssuer
+                .issue(publicUserId, username, properties);
     }
 
     public long expiresInSeconds() {
-        return properties.expiration().toSeconds();
+        return properties
+                .expiration()
+                .toSeconds();
     }
 }
