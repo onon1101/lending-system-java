@@ -26,16 +26,14 @@ class RegistrationAuditPolicyTests {
     @Test
     void mapsKnownBusinessFailure() {
         Object event =
-                policy.onReturned(
-                        command("Alice"), Result.failure(new InvalidEmailDomainError()));
+                policy.onReturned(command("Alice"), Result.failure(new InvalidEmailDomainError()));
 
         assertEquals(new RegistrationAuditEvent.Failed("alice", "User.InvalidEmail"), event);
     }
 
     @Test
     void mapsUnexpectedExceptionWithoutExposingItsMessage() {
-        Object event =
-                policy.onThrown(command("Alice"), new RuntimeException("sensitive details"));
+        Object event = policy.onThrown(command("Alice"), new RuntimeException("sensitive details"));
 
         assertEquals(new RegistrationAuditEvent.Failed("alice", "system_error"), event);
     }

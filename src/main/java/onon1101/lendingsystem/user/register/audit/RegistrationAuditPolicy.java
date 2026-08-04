@@ -22,8 +22,7 @@ public final class RegistrationAuditPolicy
                     new RegistrationAuditEvent.Succeeded(
                             normalizedUsername, success.value().userId());
             case Result.Failure<RegisterResult> failure ->
-                    new RegistrationAuditEvent.Failed(
-                            normalizedUsername, failure.error().code());
+                    new RegistrationAuditEvent.Failed(normalizedUsername, failure.error().code());
         };
     }
 

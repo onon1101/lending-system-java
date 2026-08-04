@@ -24,14 +24,12 @@ public final class ForgotPasswordAuditPolicy
             case Result.Success<ForgotPasswordResult> ignored ->
                     new ForgotPasswordAuditEvent.Requested(normalizedEmail);
             case Result.Failure<ForgotPasswordResult> failure ->
-                    new ForgotPasswordAuditEvent.Rejected(
-                            normalizedEmail, failure.error().code());
+                    new ForgotPasswordAuditEvent.Rejected(normalizedEmail, failure.error().code());
         };
     }
 
     @Override
-    public ForgotPasswordAuditEvent onThrown(
-            ForgotPasswordCommand command, Throwable throwable) {
+    public ForgotPasswordAuditEvent onThrown(ForgotPasswordCommand command, Throwable throwable) {
         return new ForgotPasswordAuditEvent.Failed(command.email(), "system_error");
     }
 }

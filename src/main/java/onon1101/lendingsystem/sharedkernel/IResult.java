@@ -1,4 +1,3 @@
 package onon1101.lendingsystem.sharedkernel;
 
-public interface IResult {
-}
+public interface IResult {}

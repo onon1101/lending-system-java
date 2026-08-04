@@ -30,6 +30,7 @@ public class ForgotPasswordTokenService {
                         .expiresAt(now.plus(properties.expiration()))
                         .subject(publicUserId.toString())
                         .claim("username", username)
+                        .claim("purpose", "password-reset")
                         .build();
 
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();

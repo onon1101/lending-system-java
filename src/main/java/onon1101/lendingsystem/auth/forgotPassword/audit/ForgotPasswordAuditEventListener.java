@@ -1,6 +1,5 @@
 package onon1101.lendingsystem.auth.forgotPassword.audit;
 
-import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordAuditLogger;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

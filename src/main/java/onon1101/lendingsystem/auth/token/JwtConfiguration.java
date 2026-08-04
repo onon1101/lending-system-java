@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
@@ -15,7 +16,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 public class JwtConfiguration {
 
     @Bean
-    SecretKey jwtSecretKey(AccessTokenProperties properties) {
+    SecretKey jwtSecretKey(JwtSigningProperties properties) {
         byte[] secret = properties.secret().getBytes(StandardCharsets.UTF_8);
 
         if (secret.length < 32) {
@@ -31,7 +32,11 @@ public class JwtConfiguration {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(SecretKey secretKey) {
-        return NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build();
+    JwtDecoder jwtDecoder(SecretKey secretKey, AccessTokenProperties accessTokenProperties) {
+        NimbusJwtDecoder decoder =
+                NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build();
+        decoder.setJwtValidator(
+                JwtValidators.createDefaultWithIssuer(accessTokenProperties.issuer()));
+        return decoder;
     }
 }

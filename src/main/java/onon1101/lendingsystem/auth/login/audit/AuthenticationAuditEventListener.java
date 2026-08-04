@@ -1,6 +1,5 @@
 package onon1101.lendingsystem.auth.login.audit;
 
-import onon1101.lendingsystem.auth.login.AuthenticationAuditLogger;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

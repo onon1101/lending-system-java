@@ -10,19 +10,19 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 @Service
-public final class AccessTokenService {
+public class EmailValidateTokenService {
 
     private final JwtEncoder jwtEncoder;
-    private final AccessTokenProperties properties;
+    private final EmailValidateTokenProperties properties;
 
-    public AccessTokenService(JwtEncoder jwtEncoder, AccessTokenProperties properties) {
+    public EmailValidateTokenService(
+            JwtEncoder jwtEncoder, EmailValidateTokenProperties properties) {
         this.jwtEncoder = jwtEncoder;
         this.properties = properties;
     }
 
     public String createToken(UUID publicUserId, String username) {
         Instant now = Instant.now();
-
         JwtClaimsSet claims =
                 JwtClaimsSet.builder()
                         .issuer(properties.issuer())
@@ -30,11 +30,10 @@ public final class AccessTokenService {
                         .expiresAt(now.plus(properties.expiration()))
                         .subject(publicUserId.toString())
                         .claim("username", username)
-                        .claim("purpose", "access-token")
+                        .claim("purpose", "email-validation")
                         .build();
 
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
-
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 

@@ -2,7 +2,6 @@ package onon1101.lendingsystem.auth.login;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Locale;
 import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditPolicy;
 import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
 import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;

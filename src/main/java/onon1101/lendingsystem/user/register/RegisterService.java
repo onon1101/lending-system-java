@@ -1,12 +1,14 @@
 package onon1101.lendingsystem.user.register;
 
-import java.util.Locale;
+import onon1101.lendingsystem.auth.token.EmailValidateTokenService;
 import onon1101.lendingsystem.sharedkernel.EmailUtil;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
+import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;
 import onon1101.lendingsystem.user.register.error.InvalidRegistrationDomainError;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +18,18 @@ public class RegisterService {
 
     private final RegisterAccountWriter accountWriter;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
+    private final EmailValidateTokenService emailValidateTokenService;
 
-    public RegisterService(RegisterAccountWriter accountWriter, PasswordEncoder passwordEncoder) {
+    public RegisterService(
+            RegisterAccountWriter accountWriter,
+            PasswordEncoder passwordEncoder,
+            ApplicationEventPublisher eventPublisher,
+            EmailValidateTokenService emailValidateTokenService) {
         this.accountWriter = accountWriter;
         this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
+        this.emailValidateTokenService = emailValidateTokenService;
     }
 
     @Transactional
@@ -35,16 +45,18 @@ public class RegisterService {
 
         String passwordEncoded = passwordEncoder.encode(password);
 
-        // todo: 需要寄信驗證
-
         RegisterAccount account =
-                accountWriter
-                        .registerAccount(username, passwordEncoded, email)
-                        .orElse(null);
+                accountWriter.registerAccount(username, passwordEncoded, email).orElse(null);
 
         if (account == null) {
             return Result.failure(new InvalidRegistrationDomainError());
         }
+
+        // 驗證 Email 是否有效 Token
+        String emailValidateToken =
+                emailValidateTokenService.createToken(account.publicUserId(), username);
+        eventPublisher.publishEvent(
+                new EmailValidateRequested(email, username, emailValidateToken));
 
         return Result.success(new RegisterResult(account.publicUserId()));
     }

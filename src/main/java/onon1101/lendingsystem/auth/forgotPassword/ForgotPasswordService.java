@@ -33,7 +33,7 @@ public class ForgotPasswordService {
     public Result<ForgotPasswordResult> handle(ForgotPasswordCommand command) {
         String email = command.email();
 
-        if (email == null || email.isBlank()) {
+        if (email.isBlank()) {
             return Result.failure(new InvalidEmailDomainError());
         }
 

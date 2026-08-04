@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.forgotPassword;
+package onon1101.lendingsystem.auth.forgotPassword.audit;
 
 import java.util.Map;
 import onon1101.lendingsystem.security.AccountReferenceEncoder;

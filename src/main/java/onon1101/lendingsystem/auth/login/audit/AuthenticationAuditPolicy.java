@@ -19,8 +19,7 @@ public final class AuthenticationAuditPolicy
             case Result.Success<LoginResult> success ->
                     new AuthenticationAuditEvent.Succeeded(normalizedUsername);
             case Result.Failure<LoginResult> failure ->
-                    new AuthenticationAuditEvent.Failed(
-                            normalizedUsername, failure.error().code());
+                    new AuthenticationAuditEvent.Failed(normalizedUsername, failure.error().code());
         };
     }
 

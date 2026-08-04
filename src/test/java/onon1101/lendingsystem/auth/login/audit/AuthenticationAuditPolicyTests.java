@@ -38,8 +38,7 @@ class AuthenticationAuditPolicyTests {
                 policy.onReturned(
                         command("Alice"), Result.failure(new TooManyAttemptsDomainError()));
 
-        assertEquals(
-                new AuthenticationAuditEvent.Failed("alice", "Auth.TooManyAttempts"), event);
+        assertEquals(new AuthenticationAuditEvent.Failed("alice", "Auth.TooManyAttempts"), event);
     }
 
     @Test
