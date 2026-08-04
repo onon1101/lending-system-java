@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.token;
+package onon1101.lendingsystem.sharedkernel.token;
 
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;

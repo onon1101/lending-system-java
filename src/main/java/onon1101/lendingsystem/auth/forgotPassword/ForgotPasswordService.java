@@ -4,7 +4,7 @@ import java.util.Locale;
 import onon1101.lendingsystem.auth.forgotPassword.audit.ForgotPasswordAuditPolicy;
 import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailRequested;
 import onon1101.lendingsystem.auth.forgotPassword.error.InvalidEmailDomainError;
-import onon1101.lendingsystem.auth.forgotPassword.token.ForgotPasswordTokenService;
+import onon1101.lendingsystem.auth.commons.PasswordTokenService;
 import onon1101.lendingsystem.sharedkernel.EmailUtil;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class ForgotPasswordService {
 
     private final ForgotPasswordAccountReader accountReader;
-    private final ForgotPasswordTokenService tokenService;
+    private final PasswordTokenService tokenService;
     private final ApplicationEventPublisher eventPublisher;
 
     public ForgotPasswordService(
             ForgotPasswordAccountReader accountReader,
-            ForgotPasswordTokenService tokenService,
+            PasswordTokenService tokenService,
             ApplicationEventPublisher eventPublisher) {
         this.accountReader = accountReader;
         this.tokenService = tokenService;

@@ -2,7 +2,7 @@ package onon1101.lendingsystem.auth.login.token;
 
 import java.time.Duration;
 
-import onon1101.lendingsystem.auth.token.TokenProperties;
+import onon1101.lendingsystem.sharedkernel.token.TokenProperties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

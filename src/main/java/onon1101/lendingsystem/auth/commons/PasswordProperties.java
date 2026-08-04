@@ -1,14 +1,14 @@
-package onon1101.lendingsystem.auth.forgotPassword.token;
+package onon1101.lendingsystem.auth.commons;
 
 import java.time.Duration;
 
-import onon1101.lendingsystem.auth.token.TokenProperties;
+import onon1101.lendingsystem.sharedkernel.token.TokenProperties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "lending.forgot-token")
-public record ForgotPasswordProperties(String issuer,
-                                       Duration expiration) implements TokenProperties {
+public record PasswordProperties(String issuer,
+                                 Duration expiration) implements TokenProperties {
 
     public static final String PURPOSE = "password-reset";
 

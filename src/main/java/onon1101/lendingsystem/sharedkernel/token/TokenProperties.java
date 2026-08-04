@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.token;
+package onon1101.lendingsystem.sharedkernel.token;
 
 import java.time.Duration;
 

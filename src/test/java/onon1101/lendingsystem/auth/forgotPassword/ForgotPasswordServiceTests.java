@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import java.util.UUID;
 import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailRequested;
-import onon1101.lendingsystem.auth.forgotPassword.token.ForgotPasswordTokenService;
+import onon1101.lendingsystem.auth.commons.PasswordTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -17,7 +17,7 @@ class ForgotPasswordServiceTests {
 
     private final ForgotPasswordAccountReader accountReader =
             mock(ForgotPasswordAccountReader.class);
-    private final ForgotPasswordTokenService tokenService = mock(ForgotPasswordTokenService.class);
+    private final PasswordTokenService tokenService = mock(PasswordTokenService.class);
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
     private final ForgotPasswordService service =
             new ForgotPasswordService(accountReader, tokenService, eventPublisher);

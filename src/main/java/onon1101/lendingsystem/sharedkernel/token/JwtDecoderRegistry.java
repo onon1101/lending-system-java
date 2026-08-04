@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.token;
+package onon1101.lendingsystem.sharedkernel.token;
 
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 final class JwtDecoderRegistry implements JwtDecoderProvider {
