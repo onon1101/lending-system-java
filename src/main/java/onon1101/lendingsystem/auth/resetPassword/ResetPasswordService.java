@@ -1,12 +1,11 @@
 package onon1101.lendingsystem.auth.resetPassword;
 
 import onon1101.lendingsystem.auth.commons.PasswordTokenService;
-import onon1101.lendingsystem.auth.commons.TokenPayload;
+import onon1101.lendingsystem.sharedkernel.token.TokenPayload;
 import onon1101.lendingsystem.auth.resetPassword.error.InvalidResetTokenDomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +26,7 @@ public class ResetPasswordService {
         this.tokenService = tokenService;
     }
 
+    //todo: 透過 user_public_id 查詢 redis
     @Transactional
     public Result<ResetPasswordResult> execute(
             ResetPasswordCommand command
@@ -46,6 +46,7 @@ public class ResetPasswordService {
             return Result.failure(new InvalidResetTokenDomainError());
         }
 
-        return Result.success(null);
+        //todo 使用 email
+        return Result.success(new ResetPasswordResult(new String()));
     }
 }

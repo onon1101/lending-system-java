@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Repository
-final class JdbcResetPasswordWriter implements ResetPasswordWriter {
+class JdbcResetPasswordWriter implements ResetPasswordWriter {
 
     private final JdbcClient jdbcClient;
 

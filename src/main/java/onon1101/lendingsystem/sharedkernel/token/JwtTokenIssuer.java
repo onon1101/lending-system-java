@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Component
-public final class JwtTokenIssuer {
+public class JwtTokenIssuer {
 
     private final JwtEncoder jwtEncoder;
 
@@ -21,6 +21,7 @@ public final class JwtTokenIssuer {
         this.jwtEncoder = jwtEncoder;
     }
 
+    // JWE
     public String issue(
             UUID publicUserId,
             String username,
@@ -28,6 +29,7 @@ public final class JwtTokenIssuer {
     ) {
         Instant now = Instant.now();
 
+        //todo: 留下 user_public_id，剩餘 claims 刪除。
         JwtClaimsSet claims =
                 JwtClaimsSet.builder()
                         .issuer(properties.issuer())

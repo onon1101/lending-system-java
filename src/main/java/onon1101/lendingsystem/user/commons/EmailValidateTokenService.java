@@ -1,31 +1,27 @@
-package onon1101.lendingsystem.auth.commons;
+package onon1101.lendingsystem.user.commons;
 
-import java.time.Instant;
 import java.util.UUID;
 
-import onon1101.lendingsystem.sharedkernel.token.JwtDecoderProvider;
 import onon1101.lendingsystem.sharedkernel.token.JwtTokenIssuer;
 
 import onon1101.lendingsystem.sharedkernel.token.JwtTokenService;
 
 import onon1101.lendingsystem.sharedkernel.token.TokenPayload;
 
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PasswordTokenService {
+public class EmailValidateTokenService {
 
     private final JwtTokenService tokenService;
-    private final PasswordProperties properties;
+    private final EmailValidateTokenProperties properties;
 
-    public PasswordTokenService(
-            JwtTokenService tokenService,
-            PasswordProperties properties
+    public EmailValidateTokenService(
+            JwtTokenService tokenIssuer,
+            EmailValidateTokenProperties properties
     ) {
+        this.tokenService = tokenIssuer;
         this.properties = properties;
-        this.tokenService = tokenService;
     }
 
     public String createToken(UUID publicUserId, String username) {
@@ -33,7 +29,8 @@ public class PasswordTokenService {
                 .encode(
                         publicUserId,
                         username,
-                        properties);
+                        properties
+                );
     }
 
     public TokenPayload decode(

@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.user.register.token;
+package onon1101.lendingsystem.user.commons;
 
 import java.time.Duration;
 

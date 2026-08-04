@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.UUID;
-import onon1101.lendingsystem.user.register.token.EmailValidateTokenService;
+import onon1101.lendingsystem.user.commons.EmailValidateTokenService;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import org.junit.jupiter.api.Test;

@@ -7,5 +7,6 @@ public record LoginAccount(
         UUID publicUserId,
         String username,
         String passwordHash,
+        String email,
         Integer passwordId,
         Instant lockedUntil) {}

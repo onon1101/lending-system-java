@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.user.register;
 
-import onon1101.lendingsystem.user.register.token.EmailValidateTokenService;
+import onon1101.lendingsystem.user.commons.EmailValidateTokenService;
 import onon1101.lendingsystem.sharedkernel.EmailUtil;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;

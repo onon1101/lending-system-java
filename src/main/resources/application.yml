@@ -11,7 +11,7 @@ spring:
       schema-locations: classpath:schema.sql
       continue-on-error: false
   mail:
-    host: "${MAIL_HOST:localhost}"
+    host: "${MAIL_HOST:192.168.1.121}"
     port: "${MAIL_PORT:1025}"
     username: "${MAIL_USERNAME:}"
     password: "${MAIL_PASSWORD:}"
@@ -23,7 +23,7 @@ spring:
             enable: "${MAIL_STARTTLS:false}"
   data:
     redis:
-      url: "${REDIS_URL: redis://localhost:6379}"
+      url: "${REDIS_URL:redis://192.168.1.115:6379}"
       connect-timeout: "${REDIS_CONNECT_TIMEOUT:2s}"
       timeout: "${REDIS_COMMAND_TIMEOUT:2s}"
       database: "${REDIS_DATABASE:0}"
