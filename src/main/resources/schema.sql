@@ -73,7 +73,6 @@ CREATE TABLE IF NOT EXISTS user_password_credentials
     password_changed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     failed_attempts INTEGER NOT NULL DEFAULT 0,
 
-    --todo?
     locked_until TIMESTAMP WITH TIME ZONE,
 
     CONSTRAINT fk_user_password_credentials_identity

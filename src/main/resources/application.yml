@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: LendingSystem
+  datasource:
+    url: "${DATABASE_URL:jdbc:postgresql://192.168.1.120:5432/postgres}"
+    username: "${DB_USER:lending_user}"
+    password: "${DB_PASSWORD:calcal321}"
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      continue-on-error: false
+  mail:
+    host: "${MAIL_HOST:localhost}"
+    port: "${MAIL_PORT:1025}"
+    username: "${MAIL_USERNAME:}"
+    password: "${MAIL_PASSWORD:}"
+    properties:
+      mail:
+        smtp:
+          auth: "${MAIL_SMTP_AUTH:false}"
+          starttls:
+            enable: "${MAIL_STARTTLS:false}"
+
+logging:
+  level:
+    root: INFO
+    onon1101.lendingsystem: DEBUG
+    org.springframework: WARN
+  file:
+    name: logs/lending-system.log
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-components: always
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+lending:
+  minio:
+    enabled: "${MINIO_HEALTH_ENABLED:false}"
+    endpoint: "${MINIO_ENDPOINT:http://localhost:9000}"
+    access-key: "${MINIO_ACCESS_KEY:minioadmin}"
+    secret-key: "${MINIO_SECRET_KEY:minioadmin}"
+    bucket: "${MINIO_BUCKET_NAME:lending-system}"
+  video-downloader:
+    enabled: "${VIDEO_HEALTH_ENABLED:false}"
+    target: "${VIDEO_SERVICE_ADDR:localhost:50051}"
+  jwt:
+    secret: "${JWT_SECRET:development-secret-key-at-least-32-bytes}"
+  access-token:
+    issuer: lending-system-access-token
+    expiration: PT1H
+  forgot-token:
+    issuer: lending-system-forgot-password
+    expiration: PT15M
+  email-token:
+    issuer: lending-system-email-validation
+    expiration: PT24H
+  audit:
+    hmac-key: "${AUDIT_HMAC_KEY:development-audit-hmac-key-do-not-use-in-production}"
+
+app:
+  mail:
+    sender: "${MAIL_SENDER:no-reply@lending-system.local}"
+  reset-password-url: "${RESET_PASSWORD_URL:http://localhost:3000/reset-password}"
+  email-validation-url: "${EMAIL_VALIDATION_URL:http://localhost:3000/validate-email}"
