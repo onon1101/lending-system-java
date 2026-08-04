@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.token;
+package onon1101.lendingsystem.auth.login.token;
 
 import java.time.Instant;
 import java.util.UUID;

@@ -5,7 +5,7 @@ import java.time.Instant;
 import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditPolicy;
 import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
 import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
-import onon1101.lendingsystem.auth.token.AccessTokenService;
+import onon1101.lendingsystem.auth.login.token.AccessTokenService;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.springframework.security.crypto.password.PasswordEncoder;

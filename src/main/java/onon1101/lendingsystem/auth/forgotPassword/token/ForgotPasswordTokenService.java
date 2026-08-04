@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.token;
+package onon1101.lendingsystem.auth.forgotPassword.token;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -10,19 +10,19 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailValidateTokenService {
+public class ForgotPasswordTokenService {
 
     private final JwtEncoder jwtEncoder;
-    private final EmailValidateTokenProperties properties;
+    private final ForgotPasswordProperties properties;
 
-    public EmailValidateTokenService(
-            JwtEncoder jwtEncoder, EmailValidateTokenProperties properties) {
+    public ForgotPasswordTokenService(JwtEncoder jwtEncoder, ForgotPasswordProperties properties) {
         this.jwtEncoder = jwtEncoder;
         this.properties = properties;
     }
 
     public String createToken(UUID publicUserId, String username) {
         Instant now = Instant.now();
+
         JwtClaimsSet claims =
                 JwtClaimsSet.builder()
                         .issuer(properties.issuer())
@@ -30,10 +30,11 @@ public class EmailValidateTokenService {
                         .expiresAt(now.plus(properties.expiration()))
                         .subject(publicUserId.toString())
                         .claim("username", username)
-                        .claim("purpose", "email-validation")
+                        .claim("purpose", "password-reset")
                         .build();
 
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+
         return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
     }
 

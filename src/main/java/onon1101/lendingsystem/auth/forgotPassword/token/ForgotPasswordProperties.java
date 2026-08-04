@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.auth.token;
+package onon1101.lendingsystem.auth.forgotPassword.token;
 
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
