@@ -1,5 +1,8 @@
 package onon1101.lendingsystem.sharedkernel.token;
 
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -7,44 +10,31 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.util.UUID;
-
 @Component
-public class JwtTokenIssuer {
+public final class JwtTokenIssuer {
 
     private final JwtEncoder jwtEncoder;
 
-    public JwtTokenIssuer(
-            JwtEncoder jwtEncoder
-    ) {
+    public JwtTokenIssuer(JwtEncoder jwtEncoder) {
         this.jwtEncoder = jwtEncoder;
     }
 
-    // JWE
     public String issue(
-            UUID publicUserId,
-            String username,
-            TokenProperties properties
-    ) {
+            UUID publicUserId, Map<String, Object> additionalClaims, TokenProperties properties) {
         Instant now = Instant.now();
 
-        //todo: 留下 user_public_id，剩餘 claims 刪除。
-        JwtClaimsSet claims =
+        JwtClaimsSet.Builder claims =
                 JwtClaimsSet.builder()
                         .issuer(properties.issuer())
                         .issuedAt(now)
                         .expiresAt(now.plus(properties.expiration()))
                         .subject(publicUserId.toString())
-                        .claim("username", username)
-                        .claim("purpose", properties.purpose())
-                        .build();
+                        .claim("purpose", properties.purpose());
 
-        JwsHeader header =
-                JwsHeader.with(MacAlgorithm.HS256).build();
+        additionalClaims.forEach(claims::claim);
 
-        return jwtEncoder
-                .encode(JwtEncoderParameters.from(header, claims))
-                .getTokenValue();
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+
+        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims.build())).getTokenValue();
     }
 }

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record LoginAccount(
+        long privateUserId,
         UUID publicUserId,
         String username,
         String passwordHash,

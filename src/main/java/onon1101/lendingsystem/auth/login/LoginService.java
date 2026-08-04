@@ -75,7 +75,9 @@ public class LoginService {
         // 清洗更新次數
         accountWriter.resetFailedAttempts(account.passwordId());
 
-        String accessToken = tokenService.createToken(account.publicUserId(), account.email(), account.username());
+        String accessToken =
+                tokenService.createToken(
+                        account.privateUserId(), account.publicUserId(), account.username());
 
         return Result.success(new LoginResult(accessToken, tokenService.expiresInSeconds()));
     }

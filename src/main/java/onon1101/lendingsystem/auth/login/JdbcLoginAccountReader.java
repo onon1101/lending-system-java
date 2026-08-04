@@ -22,8 +22,10 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
         String sql =
                 """
                         SELECT
+                            users.id AS private_user_id,
                             users.public_id,
                             users.username,
+                            identities.email,
                             credentials.password_hash,
                             credentials.auth_identity_id,
                             credentials.locked_until
@@ -49,9 +51,11 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                                     resultSet.getObject("locked_until", OffsetDateTime.class);
 
                             return new LoginAccount(
+                                    resultSet.getLong("private_user_id"),
                                     resultSet.getObject("public_id", UUID.class),
                                     resultSet.getString("username"),
                                     resultSet.getString("password_hash"),
+                                    resultSet.getString("email"),
                                     resultSet.getInt("auth_identity_id"),
                                     lockedUntil == null ? null : lockedUntil.toInstant());
                         })

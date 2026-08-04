@@ -63,6 +63,8 @@ lending:
   access-token:
     issuer: lending-system-access-token
     expiration: PT1H
+  user-cache:
+    ttl: "${USER_CACHE_TTL:PT15M}"
   forgot-token:
     issuer: lending-system-forgot-password
     expiration: PT15M
