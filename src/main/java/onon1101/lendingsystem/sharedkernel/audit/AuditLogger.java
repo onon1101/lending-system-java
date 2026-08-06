@@ -23,38 +23,37 @@ public class AuditLogger {
 
     public void handleSuccess(
             String eventType,
-            UUID publicUserid
+            AuditEventAttribute attribute
     ) {
-        append(eventType, AuditOutcome.SUCCESS, publicUserid, null);
+        append(eventType, AuditOutcome.SUCCESS, attribute, null);
     }
 
     public void handleRejected(
             String eventType,
-            UUID publicUserId,
+            AuditEventAttribute attribute,
             String reason
     ) {
-        append(eventType, AuditOutcome.REJECTED, publicUserId, reason);
+        append(eventType, AuditOutcome.REJECTED, attribute, reason);
     }
 
     public void handleFailed(
             String eventType,
-            UUID publicUserId,
+            AuditEventAttribute attribute,
             String reason
     ) {
-        append(eventType, AuditOutcome.REJECTED, publicUserId, reason);
+        append(eventType, AuditOutcome.REJECTED, attribute, reason);
     }
 
     private void append(
             String eventType,
             AuditOutcome outcome,
-            UUID account,
+            AuditEventAttribute attribute,
             String reason
     ) {
-        String accountStr = account.toString();
         Map<String, String> attributes =
                 reason == null
-                        ? Map.of("accountRef", encode(accountStr))
-                        : Map.of("accountRef", encode(accountStr), "reason", reason);
+                        ? Map.of(attribute.Key(), encode(attribute.Value()))
+                        : Map.of(attribute.Key(), encode(attribute.Value()), "reason", reason);
         auditSink.append(new AuditRecord(eventType, outcome, attributes));
     }
 

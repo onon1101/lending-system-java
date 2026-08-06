@@ -1,3 +1,6 @@
 package onon1101.lendingsystem.auth.forgotPassword;
 
-public record ForgotPasswordResult() {}
+import java.util.UUID;
+
+public record ForgotPasswordResult(
+        UUID publicUserId) {}

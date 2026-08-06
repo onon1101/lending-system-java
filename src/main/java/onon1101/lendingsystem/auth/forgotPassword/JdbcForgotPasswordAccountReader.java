@@ -21,8 +21,8 @@ public class JdbcForgotPasswordAccountReader implements ForgotPasswordAccountRea
         String sql =
                 """
                 SELECT
-                	a.public_id,
-                	a.username
+                	b.public_id,
+                	b.username
                 FROM user_auth_identities a
                 LEFT JOIN users b ON a.user_id = b.id
                 WHERE a.provider = :provider

@@ -18,7 +18,7 @@ public class AuditEventListener {
     public void onSuccess(AuditEvent.Success event) {
         auditLogger.handleSuccess(
                 event.eventType(),
-                event.publicUserId()
+                event.attribute()
         );
     }
 
@@ -26,7 +26,7 @@ public class AuditEventListener {
     public void onRejected(AuditEvent.Rejected event) {
         auditLogger.handleRejected(
                 event.eventType(),
-                event.publicUserId(),
+                event.attribute(),
                 event.reason()
         );
     }
@@ -35,7 +35,7 @@ public class AuditEventListener {
     public void onFailed(AuditEvent.Failed event) {
         auditLogger.handleFailed(
                 event.eventType(),
-                event.publicUserId(),
+                event.attribute(),
                 event.reason()
         );
     }

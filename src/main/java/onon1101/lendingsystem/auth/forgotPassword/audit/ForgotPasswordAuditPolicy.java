@@ -1,9 +1,12 @@
 package onon1101.lendingsystem.auth.forgotPassword.audit;
 
+import jakarta.validation.constraints.Email;
+
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordCommand;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordResult;
 import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
 import onon1101.lendingsystem.sharedkernel.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.sharedkernel.audit.EventAttributes.EmailAuditEventAttribute;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.springframework.stereotype.Component;
 
@@ -12,37 +15,31 @@ public final class ForgotPasswordAuditPolicy
         implements CommandAuditPolicy<
                 ForgotPasswordCommand, Result<ForgotPasswordResult>, AuditEvent> {
 
-//    @Override
-//    public ForgotPasswordAuditEvent onReturned(
-//            ForgotPasswordCommand command, Result<ForgotPasswordResult> result) {
-//        String normalizedEmail = command.email();
-//
-//        return switch (result) {
-//            /*
-//             * 帳號不存在時 ForgotPasswordService 也會回傳成功，
-//             * 因此 audit 不會洩漏帳號是否存在。
-//             */
-//            case Result.Success<ForgotPasswordResult> ignored ->
-//                    new ForgotPasswordAuditEvent.Requested(normalizedEmail);
-//            case Result.Failure<ForgotPasswordResult> failure ->
-//                    new ForgotPasswordAuditEvent.Rejected(normalizedEmail, failure.error().code());
-//        };
-//    }
-//
-//    @Override
-//    public ForgotPasswordAuditEvent onThrown(ForgotPasswordCommand command, Throwable throwable) {
-//        return new ForgotPasswordAuditEvent.Failed(command.email(), "system_error");
-//    }
-
     @Override
     public AuditEvent onReturned(
             ForgotPasswordCommand command,
             Result<ForgotPasswordResult> result
     ) {
         return switch (result) {
-            case Result.Success -> new AuditEvent.Success(
+            case Result.Success<ForgotPasswordResult> ignored -> new AuditEvent.Success(
                     "password_reset_sender_requested",
-            )
-        }
+                    new EmailAuditEventAttribute(command.email()));
+            case Result.Failure<ForgotPasswordResult> failure -> new AuditEvent.Rejected(
+                    "password_reset_sender_rejected",
+                    new EmailAuditEventAttribute(command.email()),
+                    failure.error().message());
+        };
+    }
+
+    @Override
+    public AuditEvent onThrown(
+            ForgotPasswordCommand command,
+            Throwable throwable
+    ) {
+        return new AuditEvent.Failed(
+            "password_reset_sender_failed",
+                new EmailAuditEventAttribute(command.email()),
+                "system_error"
+        );
     }
 }

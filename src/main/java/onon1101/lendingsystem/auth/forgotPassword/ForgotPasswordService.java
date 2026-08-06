@@ -48,7 +48,7 @@ public class ForgotPasswordService {
 
         if (account == null) {
             // 不管帳號存在與否，都成功
-            return Result.success(new ForgotPasswordResult());
+            return Result.success(new ForgotPasswordResult(null));
         }
 
         String token = tokenService.createToken(account.publicUserId(), account.username());
@@ -57,6 +57,6 @@ public class ForgotPasswordService {
                 new PasswordResetEmailRequested(normalizedEmail, account.username(), token));
 
         // return
-        return Result.success(new ForgotPasswordResult());
+        return Result.success(new ForgotPasswordResult(account.publicUserId()));
     }
 }
