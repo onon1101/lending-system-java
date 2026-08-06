@@ -1,17 +1,28 @@
 package onon1101.lendingsystem.auth.resetPassword.audit;
 
+import onon1101.lendingsystem.auth.commons.PasswordProperties;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordCommand;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResult;
 import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
 import onon1101.lendingsystem.sharedkernel.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.sharedkernel.audit.EmailAuditEventAttribute;
+import onon1101.lendingsystem.sharedkernel.audit.TokenAuditEventAttribute;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
+import onon1101.lendingsystem.sharedkernel.token.JwtTokenService;
 import org.springframework.stereotype.Component;
 
 @Component
 public final class ResetPasswordAuditPolicy
         implements CommandAuditPolicy<
                 ResetPasswordCommand, Result<ResetPasswordResult>, AuditEvent> {
+
+    private final JwtTokenService tokenService;
+    private final PasswordProperties passwordProperties;
+
+    public ResetPasswordAuditPolicy(
+            JwtTokenService tokenService, PasswordProperties passwordProperties) {
+        this.tokenService = tokenService;
+        this.passwordProperties = passwordProperties;
+    }
 
     @Override
     public AuditEvent onReturned(
@@ -20,11 +31,11 @@ public final class ResetPasswordAuditPolicy
             case Result.Success<ResetPasswordResult> success ->
                     new AuditEvent.Success(
                             "password_reset_receiver_successed",
-                            new EmailAuditEventAttribute(success.value().email()));
+                            tokenAttribute(command));
             case Result.Failure<ResetPasswordResult> failure ->
                     new AuditEvent.Rejected(
                             "password_reset_receiver_failed",
-                            new EmailAuditEventAttribute("unavailable"),
+                            tokenAttribute(command),
                             failure.error().code());
         };
     }
@@ -33,7 +44,12 @@ public final class ResetPasswordAuditPolicy
     public AuditEvent onThrown(ResetPasswordCommand command, Throwable throwable) {
         return new AuditEvent.Failed(
                 "password_reset_receiver_failed",
-                new EmailAuditEventAttribute("unavailable"),
+                tokenAttribute(command),
                 "system_error");
+    }
+
+    private TokenAuditEventAttribute tokenAttribute(ResetPasswordCommand command) {
+        return new TokenAuditEventAttribute(
+                tokenService, passwordProperties, command.resetToken());
     }
 }
