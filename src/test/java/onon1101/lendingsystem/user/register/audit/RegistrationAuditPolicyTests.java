@@ -1,8 +1,9 @@
 package onon1101.lendingsystem.user.register.audit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
+import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import onon1101.lendingsystem.user.register.RegisterCommand;
 import onon1101.lendingsystem.user.register.RegisterResult;
@@ -20,7 +21,8 @@ class RegistrationAuditPolicyTests {
         Object event =
                 policy.onReturned(command(" Alice "), Result.success(new RegisterResult(userId)));
 
-        assertEquals(new RegistrationAuditEvent.Succeeded("alice", userId), event);
+        assertSuccess(
+                event, "registration_succeeded", "publicUserIdRef", userId.toString());
     }
 
     @Test
@@ -28,17 +30,63 @@ class RegistrationAuditPolicyTests {
         Object event =
                 policy.onReturned(command("Alice"), Result.failure(new InvalidEmailDomainError()));
 
-        assertEquals(new RegistrationAuditEvent.Failed("alice", "User.InvalidEmail"), event);
+        assertRejected(event, "registration_failed", "accountRef", "alice", "User.InvalidEmail");
     }
 
     @Test
     void mapsUnexpectedExceptionWithoutExposingItsMessage() {
         Object event = policy.onThrown(command("Alice"), new RuntimeException("sensitive details"));
 
-        assertEquals(new RegistrationAuditEvent.Failed("alice", "system_error"), event);
+        assertFailed(event, "registration_failed", "accountRef", "alice", "system_error");
     }
 
     private RegisterCommand command(String username) {
         return new RegisterCommand(username, "password", "alice@example.com");
+    }
+
+    private void assertSuccess(
+            Object event, String eventType, String attributeKey, String attributeValue) {
+        assertThat(event)
+                .isInstanceOfSatisfying(
+                        AuditEvent.Success.class,
+                        success -> {
+                            assertThat(success.eventType()).isEqualTo(eventType);
+                            assertThat(success.attribute().Key()).isEqualTo(attributeKey);
+                            assertThat(success.attribute().Value()).isEqualTo(attributeValue);
+                        });
+    }
+
+    private void assertRejected(
+            Object event,
+            String eventType,
+            String attributeKey,
+            String attributeValue,
+            String reason) {
+        assertThat(event)
+                .isInstanceOfSatisfying(
+                        AuditEvent.Rejected.class,
+                        rejected -> {
+                            assertThat(rejected.eventType()).isEqualTo(eventType);
+                            assertThat(rejected.attribute().Key()).isEqualTo(attributeKey);
+                            assertThat(rejected.attribute().Value()).isEqualTo(attributeValue);
+                            assertThat(rejected.reason()).isEqualTo(reason);
+                        });
+    }
+
+    private void assertFailed(
+            Object event,
+            String eventType,
+            String attributeKey,
+            String attributeValue,
+            String reason) {
+        assertThat(event)
+                .isInstanceOfSatisfying(
+                        AuditEvent.Failed.class,
+                        failed -> {
+                            assertThat(failed.eventType()).isEqualTo(eventType);
+                            assertThat(failed.attribute().Key()).isEqualTo(attributeKey);
+                            assertThat(failed.attribute().Value()).isEqualTo(attributeValue);
+                            assertThat(failed.reason()).isEqualTo(reason);
+                        });
     }
 }

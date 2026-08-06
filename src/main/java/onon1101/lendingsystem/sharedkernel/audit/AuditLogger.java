@@ -1,7 +1,5 @@
 package onon1101.lendingsystem.sharedkernel.audit;
 
-import onon1101.lendingsystem.security.AccountReferenceEncoder;
-
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -41,7 +39,7 @@ public class AuditLogger {
             AuditEventAttribute attribute,
             String reason
     ) {
-        append(eventType, AuditOutcome.REJECTED, attribute, reason);
+        append(eventType, AuditOutcome.ERROR, attribute, reason);
     }
 
     private void append(

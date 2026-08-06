@@ -1,57 +1,51 @@
-package onon1101.lendingsystem.auth.login.audit;
+package onon1101.lendingsystem.auth.resetPassword.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import onon1101.lendingsystem.auth.login.LoginCommand;
-import onon1101.lendingsystem.auth.login.LoginResult;
-import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
-import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
+import onon1101.lendingsystem.auth.resetPassword.ResetPasswordCommand;
+import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResult;
+import onon1101.lendingsystem.auth.resetPassword.error.InvalidResetTokenDomainError;
 import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.junit.jupiter.api.Test;
 
-class AuthenticationAuditPolicyTests {
+class ResetPasswordAuditPolicyTests {
 
-    private final AuthenticationAuditPolicy policy = new AuthenticationAuditPolicy();
+    private final ResetPasswordAuditPolicy policy = new ResetPasswordAuditPolicy();
 
     @Test
     void mapsSuccessfulResult() {
         Object event =
                 policy.onReturned(
-                        command(" Alice "), Result.success(new LoginResult("token", 300)));
+                        command(), Result.success(new ResetPasswordResult("user@example.com")));
 
-        assertSuccess(event, "authentication_succeeded", "accountRef", "alice");
+        assertSuccess(
+                event, "password_reset_receiver_successed", "emailRef", "user@example.com");
     }
 
     @Test
-    void mapsFailedResult() {
+    void mapsKnownBusinessFailure() {
         Object event =
-                policy.onReturned(
-                        command("Alice"), Result.failure(new InvalidCredentialsDomainError()));
+                policy.onReturned(command(), Result.failure(new InvalidResetTokenDomainError()));
 
         assertRejected(
-                event, "authentication_failed", "accountRef", "alice", "Auth.InvalidCredentials");
-    }
-
-    @Test
-    void mapsTooManyAttemptsFailure() {
-        Object event =
-                policy.onReturned(
-                        command("Alice"), Result.failure(new TooManyAttemptsDomainError()));
-
-        assertRejected(
-                event, "authentication_failed", "accountRef", "alice", "Auth.TooManyAttempts");
+                event,
+                "password_reset_receiver_failed",
+                "emailRef",
+                "unavailable",
+                "ResetPassword.InvalidResetToken");
     }
 
     @Test
     void mapsUnexpectedException() {
-        Object event = policy.onThrown(command("Alice"), new RuntimeException("failure"));
+        Object event = policy.onThrown(command(), new RuntimeException("sensitive details"));
 
-        assertFailed(event, "authentication_failed", "accountRef", "alice", "system_error");
+        assertFailed(
+                event, "password_reset_receiver_failed", "emailRef", "unavailable", "system_error");
     }
 
-    private LoginCommand command(String username) {
-        return new LoginCommand(username, "password");
+    private ResetPasswordCommand command() {
+        return new ResetPasswordCommand("reset-token", "new-secure-password");
     }
 
     private void assertSuccess(

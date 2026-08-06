@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.security;
+package onon1101.lendingsystem.sharedkernel.audit;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;

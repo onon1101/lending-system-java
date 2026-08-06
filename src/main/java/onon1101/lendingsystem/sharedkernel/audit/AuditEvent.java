@@ -1,7 +1,6 @@
 package onon1101.lendingsystem.sharedkernel.audit;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public interface AuditEvent {
     record Success(String eventType, AuditEventAttribute attribute) implements AuditEvent {
@@ -11,7 +10,8 @@ public interface AuditEvent {
         }
     }
 
-    record Rejected(String eventType, AuditEventAttribute attribute, String reason) implements AuditEvent {
+    record Rejected(String eventType, AuditEventAttribute attribute, String reason)
+            implements AuditEvent {
         public Rejected {
             Objects.requireNonNull(eventType, "Event Type must not be null.");
             Objects.requireNonNull(attribute, "Attribute must not be null.");
@@ -19,7 +19,8 @@ public interface AuditEvent {
         }
     }
 
-    record Failed(String eventType, AuditEventAttribute attribute, String reason) implements AuditEvent{
+    record Failed(String eventType, AuditEventAttribute attribute, String reason)
+            implements AuditEvent {
         public Failed {
             Objects.requireNonNull(eventType, "Event Type must not be null.");
             Objects.requireNonNull(attribute, "Attribute must not be null.");

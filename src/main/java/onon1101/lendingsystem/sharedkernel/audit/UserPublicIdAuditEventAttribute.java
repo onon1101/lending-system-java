@@ -1,6 +1,4 @@
-package onon1101.lendingsystem.sharedkernel.audit.EventAttributes;
-
-import onon1101.lendingsystem.sharedkernel.audit.AuditEventAttribute;
+package onon1101.lendingsystem.sharedkernel.audit;
 
 import java.util.UUID;
 

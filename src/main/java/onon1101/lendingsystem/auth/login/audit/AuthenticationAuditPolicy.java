@@ -2,29 +2,39 @@ package onon1101.lendingsystem.auth.login.audit;
 
 import onon1101.lendingsystem.auth.login.LoginCommand;
 import onon1101.lendingsystem.auth.login.LoginResult;
+import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
 import onon1101.lendingsystem.sharedkernel.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.sharedkernel.audit.UsernameAuditEventAttribute;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.springframework.stereotype.Component;
 
 /** Maps authentication command outcomes to authentication audit events. */
 @Component
 public final class AuthenticationAuditPolicy
-        implements CommandAuditPolicy<LoginCommand, Result<LoginResult>, AuthenticationAuditEvent> {
+        implements CommandAuditPolicy<LoginCommand, Result<LoginResult>, AuditEvent> {
 
     @Override
-    public AuthenticationAuditEvent onReturned(LoginCommand command, Result<LoginResult> result) {
+    public AuditEvent onReturned(LoginCommand command, Result<LoginResult> result) {
         String normalizedUsername = command.username();
 
         return switch (result) {
             case Result.Success<LoginResult> success ->
-                    new AuthenticationAuditEvent.Succeeded(normalizedUsername);
+                    new AuditEvent.Success(
+                            "authentication_succeeded",
+                            new UsernameAuditEventAttribute(normalizedUsername));
             case Result.Failure<LoginResult> failure ->
-                    new AuthenticationAuditEvent.Failed(normalizedUsername, failure.error().code());
+                    new AuditEvent.Rejected(
+                            "authentication_failed",
+                            new UsernameAuditEventAttribute(normalizedUsername),
+                            failure.error().code());
         };
     }
 
     @Override
-    public AuthenticationAuditEvent onThrown(LoginCommand command, Throwable throwable) {
-        return new AuthenticationAuditEvent.Failed(command.username(), "system_error");
+    public AuditEvent onThrown(LoginCommand command, Throwable throwable) {
+        return new AuditEvent.Failed(
+                "authentication_failed",
+                new UsernameAuditEventAttribute(command.username()),
+                "system_error");
     }
 }
