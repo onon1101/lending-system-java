@@ -47,6 +47,6 @@ public class ResetPasswordService {
         }
 
         //todo 使用 email
-        return Result.success(new ResetPasswordResult(new String()));
+        return Result.success(new ResetPasswordResult());
     }
 }

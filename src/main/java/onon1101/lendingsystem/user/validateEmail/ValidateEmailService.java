@@ -1,10 +1,12 @@
 package onon1101.lendingsystem.user.validateEmail;
 
+import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 
 import onon1101.lendingsystem.sharedkernel.token.TokenPayload;
 import onon1101.lendingsystem.user.commons.EmailValidateTokenService;
 
+import onon1101.lendingsystem.user.validateEmail.audit.ValidateEmailAuditPolicy;
 import onon1101.lendingsystem.user.validateEmail.error.InvalidEmailUpdatedDomainError;
 
 import org.springframework.stereotype.Service;
@@ -24,7 +26,8 @@ public class ValidateEmailService {
         this.tokenService = tokenService;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional()
+    @AuditedCommand(ValidateEmailAuditPolicy.class)
     public Result<ValidateEmailResult> execute(
             ValidateEmailCommand command
     ) {

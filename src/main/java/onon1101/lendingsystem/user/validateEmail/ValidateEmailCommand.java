@@ -1,6 +1,7 @@
 package onon1101.lendingsystem.user.validateEmail;
 
-public record ValidateEmailCommand(
+import onon1101.lendingsystem.sharedkernel.ICommand;
+
+public record ValidateEmailCommand (
         String validateToken
-) {
-}
+) implements ICommand { }

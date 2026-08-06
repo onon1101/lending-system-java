@@ -1,12 +1,11 @@
 package onon1101.lendingsystem.user.validateEmail;
 
-import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResponse;
 import onon1101.lendingsystem.sharedkernel.api.ApiResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,9 +21,9 @@ public class ValidateEmailController {
         this.validateEmailService = validateEmailService;
     }
 
-    @GetMapping("/validate-email?token={validateToken}")
+    @GetMapping("/validate-email")
     public ResponseEntity<ApiResponse<ValidateEmailResponse>> handle(
-            @PathVariable String validateToken
+            @RequestParam("token") String validateToken
     ) {
         return validateEmailService
                 .execute(new ValidateEmailCommand(validateToken))
