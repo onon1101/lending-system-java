@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class JwtTokenIssuer {
+public class JwtTokenIssuer {
 
     private final JwtEncoder jwtEncoder;
 

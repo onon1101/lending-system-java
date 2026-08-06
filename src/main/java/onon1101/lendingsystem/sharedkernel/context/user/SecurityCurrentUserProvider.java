@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 
 @Component
-public final class SecurityCurrentUserProvider implements CurrentUserProvider {
+public class SecurityCurrentUserProvider implements CurrentUserProvider {
 
     private final UserCache userCache;
     private final CurrentUserReader userReader;

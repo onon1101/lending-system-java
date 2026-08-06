@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public final class JdbcCurrentUserReader implements CurrentUserReader {
+public class JdbcCurrentUserReader implements CurrentUserReader {
 
     private final JdbcClient jdbcClient;
 

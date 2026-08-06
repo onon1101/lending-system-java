@@ -12,7 +12,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
 @Repository
-public final class RedisUserCache implements UserCache {
+public class RedisUserCache implements UserCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisUserCache.class);
     private static final String MODULE = "user";
