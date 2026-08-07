@@ -5,8 +5,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
-import onon1101.lendingsystem.sharedkernel.Command;
-import onon1101.lendingsystem.sharedkernel.CommandResult;
+
+import onon1101.lendingsystem.configurations.audit.AuditEvent;
+import onon1101.lendingsystem.configurations.audit.AuditedCommand;
+import onon1101.lendingsystem.configurations.audit.CommandAuditAspect;
+import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.configurations.services.Command;
+import onon1101.lendingsystem.configurations.services.CommandResult;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.Test;

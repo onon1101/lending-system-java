@@ -6,8 +6,8 @@ import java.util.UUID;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordCommand;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordResult;
 import onon1101.lendingsystem.auth.forgotPassword.error.InvalidEmailDomainError;
-import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
-import onon1101.lendingsystem.sharedkernel.domain.result.Result;
+import onon1101.lendingsystem.configurations.audit.AuditEvent;
+import onon1101.lendingsystem.configurations.domain.Result;
 import org.junit.jupiter.api.Test;
 
 class ForgotPasswordAuditPolicyTests {

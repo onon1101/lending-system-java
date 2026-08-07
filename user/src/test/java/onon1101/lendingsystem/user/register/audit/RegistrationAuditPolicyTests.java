@@ -3,8 +3,8 @@ package onon1101.lendingsystem.user.register.audit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;
-import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
-import onon1101.lendingsystem.sharedkernel.domain.result.Result;
+import onon1101.lendingsystem.configurations.audit.AuditEvent;
+import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.user.register.RegisterCommand;
 import onon1101.lendingsystem.user.register.RegisterResult;
 import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;

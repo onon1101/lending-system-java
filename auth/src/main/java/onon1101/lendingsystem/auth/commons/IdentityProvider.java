@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.auth.commons;
 
-import onon1101.lendingsystem.sharedkernel.domain.Enumeration;
+import onon1101.lendingsystem.configurations.domain.Enumeration;
 
 public final class IdentityProvider extends Enumeration<Integer, String> {
 

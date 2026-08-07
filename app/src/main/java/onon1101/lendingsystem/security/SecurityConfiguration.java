@@ -1,8 +1,8 @@
 package onon1101.lendingsystem.security;
 
 import onon1101.lendingsystem.auth.login.token.AccessTokenProperties;
-import onon1101.lendingsystem.sharedkernel.api.RequestContextFilter;
-import onon1101.lendingsystem.sharedkernel.token.JwtDecoderProvider;
+import onon1101.lendingsystem.configurations.controller.RequestContextFilter;
+import onon1101.lendingsystem.configurations.token.JwtDecoderProvider;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

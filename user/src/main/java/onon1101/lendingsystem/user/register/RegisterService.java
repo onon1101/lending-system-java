@@ -1,9 +1,9 @@
 package onon1101.lendingsystem.user.register;
 
-import onon1101.lendingsystem.sharedkernel.EmailUtil;
-import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
-import onon1101.lendingsystem.sharedkernel.domain.result.Result;
-import onon1101.lendingsystem.sharedkernel.token.emailvalidation.EmailValidateTokenService;
+import onon1101.lendingsystem.configurations.email.EmailUtil;
+import onon1101.lendingsystem.configurations.audit.AuditedCommand;
+import onon1101.lendingsystem.configurations.domain.Result;
+import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenService;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;
@@ -39,7 +39,7 @@ public class RegisterService {
         String email = command.email();
         String password = command.password();
 
-        if (!EmailUtil.validateEmail(email)) {
+        if (EmailUtil.validateEmail(email)) {
             return Result.failure(new InvalidEmailDomainError());
         }
 

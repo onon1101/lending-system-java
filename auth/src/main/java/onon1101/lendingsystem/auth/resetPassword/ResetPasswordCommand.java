@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.auth.resetPassword;
 
-import onon1101.lendingsystem.sharedkernel.Command;
+import onon1101.lendingsystem.configurations.services.Command;
 import org.jspecify.annotations.NonNull;
 
 public record ResetPasswordCommand(String resetToken, String newPassword) implements Command {

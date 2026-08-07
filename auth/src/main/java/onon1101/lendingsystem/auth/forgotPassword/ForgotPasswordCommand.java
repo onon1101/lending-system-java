@@ -1,7 +1,7 @@
 package onon1101.lendingsystem.auth.forgotPassword;
 
 import java.util.Locale;
-import onon1101.lendingsystem.sharedkernel.Command;
+import onon1101.lendingsystem.configurations.services.Command;
 
 public record ForgotPasswordCommand(String email) implements Command {
 

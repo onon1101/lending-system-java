@@ -2,8 +2,8 @@ package onon1101.lendingsystem.auth.login.token;
 
 import java.util.Map;
 import java.util.UUID;
-import onon1101.lendingsystem.sharedkernel.context.user.AccessTokenClaim;
-import onon1101.lendingsystem.sharedkernel.token.JwtTokenService;
+import onon1101.lendingsystem.configurations.context.user.AccessTokenClaim;
+import onon1101.lendingsystem.configurations.token.JwtTokenService;
 import org.springframework.stereotype.Service;
 
 @Service

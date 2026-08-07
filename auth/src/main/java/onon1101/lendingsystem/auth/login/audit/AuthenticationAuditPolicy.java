@@ -2,10 +2,10 @@ package onon1101.lendingsystem.auth.login.audit;
 
 import onon1101.lendingsystem.auth.login.LoginCommand;
 import onon1101.lendingsystem.auth.login.LoginResult;
-import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
-import onon1101.lendingsystem.sharedkernel.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.sharedkernel.audit.UsernameAuditEventAttribute;
-import onon1101.lendingsystem.sharedkernel.domain.result.Result;
+import onon1101.lendingsystem.configurations.audit.AuditEvent;
+import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.configurations.audit.UsernameAuditEventAttribute;
+import onon1101.lendingsystem.configurations.domain.Result;
 import org.springframework.stereotype.Component;
 
 /** Maps authentication command outcomes to authentication audit events. */

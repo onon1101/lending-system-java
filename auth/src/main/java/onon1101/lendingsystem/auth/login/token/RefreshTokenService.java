@@ -6,11 +6,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.sql.Ref;
-import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.UUID;
+import onon1101.lendingsystem.configurations.time.IClock;
 
 @Service
 public class RefreshTokenService {
@@ -20,13 +19,13 @@ public class RefreshTokenService {
     private final SecureRandom secureRandom = new SecureRandom();
     private final RefreshTokenStore tokenStore;
     private final RefreshTokenProperties properties;
+    private final IClock clock;
 
     public RefreshTokenService(
-            RefreshTokenStore tokenStore,
-            RefreshTokenProperties properties
-    ) {
+            RefreshTokenStore tokenStore, RefreshTokenProperties properties, IClock clock) {
         this.tokenStore = tokenStore;
         this.properties = properties;
+        this.clock = clock;
     }
 
     public String createToken(
@@ -47,7 +46,7 @@ public class RefreshTokenService {
                         privateUserId,
                         publicUserId,
                         username,
-                        Instant.now());
+                        clock.now());
 
         tokenStore.save(
                 hash(rawToken),

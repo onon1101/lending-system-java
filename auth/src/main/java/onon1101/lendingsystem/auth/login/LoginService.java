@@ -7,8 +7,9 @@ import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
 import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
 import onon1101.lendingsystem.auth.login.token.AccessTokenService;
 import onon1101.lendingsystem.auth.login.token.RefreshTokenService;
-import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
-import onon1101.lendingsystem.sharedkernel.domain.result.Result;
+import onon1101.lendingsystem.configurations.audit.AuditedCommand;
+import onon1101.lendingsystem.configurations.domain.Result;
+import onon1101.lendingsystem.configurations.time.IClock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,25 +28,28 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
     private final AccessTokenService accessTokenService;
     private final RefreshTokenService refreshTokenService;
+    private final IClock clock;
 
     public LoginService(
             LoginAccountReader accountReader,
             LoginAccountWriter accountWriter,
             PasswordEncoder passwordEncoder,
             AccessTokenService tokenService,
-            RefreshTokenService refreshTokenService) {
+            RefreshTokenService refreshTokenService,
+            IClock clock) {
         this.accountReader = accountReader;
         this.accountWriter = accountWriter;
         this.passwordEncoder = passwordEncoder;
         this.accessTokenService = tokenService;
         this.refreshTokenService = refreshTokenService;
+        this.clock = clock;
     }
 
     // TODO Add refresh token support.
     @Transactional()
     @AuditedCommand(AuthenticationAuditPolicy.class)
     public Result<LoginResult> login(LoginCommand command) {
-        Instant now = Instant.now();
+        Instant now = clock.now();
 
         String username = command.username();
         String password = command.password();
@@ -58,7 +62,7 @@ public class LoginService {
         }
 
         // 嘗試太多次
-        if (account.lockedUntil() != null && account.lockedUntil().isAfter(Instant.now())) {
+        if (account.lockedUntil() != null && account.lockedUntil().isAfter(now)) {
             return Result.failure(new TooManyAttemptsDomainError());
         }
 

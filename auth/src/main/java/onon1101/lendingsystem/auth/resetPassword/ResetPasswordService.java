@@ -2,8 +2,8 @@ package onon1101.lendingsystem.auth.resetPassword;
 
 import onon1101.lendingsystem.auth.commons.PasswordTokenService;
 import onon1101.lendingsystem.auth.resetPassword.error.InvalidResetTokenDomainError;
-import onon1101.lendingsystem.sharedkernel.domain.result.Result;
-import onon1101.lendingsystem.sharedkernel.token.TokenPayload;
+import onon1101.lendingsystem.configurations.domain.Result;
+import onon1101.lendingsystem.configurations.token.TokenPayload;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -5,9 +5,9 @@ import onon1101.lendingsystem.auth.commons.PasswordTokenService;
 import onon1101.lendingsystem.auth.forgotPassword.audit.ForgotPasswordAuditPolicy;
 import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailRequested;
 import onon1101.lendingsystem.auth.forgotPassword.error.InvalidEmailDomainError;
-import onon1101.lendingsystem.sharedkernel.EmailUtil;
-import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
-import onon1101.lendingsystem.sharedkernel.domain.result.Result;
+import onon1101.lendingsystem.configurations.email.EmailUtil;
+import onon1101.lendingsystem.configurations.audit.AuditedCommand;
+import onon1101.lendingsystem.configurations.domain.Result;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class ForgotPasswordService {
 
         String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
 
-        if (!EmailUtil.validateEmail(normalizedEmail)) {
+        if (EmailUtil.validateEmail(normalizedEmail)) {
             return Result.failure(new InvalidEmailDomainError());
         }
 

@@ -1,8 +1,8 @@
 package onon1101.lendingsystem.auth.commons;
 
 import java.util.UUID;
-import onon1101.lendingsystem.sharedkernel.token.JwtTokenService;
-import onon1101.lendingsystem.sharedkernel.token.TokenPayload;
+import onon1101.lendingsystem.configurations.token.JwtTokenService;
+import onon1101.lendingsystem.configurations.token.TokenPayload;
 import org.springframework.stereotype.Service;
 
 @Service

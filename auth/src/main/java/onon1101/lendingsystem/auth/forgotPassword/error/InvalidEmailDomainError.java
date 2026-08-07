@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.auth.forgotPassword.error;
 
-import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
+import onon1101.lendingsystem.configurations.domain.DomainError;
 
 public class InvalidEmailDomainError extends DomainError {
     public InvalidEmailDomainError() {
