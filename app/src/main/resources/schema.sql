@@ -1,7 +1,7 @@
 
-DROP TABLE IF EXISTS user_password_credentials CASCADE;
-DROP TABLE IF EXISTS user_auth_identities CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
+--DROP TABLE IF EXISTS user_password_credentials CASCADE;
+--DROP TABLE IF EXISTS user_auth_identities CASCADE;
+--DROP TABLE IF EXISTS users CASCADE;
 
 -- 存放使用者資訊
 CREATE TABLE IF NOT EXISTS users
@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS users
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT uq_users_username UNIQUE (username),
+
+    CONSTRAINT uq_users_email UNIQUE (email),
 
     CONSTRAINT ck_users_username_lowercase
         CHECK (username = LOWER(username)),

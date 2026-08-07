@@ -26,7 +26,7 @@ class LoginApiIntegrationTests extends AbstractApiIntegrationTest {
         JsonNode data = assertSuccessful(response, HttpStatus.OK.value());
         assertThat(data.path("accessToken").asString()).isNotBlank();
         assertThat(data.path("tokenType").asString()).isEqualTo("Bearer");
-        assertThat(data.path("expiresIn").asLong()).isPositive();
+        assertThat(data.path("accessTokenExpiresIn").asLong()).isPositive();
     }
 
     @Test

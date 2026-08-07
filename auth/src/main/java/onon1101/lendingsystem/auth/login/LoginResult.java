@@ -2,4 +2,9 @@ package onon1101.lendingsystem.auth.login;
 
 import onon1101.lendingsystem.sharedkernel.CommandResult;
 
-public record LoginResult(String accessToken, long expiresIn) implements CommandResult {}
+public record LoginResult(
+        String accessToken,
+        long accessTokenExpiresIn,
+        String refreshToken,
+        long refreshTokenExpiresIn
+) implements CommandResult {}

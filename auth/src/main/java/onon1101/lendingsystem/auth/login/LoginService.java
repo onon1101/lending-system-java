@@ -6,6 +6,7 @@ import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditPolicy;
 import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
 import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
 import onon1101.lendingsystem.auth.login.token.AccessTokenService;
+import onon1101.lendingsystem.auth.login.token.RefreshTokenService;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,17 +25,20 @@ public class LoginService {
     private final LoginAccountReader accountReader;
     private final LoginAccountWriter accountWriter;
     private final PasswordEncoder passwordEncoder;
-    private final AccessTokenService tokenService;
+    private final AccessTokenService accessTokenService;
+    private final RefreshTokenService refreshTokenService;
 
     public LoginService(
             LoginAccountReader accountReader,
             LoginAccountWriter accountWriter,
             PasswordEncoder passwordEncoder,
-            AccessTokenService tokenService) {
+            AccessTokenService tokenService,
+            RefreshTokenService refreshTokenService) {
         this.accountReader = accountReader;
         this.accountWriter = accountWriter;
         this.passwordEncoder = passwordEncoder;
-        this.tokenService = tokenService;
+        this.accessTokenService = tokenService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     // TODO Add refresh token support.
@@ -76,9 +80,22 @@ public class LoginService {
         accountWriter.resetFailedAttempts(account.passwordId());
 
         String accessToken =
-                tokenService.createToken(
-                        account.privateUserId(), account.publicUserId(), account.username());
+                accessTokenService.createToken(
+                        account.privateUserId(),
+                        account.publicUserId(),
+                        account.username());
 
-        return Result.success(new LoginResult(accessToken, tokenService.expiresInSeconds()));
+        String refreshToken =
+                refreshTokenService.createToken(
+                        account.privateUserId(),
+                        account.publicUserId(),
+                        account.username());
+
+        return Result.success(
+                new LoginResult(
+                        accessToken,
+                        accessTokenService.expiresInSeconds(),
+                        refreshToken,
+                        refreshTokenService.expiresInSeconds()));
     }
 }
