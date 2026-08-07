@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.user.commons;
+package onon1101.lendingsystem.sharedkernel.token.emailvalidation;
 
 import java.time.Duration;
 import onon1101.lendingsystem.sharedkernel.token.TokenProperties;

@@ -1,13 +1,13 @@
-package onon1101.lendingsystem.user.validateEmail.audit;
+package onon1101.lendingsystem.auth.emailVerificationConfirm.audit;
 
 import onon1101.lendingsystem.sharedkernel.audit.AuditEvent;
 import onon1101.lendingsystem.sharedkernel.audit.CommandAuditPolicy;
 import onon1101.lendingsystem.sharedkernel.audit.TokenAuditEventAttribute;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
 import onon1101.lendingsystem.sharedkernel.token.JwtTokenService;
-import onon1101.lendingsystem.user.commons.EmailValidateTokenProperties;
-import onon1101.lendingsystem.user.validateEmail.ValidateEmailCommand;
-import onon1101.lendingsystem.user.validateEmail.ValidateEmailResult;
+import onon1101.lendingsystem.sharedkernel.token.emailvalidation.EmailValidateTokenProperties;
+import onon1101.lendingsystem.auth.emailVerificationConfirm.ValidateEmailCommand;
+import onon1101.lendingsystem.auth.emailVerificationConfirm.ValidateEmailResult;
 import org.springframework.stereotype.Component;
 
 @Component

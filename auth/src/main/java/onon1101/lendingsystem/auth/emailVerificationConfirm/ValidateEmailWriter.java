@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.user.validateEmail;
+package onon1101.lendingsystem.auth.emailVerificationConfirm;
 
 import java.util.UUID;
 

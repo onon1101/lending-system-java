@@ -1,22 +1,22 @@
-package onon1101.lendingsystem.user.validateEmail;
+package onon1101.lendingsystem.auth.emailVerificationConfirm;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import onon1101.lendingsystem.sharedkernel.api.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "user", description = "使用者服務相關 API")
+@Tag(name = "auth", description = "認證相關 API")
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/auth/email-verification")
 public class ValidateEmailController {
 
     private final ValidateEmailService validateEmailService;
@@ -26,9 +26,10 @@ public class ValidateEmailController {
     }
 
     @Operation(
-            summary = "驗證 Email",
+            summary = "確認 Email 驗證",
             description =
-                    "使用 Email 驗證 token 完成電子郵件驗證。業務失敗時 errorCode 可能為" + " User.InvalidEmailUpdated。")
+                    "使用 Email 驗證 token 完成電子郵件驗證。"
+                            + "業務失敗時 errorCode 可能為 User.InvalidEmailUpdated。")
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
                 responseCode = "200",
@@ -47,13 +48,11 @@ public class ValidateEmailController {
                 description = "資料庫暫時無法連線",
                 content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    @GetMapping("/validate-email")
-    public ResponseEntity<ApiResponse<ValidateEmailResponse>> handle(
-            @Parameter(description = "Email 驗證 token", required = true, example = "email-token")
-                    @RequestParam("token")
-                    String validateToken) {
+    @PostMapping("/confirm")
+    public ResponseEntity<ApiResponse<ValidateEmailResponse>> confirm(
+            @Valid @RequestBody ConfirmEmailRequest request) {
         return validateEmailService
-                .execute(new ValidateEmailCommand(validateToken))
+                .execute(new ValidateEmailCommand(request.token()))
                 .match(
                         result ->
                                 ResponseEntity.ok(

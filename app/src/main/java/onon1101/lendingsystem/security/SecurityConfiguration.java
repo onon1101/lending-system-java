@@ -31,7 +31,7 @@ public class SecurityConfiguration {
                                                 "/api/v1/user/register",
                                                 "/api/v1/auth/forgot-password",
                                                 "/api/v1/auth/register",
-                                                "/api/v1/user/validate-email")
+                                                "/api/v1/auth/email-verification/confirm")
                                         .permitAll()
                                         .requestMatchers(EndpointRequest.to("health"))
                                         .permitAll()

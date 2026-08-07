@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.user.commons;
+package onon1101.lendingsystem.sharedkernel.token.emailvalidation;
 
 import java.util.UUID;
 import onon1101.lendingsystem.sharedkernel.token.JwtTokenService;
@@ -12,8 +12,8 @@ public class EmailValidateTokenService {
     private final EmailValidateTokenProperties properties;
 
     public EmailValidateTokenService(
-            JwtTokenService tokenIssuer, EmailValidateTokenProperties properties) {
-        this.tokenService = tokenIssuer;
+            JwtTokenService tokenService, EmailValidateTokenProperties properties) {
+        this.tokenService = tokenService;
         this.properties = properties;
     }
 

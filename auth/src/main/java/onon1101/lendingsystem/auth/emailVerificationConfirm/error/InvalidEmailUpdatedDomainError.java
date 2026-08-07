@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.user.validateEmail.error;
+package onon1101.lendingsystem.auth.emailVerificationConfirm.error;
 
 import onon1101.lendingsystem.sharedkernel.domain.result.DomainError;
 
