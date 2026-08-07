@@ -11,7 +11,14 @@
   <groupId>onon1101</groupId>
   <artifactId>LendingSystem</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>LendingSystem</name>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>shared-kernel</module>
+    </modules>
+
+    <name>LendingSystem</name>
   <description>LendingSystem</description>
   <url/>
   <licenses>
