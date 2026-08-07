@@ -24,11 +24,8 @@ public class JdbcCurrentUserReader implements CurrentUserReader {
                     users.public_id,
                     users.username,
                     users.status,
-                    identities.email
+                    users.email
                 FROM users
-                LEFT JOIN user_auth_identities identities
-                    ON identities.user_id = users.id
-                    AND identities.provider = 'password'
                 WHERE users.id = :privateUserId
                 LIMIT 1
                 """;

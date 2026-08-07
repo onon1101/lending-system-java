@@ -25,7 +25,7 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                             users.id AS private_user_id,
                             users.public_id,
                             users.username,
-                            identities.email,
+                            users.email,
                             credentials.password_hash,
                             credentials.auth_identity_id,
                             credentials.locked_until

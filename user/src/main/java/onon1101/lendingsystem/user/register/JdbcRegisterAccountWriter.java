@@ -29,11 +29,12 @@ public class JdbcRegisterAccountWriter implements RegisterAccountWriter {
             jdbcClient
                     .sql(
                             """
-                            INSERT INTO users (username, public_id)
-                            VALUES (:username, :publicId)
+                            INSERT INTO users (username, public_id, email, email_verified)
+                            VALUES (:username, :publicId, :email, FALSE)
                             """)
                     .param("username", username)
                     .param("publicId", publicId)
+                    .param("email", email)
                     .update(userKey, "id");
 
             long userId =
@@ -48,14 +49,13 @@ public class JdbcRegisterAccountWriter implements RegisterAccountWriter {
                     .sql(
                             """
                                     INSERT INTO user_auth_identities
-                                        (user_id, provider, provider_subject, email, email_verified)
+                                        (user_id, provider, provider_subject)
                                     VALUES
-                                        (:userId, :provider, :subject, :email, FALSE)
+                                        (:userId, :provider, :subject)
                                     """)
                     .param("userId", account.privateUserId())
                     .param("provider", "password")
                     .param("subject", username)
-                    .param("email", email)
                     .update(identityKey, "id");
 
             long identityId =

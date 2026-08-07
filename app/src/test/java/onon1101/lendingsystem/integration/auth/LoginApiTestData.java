@@ -21,11 +21,14 @@ public final class LoginApiTestData implements ApiTestData {
         jdbcClient
                 .sql(
                         """
-                        INSERT INTO users (username, public_id, status)
-                        VALUES (:username, :publicId, 'active')
+                        INSERT INTO users
+                            (username, public_id, status, email, email_verified)
+                        VALUES
+                            (:username, :publicId, 'active', :email, FALSE)
                         """)
                 .param("username", username)
                 .param("publicId", UuidCreator.getTimeOrderedEpoch())
+                .param("email", username + "@example.com")
                 .update();
 
         long userId =
@@ -39,9 +42,9 @@ public final class LoginApiTestData implements ApiTestData {
                 .sql(
                         """
                         INSERT INTO user_auth_identities
-                            (user_id, provider, provider_subject, email_verified)
+                            (user_id, provider, provider_subject)
                         VALUES
-                            (:userId, 'password', :username, false)
+                            (:userId, 'password', :username)
                         """)
                 .param("userId", userId)
                 .param("username", username)

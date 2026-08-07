@@ -17,13 +17,11 @@ public class JdbcValidateEmailWriter implements ValidateEmailWriter {
     public boolean updateStateByPublicId(UUID publicId) {
         String sql =
                 """
-                UPDATE user_auth_identities AS identity
-                SET email_verified = TRUE
-                FROM users AS user_account
-                WHERE identity.user_id = user_account.id
-                  AND user_account.public_id = :userPublicId
-                  AND identity.provider = 'password'
-                  AND identity.email_verified IS DISTINCT FROM TRUE;
+                UPDATE users
+                SET email_verified = TRUE,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE public_id = :userPublicId
+                  AND email_verified IS DISTINCT FROM TRUE;
                 """;
 
         return jdbcClient.sql(sql).param("userPublicId", publicId).update() == 1;
