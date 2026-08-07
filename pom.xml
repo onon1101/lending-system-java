@@ -16,6 +16,12 @@
 
     <modules>
         <module>shared-kernel</module>
+        <module>platform</module>
+        <module>auth</module>
+        <module>user</module>
+        <module>storage</module>
+        <module>video</module>
+        <module>app</module>
     </modules>
 
     <name>LendingSystem</name>
@@ -265,10 +271,6 @@
             <sortPom/>
           </pom>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
