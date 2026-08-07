@@ -3,8 +3,8 @@ package onon1101.lendingsystem.auth.login;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
-import onon1101.lendingsystem.auth.properties.IdentityProvider;
-import onon1101.lendingsystem.auth.properties.UserStatus;
+import onon1101.lendingsystem.auth.commons.IdentityProvider;
+import onon1101.lendingsystem.auth.commons.UserStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 

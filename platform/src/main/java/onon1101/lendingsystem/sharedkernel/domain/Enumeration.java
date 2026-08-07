@@ -1,6 +1,5 @@
 package onon1101.lendingsystem.sharedkernel.domain;
 
-
 import java.util.Objects;
 
 /**
@@ -12,14 +11,10 @@ import java.util.Objects;
 public abstract class Enumeration<K extends Comparable<K>, V>
         implements Comparable<Enumeration<K, V>> {
 
-    /**
-     * Key
-     */
+    /** Key */
     private final K key;
 
-    /**
-     * Value
-     */
+    /** Value */
     private final V value;
 
     /**

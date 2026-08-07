@@ -1,7 +1,6 @@
 package onon1101.lendingsystem.sharedkernel.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import org.springframework.http.HttpStatus;
 
 @Schema(description = "API 標準回應")

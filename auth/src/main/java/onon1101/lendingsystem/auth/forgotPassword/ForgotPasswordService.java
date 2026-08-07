@@ -1,10 +1,10 @@
 package onon1101.lendingsystem.auth.forgotPassword;
 
 import java.util.Locale;
+import onon1101.lendingsystem.auth.commons.PasswordTokenService;
 import onon1101.lendingsystem.auth.forgotPassword.audit.ForgotPasswordAuditPolicy;
 import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailRequested;
 import onon1101.lendingsystem.auth.forgotPassword.error.InvalidEmailDomainError;
-import onon1101.lendingsystem.auth.commons.PasswordTokenService;
 import onon1101.lendingsystem.sharedkernel.EmailUtil;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;

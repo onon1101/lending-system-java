@@ -15,8 +15,7 @@ public final class RegistrationAuditPolicy
         implements CommandAuditPolicy<RegisterCommand, Result<RegisterResult>, AuditEvent> {
 
     @Override
-    public AuditEvent onReturned(
-            RegisterCommand command, Result<RegisterResult> result) {
+    public AuditEvent onReturned(RegisterCommand command, Result<RegisterResult> result) {
         String normalizedUsername = command.username();
 
         return switch (result) {

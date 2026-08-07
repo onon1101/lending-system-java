@@ -8,11 +8,5 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>platform</artifactId>
-  <dependencies>
-    <dependency>
-      <groupId>onon1101</groupId>
-      <artifactId>shared-kernel</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <packaging>jar</packaging>
 </project>

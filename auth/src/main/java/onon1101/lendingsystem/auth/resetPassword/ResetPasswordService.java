@@ -1,10 +1,9 @@
 package onon1101.lendingsystem.auth.resetPassword;
 
 import onon1101.lendingsystem.auth.commons.PasswordTokenService;
-import onon1101.lendingsystem.sharedkernel.token.TokenPayload;
 import onon1101.lendingsystem.auth.resetPassword.error.InvalidResetTokenDomainError;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
-
+import onon1101.lendingsystem.sharedkernel.token.TokenPayload;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,34 +18,28 @@ public class ResetPasswordService {
     public ResetPasswordService(
             PasswordTokenService tokenService,
             ResetPasswordWriter passwordWriter,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
         this.passwordWriter = passwordWriter;
         this.tokenService = tokenService;
     }
 
-    //todo: 透過 user_public_id 查詢 redis
+    // todo: 透過 user_public_id 查詢 redis
     @Transactional
-    public Result<ResetPasswordResult> execute(
-            ResetPasswordCommand command
-    ) {
-        TokenPayload payload =
-                tokenService.decode(
-                        command.resetToken());
+    public Result<ResetPasswordResult> execute(ResetPasswordCommand command) {
+        TokenPayload payload = tokenService.decode(command.resetToken());
 
         String encodedPassword = passwordEncoder.encode(command.newPassword());
 
-        boolean updated = passwordWriter.updatePassword(
-                payload.publicUserId(),
-                encodedPassword,
-                payload.issuedAt());
+        boolean updated =
+                passwordWriter.updatePassword(
+                        payload.publicUserId(), encodedPassword, payload.issuedAt());
 
         if (!updated) {
             return Result.failure(new InvalidResetTokenDomainError());
         }
 
-        //todo 使用 email
+        // todo 使用 email
         return Result.success(new ResetPasswordResult());
     }
 }

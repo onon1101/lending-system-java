@@ -1,17 +1,15 @@
 package onon1101.lendingsystem.sharedkernel.domain.result;
 
-import onon1101.lendingsystem.sharedkernel.IResult;
-
 import java.util.Objects;
 import java.util.function.Function;
+import onon1101.lendingsystem.sharedkernel.CommandResult;
 
 /**
  * 成功與失敗的通用類型。
  *
  * @param <T> Payload 型別
  */
-public sealed interface Result<T>
-extends IResult permits Result.Success, Result.Failure {
+public sealed interface Result<T> extends CommandResult permits Result.Success, Result.Failure {
 
     /**
      * 是否成功。
@@ -62,6 +60,7 @@ extends IResult permits Result.Success, Result.Failure {
     static <T> Result<T> failure(DomainError error) {
         return new Failure<>(error);
     }
+
     /**
      * 表示成功結果，包含成功時返回的值。
      *
@@ -79,9 +78,7 @@ extends IResult permits Result.Success, Result.Failure {
             Objects.requireNonNull(value, "Success value must not be null");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public boolean isSuccess() {
             return true;
@@ -120,9 +117,7 @@ extends IResult permits Result.Success, Result.Failure {
             Objects.requireNonNull(error, "Failure error must not be null");
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public boolean isSuccess() {
             return false;

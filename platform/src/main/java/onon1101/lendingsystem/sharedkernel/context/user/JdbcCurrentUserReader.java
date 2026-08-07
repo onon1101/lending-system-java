@@ -1,9 +1,8 @@
-package onon1101.lendingsystem.user.context;
+package onon1101.lendingsystem.sharedkernel.context.user;
 
 import java.util.Optional;
 import java.util.UUID;
-import onon1101.lendingsystem.sharedkernel.context.user.CurrentUserContext;
-import onon1101.lendingsystem.sharedkernel.context.user.CurrentUserReader;
+
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 

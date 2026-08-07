@@ -3,7 +3,6 @@ package onon1101.lendingsystem.auth.login;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
@@ -18,10 +17,7 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
 
     @Override
     public FailedAttemptResult recordFailedAttempt(
-            Integer passwordId,
-            int maxAttempts,
-            Instant lockedUntil
-    ) {
+            Integer passwordId, int maxAttempts, Instant lockedUntil) {
 
         String sql =
                 """
@@ -62,8 +58,7 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
                 .query(
                         (rs, rowNum) -> {
                             OffsetDateTime resultLockedUntil =
-                                    rs.getObject("locked_until",
-                                            OffsetDateTime.class);
+                                    rs.getObject("locked_until", OffsetDateTime.class);
 
                             return new FailedAttemptResult(
                                     rs.getInt("failed_attempts"),
@@ -84,10 +79,7 @@ public class JdbcLoginAccountWriter implements LoginAccountWriter {
                         WHERE auth_identity_id = :passwordId
                         """;
 
-        int affectedRows = jdbcClient
-                .sql(sql)
-                .param("passwordId", passwordId)
-                .update();
+        int affectedRows = jdbcClient.sql(sql).param("passwordId", passwordId).update();
 
         if (affectedRows != 1) {
             throw new IllegalStateException(

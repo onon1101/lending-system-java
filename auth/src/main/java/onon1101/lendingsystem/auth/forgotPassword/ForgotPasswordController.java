@@ -5,11 +5,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
-
 import onon1101.lendingsystem.sharedkernel.api.ApiResponse;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,9 +21,7 @@ public class ForgotPasswordController {
 
     private final ForgotPasswordService forgotPasswordService;
 
-    public ForgotPasswordController(
-            ForgotPasswordService forgotPasswordService
-    ) {
+    public ForgotPasswordController(ForgotPasswordService forgotPasswordService) {
         this.forgotPasswordService = forgotPasswordService;
     }
 
@@ -55,10 +50,7 @@ public class ForgotPasswordController {
     })
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<ForgotPasswordResponse>> handle(
-            @Valid
-            @RequestBody
-            ForgotPasswordRequest request
-    ) {
+            @Valid @RequestBody ForgotPasswordRequest request) {
         return forgotPasswordService
                 .handle(new ForgotPasswordCommand(request.email()))
                 .match(
@@ -66,11 +58,9 @@ public class ForgotPasswordController {
                             ForgotPasswordResponse response =
                                     new ForgotPasswordResponse("已發送 Email");
 
-                            return ResponseEntity.ok(ApiResponse.success(
-                                    HttpStatus.OK,
-                                    response));
+                            return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, response));
                         },
-                        errorCode -> ResponseEntity.ok(
-                                ApiResponse.failure(HttpStatus.OK, errorCode)));
+                        errorCode ->
+                                ResponseEntity.ok(ApiResponse.failure(HttpStatus.OK, errorCode)));
     }
 }

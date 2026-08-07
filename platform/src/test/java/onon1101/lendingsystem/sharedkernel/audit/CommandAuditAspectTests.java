@@ -5,8 +5,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
-import onon1101.lendingsystem.sharedkernel.ICommand;
-import onon1101.lendingsystem.sharedkernel.IResult;
+import onon1101.lendingsystem.sharedkernel.Command;
+import onon1101.lendingsystem.sharedkernel.CommandResult;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.Test;
@@ -81,9 +81,9 @@ class CommandAuditAspectTests {
         }
     }
 
-    private record TestCommand() implements ICommand {}
+    private record TestCommand() implements Command {}
 
-    private record TestResult() implements IResult {}
+    private record TestResult() implements CommandResult {}
 
     private record TestEvent() implements AuditEvent {}
 }

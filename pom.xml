@@ -12,19 +12,9 @@
   <artifactId>LendingSystem</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-    <packaging>pom</packaging>
+  <packaging>pom</packaging>
 
-    <modules>
-        <module>shared-kernel</module>
-        <module>platform</module>
-        <module>auth</module>
-        <module>user</module>
-        <module>storage</module>
-        <module>video</module>
-        <module>app</module>
-    </modules>
-
-    <name>LendingSystem</name>
+  <name>LendingSystem</name>
   <description>LendingSystem</description>
   <url/>
   <licenses>
@@ -33,6 +23,13 @@
   <developers>
     <developer/>
   </developers>
+
+  <modules>
+    <module>platform</module>
+    <module>auth</module>
+    <module>user</module>
+    <module>app</module>
+  </modules>
   <scm>
     <connection/>
     <developerConnection/>
@@ -92,10 +89,10 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
-      <dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-starter-data-redis</artifactId>
-      </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-aspectj</artifactId>

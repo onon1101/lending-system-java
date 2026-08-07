@@ -25,13 +25,11 @@ public final class ResetPasswordAuditPolicy
     }
 
     @Override
-    public AuditEvent onReturned(
-            ResetPasswordCommand command, Result<ResetPasswordResult> result) {
+    public AuditEvent onReturned(ResetPasswordCommand command, Result<ResetPasswordResult> result) {
         return switch (result) {
             case Result.Success<ResetPasswordResult> success ->
                     new AuditEvent.Success(
-                            "password_reset_receiver_successed",
-                            tokenAttribute(command));
+                            "password_reset_receiver_successed", tokenAttribute(command));
             case Result.Failure<ResetPasswordResult> failure ->
                     new AuditEvent.Rejected(
                             "password_reset_receiver_failed",
@@ -43,13 +41,10 @@ public final class ResetPasswordAuditPolicy
     @Override
     public AuditEvent onThrown(ResetPasswordCommand command, Throwable throwable) {
         return new AuditEvent.Failed(
-                "password_reset_receiver_failed",
-                tokenAttribute(command),
-                "system_error");
+                "password_reset_receiver_failed", tokenAttribute(command), "system_error");
     }
 
     private TokenAuditEventAttribute tokenAttribute(ResetPasswordCommand command) {
-        return new TokenAuditEventAttribute(
-                tokenService, passwordProperties, command.resetToken());
+        return new TokenAuditEventAttribute(tokenService, passwordProperties, command.resetToken());
     }
 }

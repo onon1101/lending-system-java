@@ -5,9 +5,5 @@ import java.util.UUID;
 
 public interface ResetPasswordWriter {
 
-    boolean updatePassword(
-            UUID publicUserId,
-            String encodedPassword,
-            Instant tokenIssuedAt
-    );
+    boolean updatePassword(UUID publicUserId, String encodedPassword, Instant tokenIssuedAt);
 }

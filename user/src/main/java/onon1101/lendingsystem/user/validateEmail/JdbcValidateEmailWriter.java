@@ -1,9 +1,8 @@
 package onon1101.lendingsystem.user.validateEmail;
 
+import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
-
-import java.util.UUID;
 
 @Repository
 public class JdbcValidateEmailWriter implements ValidateEmailWriter {
@@ -15,10 +14,9 @@ public class JdbcValidateEmailWriter implements ValidateEmailWriter {
     }
 
     @Override
-    public boolean updateStateByPublicId(
-            UUID publicId
-    ) {
-        String sql = """
+    public boolean updateStateByPublicId(UUID publicId) {
+        String sql =
+                """
                 UPDATE user_auth_identities AS identity
                 SET email_verified = TRUE
                 FROM users AS user_account
@@ -28,9 +26,6 @@ public class JdbcValidateEmailWriter implements ValidateEmailWriter {
                   AND identity.email_verified IS DISTINCT FROM TRUE;
                 """;
 
-        return jdbcClient
-                .sql(sql)
-                .param("userPublicId", publicId)
-                .update() == 1;
+        return jdbcClient.sql(sql).param("userPublicId", publicId).update() == 1;
     }
 }

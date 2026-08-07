@@ -1,30 +1,26 @@
 package onon1101.lendingsystem.auth.resetPassword;
 
-import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
-
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
+import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 @Repository
 class JdbcResetPasswordWriter implements ResetPasswordWriter {
 
     private final JdbcClient jdbcClient;
 
-    JdbcResetPasswordWriter(
-            JdbcClient jdbcClient
-    ) {
+    JdbcResetPasswordWriter(JdbcClient jdbcClient) {
         this.jdbcClient = jdbcClient;
     }
 
     @Override
     public boolean updatePassword(
-            UUID publicUserId,
-            String encodedPassword,
-            Instant tokenIssuedAt) {
+            UUID publicUserId, String encodedPassword, Instant tokenIssuedAt) {
 
-        String sql = """
+        String sql =
+                """
                 UPDATE user_password_credentials
                 SET password_hash = :passwordHash,
                 	password_changed_at = CURRENT_TIMESTAMP,
@@ -42,10 +38,11 @@ class JdbcResetPasswordWriter implements ResetPasswordWriter {
                 """;
 
         return jdbcClient
-                .sql(sql)
-                .param("passwordHash", encodedPassword)
-                .param("publicUserId", publicUserId)
-                .param("tokenIssuedAt", Timestamp.from(tokenIssuedAt))
-                .update() == 1;
+                        .sql(sql)
+                        .param("passwordHash", encodedPassword)
+                        .param("publicUserId", publicUserId)
+                        .param("tokenIssuedAt", Timestamp.from(tokenIssuedAt))
+                        .update()
+                == 1;
     }
 }

@@ -1,9 +1,9 @@
 package onon1101.lendingsystem.user.register;
 
-import onon1101.lendingsystem.user.commons.EmailValidateTokenService;
 import onon1101.lendingsystem.sharedkernel.EmailUtil;
 import onon1101.lendingsystem.sharedkernel.audit.AuditedCommand;
 import onon1101.lendingsystem.sharedkernel.domain.result.Result;
+import onon1101.lendingsystem.user.commons.EmailValidateTokenService;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;

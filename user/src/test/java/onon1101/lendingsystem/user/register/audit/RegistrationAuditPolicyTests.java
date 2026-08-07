@@ -21,8 +21,7 @@ class RegistrationAuditPolicyTests {
         Object event =
                 policy.onReturned(command(" Alice "), Result.success(new RegisterResult(userId)));
 
-        assertSuccess(
-                event, "registration_succeeded", "publicUserIdRef", userId.toString());
+        assertSuccess(event, "registration_succeeded", "publicUserIdRef", userId.toString());
     }
 
     @Test

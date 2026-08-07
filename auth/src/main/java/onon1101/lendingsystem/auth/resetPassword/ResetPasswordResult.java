@@ -1,6 +1,5 @@
 package onon1101.lendingsystem.auth.resetPassword;
 
-import onon1101.lendingsystem.sharedkernel.IResult;
+import onon1101.lendingsystem.sharedkernel.CommandResult;
 
-public record ResetPasswordResult() implements IResult {
-}
+public record ResetPasswordResult() implements CommandResult {}

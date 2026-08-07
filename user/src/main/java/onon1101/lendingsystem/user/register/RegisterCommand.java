@@ -1,9 +1,9 @@
 package onon1101.lendingsystem.user.register;
 
 import java.util.Locale;
-import onon1101.lendingsystem.sharedkernel.ICommand;
+import onon1101.lendingsystem.sharedkernel.Command;
 
-public record RegisterCommand(String username, String password, String email) implements ICommand {
+public record RegisterCommand(String username, String password, String email) implements Command {
 
     @Override
     public String username() {

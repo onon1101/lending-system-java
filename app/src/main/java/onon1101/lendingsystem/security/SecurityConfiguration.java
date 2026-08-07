@@ -1,9 +1,8 @@
 package onon1101.lendingsystem.security;
 
 import onon1101.lendingsystem.auth.login.token.AccessTokenProperties;
-import onon1101.lendingsystem.sharedkernel.token.JwtDecoderProvider;
 import onon1101.lendingsystem.sharedkernel.api.RequestContextFilter;
-
+import onon1101.lendingsystem.sharedkernel.token.JwtDecoderProvider;
 import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,18 +16,13 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 public class SecurityConfiguration {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                            JwtDecoderProvider decoderProvider
-    ) throws Exception {
-        JwtDecoder accessTokenDecoder = decoderProvider.getDecoder(
-                AccessTokenProperties.PURPOSE);
-        return http
-                .csrf(csrf -> csrf.disable())
-                .addFilterBefore(new RequestContextFilter(),
-                        SecurityContextHolderFilter.class)
+    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoderProvider decoderProvider)
+            throws Exception {
+        JwtDecoder accessTokenDecoder = decoderProvider.getDecoder(AccessTokenProperties.PURPOSE);
+        return http.csrf(csrf -> csrf.disable())
+                .addFilterBefore(new RequestContextFilter(), SecurityContextHolderFilter.class)
                 .sessionManagement(
-                        session -> session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS))
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         authorize ->
                                 authorize
@@ -39,8 +33,7 @@ public class SecurityConfiguration {
                                                 "/api/v1/auth/register",
                                                 "/api/v1/user/validate-email")
                                         .permitAll()
-                                        .requestMatchers(
-                                                EndpointRequest.to("health"))
+                                        .requestMatchers(EndpointRequest.to("health"))
                                         .permitAll()
                                         .requestMatchers(
                                                 "/swagger-ui/**",
@@ -51,8 +44,7 @@ public class SecurityConfiguration {
                                         .authenticated())
                 .oauth2ResourceServer(
                         resourceServer ->
-                                resourceServer.jwt(
-                                        jwt -> jwt.decoder(accessTokenDecoder)))
+                                resourceServer.jwt(jwt -> jwt.decoder(accessTokenDecoder)))
                 .build();
     }
 }

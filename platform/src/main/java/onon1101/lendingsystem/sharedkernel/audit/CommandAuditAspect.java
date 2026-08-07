@@ -1,8 +1,8 @@
 package onon1101.lendingsystem.sharedkernel.audit;
 
 import java.lang.reflect.Method;
-import onon1101.lendingsystem.sharedkernel.ICommand;
-import onon1101.lendingsystem.sharedkernel.IResult;
+import onon1101.lendingsystem.sharedkernel.Command;
+import onon1101.lendingsystem.sharedkernel.CommandResult;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -111,7 +111,7 @@ public class CommandAuditAspect {
 
         Object commandValue = commandClass.cast(arguments[0]);
 
-        if (!(commandValue instanceof ICommand command)) {
+        if (!(commandValue instanceof Command command)) {
             throw new IllegalStateException(
                     "Command type must implement ICommand: " + commandClass.getTypeName());
         }
@@ -134,7 +134,7 @@ public class CommandAuditAspect {
 
         Object resultValue = resultClass.cast(result);
 
-        if (!(resultValue instanceof IResult typedResult)) {
+        if (!(resultValue instanceof CommandResult typedResult)) {
             throw new IllegalStateException(
                     "Result type must implement IResult: " + resultClass.getTypeName());
         }
@@ -190,14 +190,14 @@ public class CommandAuditAspect {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private AuditEvent invokeReturned(
-            CommandAuditPolicy<?, ?, ?> policy, ICommand command, IResult result) {
+            CommandAuditPolicy<?, ?, ?> policy, Command command, CommandResult result) {
 
         return ((CommandAuditPolicy) policy).onReturned(command, result);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private AuditEvent invokeThrown(
-            CommandAuditPolicy<?, ?, ?> policy, ICommand command, Throwable throwable) {
+            CommandAuditPolicy<?, ?, ?> policy, Command command, Throwable throwable) {
 
         return ((CommandAuditPolicy) policy).onThrown(command, throwable);
     }
@@ -208,5 +208,5 @@ public class CommandAuditAspect {
         }
     }
 
-    private record ValidatedInvocation(ICommand command, IResult result) {}
+    private record ValidatedInvocation(Command command, CommandResult result) {}
 }

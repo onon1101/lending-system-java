@@ -30,9 +30,7 @@ class ResetPasswordAuditPolicyTests {
         UUID publicUserId = UUID.randomUUID();
         givenTokenPublicUserId(publicUserId);
 
-        Object event =
-                policy.onReturned(
-                        command(), Result.success(new ResetPasswordResult()));
+        Object event = policy.onReturned(command(), Result.success(new ResetPasswordResult()));
 
         assertSuccess(
                 event,
