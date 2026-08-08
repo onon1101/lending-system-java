@@ -18,7 +18,7 @@ import java.net.URI;
 
 @Tag(name = "item", description = "物品相關 API")
 @RestController
-@RequestMapping("/api/v1/items")
+@RequestMapping("/api/v1/items/create")
 public class CreateItemController {
 
     private final CreateItemService createItemService;

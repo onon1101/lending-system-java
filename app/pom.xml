@@ -28,6 +28,11 @@
       <artifactId>user</artifactId>
       <version>${project.version}</version>
     </dependency>
+      <dependency>
+          <groupId>onon1101</groupId>
+          <artifactId>item</artifactId>
+          <version>${project.version}</version>
+      </dependency>
   </dependencies>
 
   <build>

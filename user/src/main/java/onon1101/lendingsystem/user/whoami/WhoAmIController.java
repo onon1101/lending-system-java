@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "auth", description = "認證相關 API")
+@Tag(name = "user", description = "使用者服務相關 API")
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/user")
 public class WhoAmIController {
 
     private final CurrentUserProvider currentUserProvider;

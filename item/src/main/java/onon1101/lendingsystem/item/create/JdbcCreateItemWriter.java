@@ -5,6 +5,7 @@ import onon1101.lendingsystem.item.domain.Item;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.time.ZoneOffset;
 import java.util.Locale;
 
 @Repository
@@ -47,8 +48,11 @@ public class JdbcCreateItemWriter implements CreateItemWriter {
                         .param("description", item.description().value())
                         .param("status", item.availability().name().toLowerCase(
                                 Locale.ROOT))
-                        .param("createdAt", item.createdAt())
-                        .param("updateAt", item.updatedAt())
+                        .param("createdAt", item.createdAt().atOffset(
+                                ZoneOffset.UTC))
+                        .param("updatedAt", item.updatedAt().atOffset(
+                                ZoneOffset.UTC
+                        ))
                         .update();
 
         if (affectedRows != 1) {
