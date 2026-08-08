@@ -1,5 +1,7 @@
 package onon1101.lendingsystem.item.domain;
 
+import org.jspecify.annotations.Nullable;
+
 import java.time.Instant;
 import java.util.Objects;
 
@@ -230,4 +232,5 @@ public final class Item {
     public Instant updatedAt() {
         return updatedAt;
     }
+
 }
