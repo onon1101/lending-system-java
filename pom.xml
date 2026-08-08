@@ -29,6 +29,7 @@
     <module>auth</module>
     <module>user</module>
     <module>app</module>
+      <module>item</module>
   </modules>
   <scm>
     <connection/>
