@@ -8,7 +8,6 @@ import onon1101.lendingsystem.auth.emailVerificationConfirm.audit.ValidateEmailA
 import onon1101.lendingsystem.auth.emailVerificationConfirm.error.InvalidEmailUpdatedDomainError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
 public class ValidateEmailService {
@@ -31,9 +30,7 @@ public class ValidateEmailService {
 
         boolean updated = validateEmailWriter.updateStateByPublicId(payload.publicUserId());
 
-        // todo: 所有的 failure 都需要 rollback
         if (!updated) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             return Result.failure(new InvalidEmailUpdatedDomainError());
         }
 
