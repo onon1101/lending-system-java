@@ -83,4 +83,10 @@ public class RefreshTokenService {
             );
         }
     }
+
+    public void revoke(
+            String rawToken
+    ) {
+        tokenStore.delete(hash(rawToken));
+    }
 }

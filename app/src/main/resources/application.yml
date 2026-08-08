@@ -62,9 +62,9 @@ lending:
     secret: "${JWT_SECRET:development-secret-key-at-least-32-bytes}"
   access-token:
     issuer: lending-system-access-token
-    expiration: PT1H
+    expiration: PT15M
   refresh-token:
-    expiration: "${REFRESH_TOKEN_EXPIRATION:P30D}"
+    expiration: "${REFRESH_TOKEN_EXPIRATION:PT1H}"
   user-cache:
     ttl: "${USER_CACHE_TTL:PT15M}"
   forgot-token:
