@@ -21,8 +21,13 @@ CREATE TABLE IF NOT EXISTS users
 
     CONSTRAINT uq_users_username UNIQUE (username),
 
-    -- 這邊使用 lower() index
     CONSTRAINT uq_users_email UNIQUE (email),
+
+    CONSTRAINT ck_users_email_normalized
+        CHECK(
+            email = LOWER(TRIM(email))
+            AND email <> ''
+        ),
 
     CONSTRAINT ck_users_username_lowercase
         CHECK (username = LOWER(username)),

@@ -3,7 +3,7 @@ package onon1101.lendingsystem.user.register;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import onon1101.lendingsystem.configurations.emailverification.EmailVerificationMailService;
+import onon1101.lendingsystem.configurations.email.EmailVerificationMailService;
 import onon1101.lendingsystem.user.register.email.EmailValidateListener;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import org.junit.jupiter.api.Test;

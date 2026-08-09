@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.configurations.emailverification;
+package onon1101.lendingsystem.configurations.email;
 
 public interface EmailVerificationMailService {
 

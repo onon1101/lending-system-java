@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import onon1101.lendingsystem.configurations.emailverification.EmailVerificationMailServiceImpl;
+import onon1101.lendingsystem.configurations.email.EmailVerificationMailServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.mail.SimpleMailMessage;
