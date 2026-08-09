@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import onon1101.lendingsystem.configurations.email.EmailNormalizer;
 
 @Schema(description = "重送 Email 驗證信請求")
 public record ResendEmailVerificationRequest(
@@ -13,4 +14,9 @@ public record ResendEmailVerificationRequest(
                         maxLength = 255)
                 @NotBlank
                 @Size(max = 255)
-                String email) {}
+                String email) {
+
+    public ResendEmailVerificationRequest {
+        email = EmailNormalizer.normalize(email);
+    }
+}

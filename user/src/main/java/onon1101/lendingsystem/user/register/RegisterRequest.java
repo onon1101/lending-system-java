@@ -3,6 +3,7 @@ package onon1101.lendingsystem.user.register;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import onon1101.lendingsystem.configurations.email.EmailNormalizer;
 
 @Schema(description = "註冊請求")
 public record RegisterRequest(
@@ -15,4 +16,9 @@ public record RegisterRequest(
                         accessMode = Schema.AccessMode.WRITE_ONLY)
                 @NotBlank @Size(max = 100) String password,
         @Schema(description = "註冊 Email", example = "member001@example.com", maxLength = 255)
-                @NotBlank @Size(max = 255) String email) {}
+                @NotBlank @Size(max = 255) String email) {
+
+    public RegisterRequest {
+        email = EmailNormalizer.normalize(email);
+    }
+}
