@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import onon1101.lendingsystem.user.register.email.EmailValidateMailServiceImpl;
+import onon1101.lendingsystem.configurations.emailverification.EmailVerificationMailServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.mail.SimpleMailMessage;
@@ -15,11 +15,11 @@ class EmailValidateMailServiceTests {
     @Test
     void buildsValidationLinkAndSendsMessage() {
         JavaMailSender mailSender = mock(JavaMailSender.class);
-        EmailValidateMailServiceImpl service =
-                new EmailValidateMailServiceImpl(
+        EmailVerificationMailServiceImpl service =
+                new EmailVerificationMailServiceImpl(
                         mailSender, "no-reply@example.com", "https://example.com/validate-email");
 
-        service.sendEmailValidateEmail("user@example.com", "alice", "signed.token");
+        service.send("user@example.com", "alice", "signed.token");
 
         ArgumentCaptor<SimpleMailMessage> messageCaptor =
                 ArgumentCaptor.forClass(SimpleMailMessage.class);

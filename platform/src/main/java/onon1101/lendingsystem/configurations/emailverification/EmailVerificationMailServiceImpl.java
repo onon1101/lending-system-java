@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.user.register.email;
+package onon1101.lendingsystem.configurations.emailverification;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -8,12 +8,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailValidateMailServiceImpl implements EmailValidateMailService {
+public class EmailVerificationMailServiceImpl implements EmailVerificationMailService {
+
     private final JavaMailSender mailSender;
     private final String senderEmail;
     private final String emailValidationUrl;
 
-    public EmailValidateMailServiceImpl(
+    public EmailVerificationMailServiceImpl(
             JavaMailSender mailSender,
             @Value("${app.mail.sender}") String senderEmail,
             @Value("${app.email-validation-url}") String emailValidationUrl) {
@@ -23,14 +24,13 @@ public class EmailValidateMailServiceImpl implements EmailValidateMailService {
     }
 
     @Override
-    public void sendEmailValidateEmail(
-            String recipientEmail, String username, String validateEmailToken) {
+    public void send(String recipientEmail, String username, String token) {
         String separator = emailValidationUrl.contains("?") ? "&" : "?";
         String link =
                 emailValidationUrl
                         + separator
                         + "token="
-                        + URLEncoder.encode(validateEmailToken, StandardCharsets.UTF_8);
+                        + URLEncoder.encode(token, StandardCharsets.UTF_8);
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(senderEmail);
