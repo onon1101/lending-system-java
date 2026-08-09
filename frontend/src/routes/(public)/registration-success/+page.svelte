@@ -14,7 +14,7 @@
 
       <a
         href="/login"
-        class="flex w-full items-center justify-center rounded-xl bg-sky-500 px-4 py-3 font-semibold text-while transition hover:bg-sky-400"
+        class="flex w-full items-center justify-center rounded-xl bg-sky-500 px-4 py-3 font-semibold text-white transition hover:bg-sky-400"
         >前往登入</a
       >
 

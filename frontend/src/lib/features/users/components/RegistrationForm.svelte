@@ -7,7 +7,6 @@
     SubmitButton,
   } from "$lib/shared/components";
   import Toast from "$lib/shared/components/feedback/Toast.svelte";
-  import { error } from "@sveltejs/kit";
   import { registerUser } from "../api/register-user";
   import { getRegisterErrorMessage } from "../utils/register-error-message";
   import { onDestroy } from "svelte";
@@ -81,7 +80,7 @@
       password = "";
 
       redirectTimer = setTimeout(() => {
-        void goto("/registation-success");
+        void goto("/registration-success");
       }, 2000);
     } catch (error) {
       errorMessage =
