@@ -86,8 +86,9 @@ class ResetPasswordAuditPolicyTests {
                         AuditEvent.Success.class,
                         success -> {
                             assertThat(success.eventType()).isEqualTo(eventType);
-                            assertThat(success.attribute().Key()).isEqualTo(attributeKey);
-                            assertThat(success.attribute().Value()).isEqualTo(attributeValue);
+                            assertThat(success.attribute().get(0).Key()).isEqualTo(attributeKey);
+                            assertThat(success.attribute().get(0).Value())
+                                    .isEqualTo(attributeValue);
                         });
     }
 
@@ -102,8 +103,9 @@ class ResetPasswordAuditPolicyTests {
                         AuditEvent.Rejected.class,
                         rejected -> {
                             assertThat(rejected.eventType()).isEqualTo(eventType);
-                            assertThat(rejected.attribute().Key()).isEqualTo(attributeKey);
-                            assertThat(rejected.attribute().Value()).isEqualTo(attributeValue);
+                            assertThat(rejected.attribute().get(0).Key()).isEqualTo(attributeKey);
+                            assertThat(rejected.attribute().get(0).Value())
+                                    .isEqualTo(attributeValue);
                             assertThat(rejected.reason()).isEqualTo(reason);
                         });
     }
@@ -119,8 +121,8 @@ class ResetPasswordAuditPolicyTests {
                         AuditEvent.Failed.class,
                         failed -> {
                             assertThat(failed.eventType()).isEqualTo(eventType);
-                            assertThat(failed.attribute().Key()).isEqualTo(attributeKey);
-                            assertThat(failed.attribute().Value()).isEqualTo(attributeValue);
+                            assertThat(failed.attribute().get(0).Key()).isEqualTo(attributeKey);
+                            assertThat(failed.attribute().get(0).Value()).isEqualTo(attributeValue);
                             assertThat(failed.reason()).isEqualTo(reason);
                         });
     }

@@ -37,8 +37,8 @@ class ForgotPasswordAuditPolicyTests {
                         rejected -> {
                             assertThat(rejected.eventType())
                                     .isEqualTo("password_reset_sender_rejected");
-                            assertThat(rejected.attribute().Key()).isEqualTo("emailRef");
-                            assertThat(rejected.attribute().Value()).isEqualTo("invalid");
+                            assertThat(rejected.attribute().get(0).Key()).isEqualTo("emailRef");
+                            assertThat(rejected.attribute().get(0).Value()).isEqualTo("invalid");
                             assertThat(rejected.reason())
                                     .isEqualTo("The provided email address is invalid");
                         });
@@ -57,8 +57,9 @@ class ForgotPasswordAuditPolicyTests {
                         failed -> {
                             assertThat(failed.eventType())
                                     .isEqualTo("password_reset_sender_failed");
-                            assertThat(failed.attribute().Key()).isEqualTo("emailRef");
-                            assertThat(failed.attribute().Value()).isEqualTo("user@example.com");
+                            assertThat(failed.attribute().get(0).Key()).isEqualTo("emailRef");
+                            assertThat(failed.attribute().get(0).Value())
+                                    .isEqualTo("user@example.com");
                             assertThat(failed.reason()).isEqualTo("system_error");
                         });
     }
@@ -70,8 +71,9 @@ class ForgotPasswordAuditPolicyTests {
                         AuditEvent.Success.class,
                         success -> {
                             assertThat(success.eventType()).isEqualTo(eventType);
-                            assertThat(success.attribute().Key()).isEqualTo(attributeKey);
-                            assertThat(success.attribute().Value()).isEqualTo(attributeValue);
+                            assertThat(success.attribute().get(0).Key()).isEqualTo(attributeKey);
+                            assertThat(success.attribute().get(0).Value())
+                                    .isEqualTo(attributeValue);
                         });
     }
 }

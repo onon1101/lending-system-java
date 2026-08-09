@@ -1,5 +1,6 @@
 package onon1101.lendingsystem.auth.login.audit;
 
+import java.util.List;
 import onon1101.lendingsystem.auth.login.LoginCommand;
 import onon1101.lendingsystem.auth.login.LoginResult;
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
@@ -21,11 +22,11 @@ public final class AuthenticationAuditPolicy
             case Result.Success<LoginResult> success ->
                     new AuditEvent.Success(
                             "authentication_succeeded",
-                            new UsernameAuditEventAttribute(normalizedUsername));
+                            List.of(new UsernameAuditEventAttribute(normalizedUsername)));
             case Result.Failure<LoginResult> failure ->
                     new AuditEvent.Rejected(
                             "authentication_failed",
-                            new UsernameAuditEventAttribute(normalizedUsername),
+                            List.of(new UsernameAuditEventAttribute(normalizedUsername)),
                             failure.error().code());
         };
     }
@@ -34,7 +35,7 @@ public final class AuthenticationAuditPolicy
     public AuditEvent onThrown(LoginCommand command, Throwable throwable) {
         return new AuditEvent.Failed(
                 "authentication_failed",
-                new UsernameAuditEventAttribute(command.username()),
+                List.of(new UsernameAuditEventAttribute(command.username())),
                 "system_error");
     }
 }

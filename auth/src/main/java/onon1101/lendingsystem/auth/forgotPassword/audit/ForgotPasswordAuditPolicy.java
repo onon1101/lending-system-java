@@ -1,5 +1,6 @@
 package onon1101.lendingsystem.auth.forgotPassword.audit;
 
+import java.util.List;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordCommand;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordResult;
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
@@ -20,11 +21,11 @@ public final class ForgotPasswordAuditPolicy
             case Result.Success<ForgotPasswordResult> ignored ->
                     new AuditEvent.Success(
                             "password_reset_sender_requested",
-                            new EmailAuditEventAttribute(command.email()));
+                            List.of(new EmailAuditEventAttribute(command.email())));
             case Result.Failure<ForgotPasswordResult> failure ->
                     new AuditEvent.Rejected(
                             "password_reset_sender_rejected",
-                            new EmailAuditEventAttribute(command.email()),
+                            List.of(new EmailAuditEventAttribute(command.email())),
                             failure.error().message());
         };
     }
@@ -33,7 +34,7 @@ public final class ForgotPasswordAuditPolicy
     public AuditEvent onThrown(ForgotPasswordCommand command, Throwable throwable) {
         return new AuditEvent.Failed(
                 "password_reset_sender_failed",
-                new EmailAuditEventAttribute(command.email()),
+                List.of(new EmailAuditEventAttribute(command.email())),
                 "system_error");
     }
 }

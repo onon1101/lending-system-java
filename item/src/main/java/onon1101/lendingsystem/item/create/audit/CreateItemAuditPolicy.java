@@ -5,6 +5,7 @@ import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
 
 import onon1101.lendingsystem.configurations.audit.eventAttributes.ItemAuditEventAttribute;
 import onon1101.lendingsystem.configurations.audit.eventAttributes.ItemCreationAuditEventAttribute;
+import onon1101.lendingsystem.configurations.audit.eventAttributes.UsernameAuditEventAttribute;
 import onon1101.lendingsystem.configurations.context.user.CurrentUserContext;
 import onon1101.lendingsystem.configurations.context.user.CurrentUserProvider;
 import onon1101.lendingsystem.configurations.domain.Result;
@@ -13,6 +14,8 @@ import onon1101.lendingsystem.item.create.CreateItemCommand;
 import onon1101.lendingsystem.item.create.CreateItemResult;
 
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public final class CreateItemAuditPolicy
@@ -36,9 +39,9 @@ public final class CreateItemAuditPolicy
 
         return new AuditEvent.Success("item_creation_succeeded",
                 //todo: 同時有 userid, itemid 的部分。
-                new ItemAuditEventAttribute(result
-                        .itemId()
-                        .toString()));
+                List.of(
+                        new UsernameAuditEventAttribute(currentUser.username()),
+                        new ItemAuditEventAttribute(result.itemId().toString())));
     }
 
     @Override
@@ -48,7 +51,7 @@ public final class CreateItemAuditPolicy
     ) {
         return new AuditEvent.Failed(
                 "item_creation_failed",
-                new ItemCreationAuditEventAttribute(command.name()),
+                List.of(new ItemCreationAuditEventAttribute(command.name())),
                 "system_error"
         );
     }

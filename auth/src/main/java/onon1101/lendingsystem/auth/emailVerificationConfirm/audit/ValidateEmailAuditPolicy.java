@@ -1,13 +1,14 @@
 package onon1101.lendingsystem.auth.emailVerificationConfirm.audit;
 
+import java.util.List;
+import onon1101.lendingsystem.auth.emailVerificationConfirm.ValidateEmailCommand;
+import onon1101.lendingsystem.auth.emailVerificationConfirm.ValidateEmailResult;
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
 import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
 import onon1101.lendingsystem.configurations.audit.eventAttributes.TokenAuditEventAttribute;
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.token.JwtTokenService;
 import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenProperties;
-import onon1101.lendingsystem.auth.emailVerificationConfirm.ValidateEmailCommand;
-import onon1101.lendingsystem.auth.emailVerificationConfirm.ValidateEmailResult;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,11 +29,12 @@ public class ValidateEmailAuditPolicy
     public AuditEvent onReturned(ValidateEmailCommand command, Result<ValidateEmailResult> result) {
         return switch (result) {
             case Result.Success<ValidateEmailResult> success ->
-                    new AuditEvent.Success("validate_email_successfully", tokenAttribute(command));
+                    new AuditEvent.Success(
+                            "validate_email_successfully", List.of(tokenAttribute(command)));
             case Result.Failure<ValidateEmailResult> failure ->
                     new AuditEvent.Rejected(
                             "validate_email_failed",
-                            tokenAttribute(command),
+                            List.of(tokenAttribute(command)),
                             failure.error().code());
         };
     }
@@ -40,7 +42,7 @@ public class ValidateEmailAuditPolicy
     @Override
     public AuditEvent onThrown(ValidateEmailCommand command, Throwable throwable) {
         return new AuditEvent.Failed(
-                "validate_email_failed", tokenAttribute(command), "system_error");
+                "validate_email_failed", List.of(tokenAttribute(command)), "system_error");
     }
 
     private TokenAuditEventAttribute tokenAttribute(ValidateEmailCommand command) {

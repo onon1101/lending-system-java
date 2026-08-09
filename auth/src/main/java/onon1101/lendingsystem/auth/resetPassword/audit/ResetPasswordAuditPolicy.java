@@ -1,5 +1,6 @@
 package onon1101.lendingsystem.auth.resetPassword.audit;
 
+import java.util.List;
 import onon1101.lendingsystem.auth.commons.PasswordProperties;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordCommand;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResult;
@@ -29,11 +30,11 @@ public final class ResetPasswordAuditPolicy
         return switch (result) {
             case Result.Success<ResetPasswordResult> success ->
                     new AuditEvent.Success(
-                            "password_reset_receiver_successed", tokenAttribute(command));
+                            "password_reset_receiver_successed", List.of(tokenAttribute(command)));
             case Result.Failure<ResetPasswordResult> failure ->
                     new AuditEvent.Rejected(
                             "password_reset_receiver_failed",
-                            tokenAttribute(command),
+                            List.of(tokenAttribute(command)),
                             failure.error().code());
         };
     }
@@ -41,7 +42,7 @@ public final class ResetPasswordAuditPolicy
     @Override
     public AuditEvent onThrown(ResetPasswordCommand command, Throwable throwable) {
         return new AuditEvent.Failed(
-                "password_reset_receiver_failed", tokenAttribute(command), "system_error");
+                "password_reset_receiver_failed", List.of(tokenAttribute(command)), "system_error");
     }
 
     private TokenAuditEventAttribute tokenAttribute(ResetPasswordCommand command) {

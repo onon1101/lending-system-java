@@ -1,7 +1,8 @@
 package onon1101.lendingsystem.configurations.audit;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-
 import onon1101.lendingsystem.configurations.audit.eventAttributes.AuditEventAttribute;
 import org.springframework.stereotype.Component;
 
@@ -16,24 +17,32 @@ public class AuditLogger {
         this.auditSink = auditSink;
     }
 
-    public void handleSuccess(String eventType, AuditEventAttribute attribute) {
-        append(eventType, AuditOutcome.SUCCESS, attribute, null);
+    public void handleSuccess(String eventType, List<AuditEventAttribute> attributes) {
+        append(eventType, AuditOutcome.SUCCESS, attributes, null);
     }
 
-    public void handleRejected(String eventType, AuditEventAttribute attribute, String reason) {
-        append(eventType, AuditOutcome.REJECTED, attribute, reason);
+    public void handleRejected(
+            String eventType, List<AuditEventAttribute> attributes, String reason) {
+        append(eventType, AuditOutcome.REJECTED, attributes, reason);
     }
 
-    public void handleFailed(String eventType, AuditEventAttribute attribute, String reason) {
-        append(eventType, AuditOutcome.ERROR, attribute, reason);
+    public void handleFailed(
+            String eventType, List<AuditEventAttribute> attributes, String reason) {
+        append(eventType, AuditOutcome.ERROR, attributes, reason);
     }
 
     private void append(
-            String eventType, AuditOutcome outcome, AuditEventAttribute attribute, String reason) {
-        Map<String, String> attributes =
-                reason == null
-                        ? Map.of(attribute.Key(), encode(attribute.Value()))
-                        : Map.of(attribute.Key(), encode(attribute.Value()), "reason", reason);
+            String eventType,
+            AuditOutcome outcome,
+            List<AuditEventAttribute> eventAttributes,
+            String reason) {
+        Map<String, String> attributes = new LinkedHashMap<>();
+        for (AuditEventAttribute attribute : eventAttributes) {
+            attributes.put(attribute.Key(), encode(attribute.Value()));
+        }
+        if (reason != null) {
+            attributes.put("reason", reason);
+        }
         auditSink.append(new AuditRecord(eventType, outcome, attributes));
     }
 
