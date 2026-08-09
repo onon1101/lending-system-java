@@ -7,6 +7,7 @@ export const API_ROUTES = {
     forgotPassword: "/api/v1/auth/forgot-password",
     resetPassword: "/api/v1/auth",
     confirmEmail: "/api/v1/auth/email-verification/confirm",
+    resendEmailVerification: "/api/v1/auth/email-verification/resend",
   },
   users: {
     register: "/api/v1/user/register",

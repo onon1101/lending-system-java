@@ -33,3 +33,7 @@ export type ConfirmEmailRequest = {
 export type MessageResponse = {
   message: string;
 };
+
+export type ResendEmailVerificationRequest = {
+  email: string;
+};
