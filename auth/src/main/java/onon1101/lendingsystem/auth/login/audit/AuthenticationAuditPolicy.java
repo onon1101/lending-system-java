@@ -4,7 +4,7 @@ import onon1101.lendingsystem.auth.login.LoginCommand;
 import onon1101.lendingsystem.auth.login.LoginResult;
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
 import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.UsernameAuditEventAttribute;
+import onon1101.lendingsystem.configurations.audit.eventAttributes.UsernameAuditEventAttribute;
 import onon1101.lendingsystem.configurations.domain.Result;
 import org.springframework.stereotype.Component;
 

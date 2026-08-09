@@ -48,7 +48,7 @@ public class ResetPasswordController {
                 description = "資料庫暫時無法連線",
                 content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    @PostMapping
+    @PostMapping("/reset-password")
     ResponseEntity<ApiResponse<ResetPasswordResponse>> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request) {
         return service.execute(

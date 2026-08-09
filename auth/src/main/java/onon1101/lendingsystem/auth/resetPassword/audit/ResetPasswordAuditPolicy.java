@@ -5,7 +5,7 @@ import onon1101.lendingsystem.auth.resetPassword.ResetPasswordCommand;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResult;
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
 import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.TokenAuditEventAttribute;
+import onon1101.lendingsystem.configurations.audit.eventAttributes.TokenAuditEventAttribute;
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.token.JwtTokenService;
 import org.springframework.stereotype.Component;

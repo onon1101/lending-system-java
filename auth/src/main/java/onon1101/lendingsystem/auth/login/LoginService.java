@@ -6,7 +6,7 @@ import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditPolicy;
 import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
 import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
 import onon1101.lendingsystem.auth.login.token.AccessTokenService;
-import onon1101.lendingsystem.auth.login.token.RefreshTokenService;
+import onon1101.lendingsystem.auth.login.token.RefreshTokenIssuer;
 import onon1101.lendingsystem.configurations.audit.AuditedCommand;
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.time.IClock;
@@ -27,7 +27,7 @@ public class LoginService {
     private final LoginAccountWriter accountWriter;
     private final PasswordEncoder passwordEncoder;
     private final AccessTokenService accessTokenService;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenIssuer refreshTokenIssuer;
     private final IClock clock;
 
     public LoginService(
@@ -35,13 +35,13 @@ public class LoginService {
             LoginAccountWriter accountWriter,
             PasswordEncoder passwordEncoder,
             AccessTokenService tokenService,
-            RefreshTokenService refreshTokenService,
+            RefreshTokenIssuer refreshTokenIssuer,
             IClock clock) {
         this.accountReader = accountReader;
         this.accountWriter = accountWriter;
         this.passwordEncoder = passwordEncoder;
         this.accessTokenService = tokenService;
-        this.refreshTokenService = refreshTokenService;
+        this.refreshTokenIssuer = refreshTokenIssuer;
         this.clock = clock;
     }
 
@@ -90,7 +90,7 @@ public class LoginService {
                         account.username());
 
         String refreshToken =
-                refreshTokenService.createToken(
+                refreshTokenIssuer.createToken(
                         account.privateUserId(),
                         account.publicUserId(),
                         account.username());
@@ -100,6 +100,6 @@ public class LoginService {
                         accessToken,
                         accessTokenService.expiresInSeconds(),
                         refreshToken,
-                        refreshTokenService.expiresInSeconds()));
+                        refreshTokenIssuer.expiresInSeconds()));
     }
 }

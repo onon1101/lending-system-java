@@ -2,7 +2,7 @@ package onon1101.lendingsystem.auth.emailVerificationConfirm.audit;
 
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
 import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.TokenAuditEventAttribute;
+import onon1101.lendingsystem.configurations.audit.eventAttributes.TokenAuditEventAttribute;
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.token.JwtTokenService;
 import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenProperties;

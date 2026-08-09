@@ -1,11 +1,14 @@
 package onon1101.lendingsystem.item.create;
 
 import com.github.f4b6a3.uuid.UuidCreator;
+import onon1101.lendingsystem.configurations.audit.AuditedCommand;
 import onon1101.lendingsystem.configurations.context.user.CurrentUserContext;
 
 import onon1101.lendingsystem.configurations.context.user.CurrentUserProvider;
+import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.time.IClock;
 
+import onon1101.lendingsystem.item.create.audit.CreateItemAuditPolicy;
 import onon1101.lendingsystem.item.domain.Item;
 
 import onon1101.lendingsystem.item.domain.ItemDescription;
@@ -36,6 +39,7 @@ public class CreateItemService {
     }
 
     @Transactional
+    @AuditedCommand(CreateItemAuditPolicy.class)
     public CreateItemResult create(CreateItemCommand command) {
         CurrentUserContext currentUser = currentUserProvider.getCurrentUser();
         Instant now = clock.now();

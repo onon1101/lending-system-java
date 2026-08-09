@@ -8,11 +8,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HexFormat;
+import java.util.Optional;
 import java.util.UUID;
 import onon1101.lendingsystem.configurations.time.IClock;
 
 @Service
-public class RefreshTokenService {
+public class RefreshTokenIssuer {
 
     private static final int TOKEN_BYTES = 32;
 
@@ -21,8 +22,10 @@ public class RefreshTokenService {
     private final RefreshTokenProperties properties;
     private final IClock clock;
 
-    public RefreshTokenService(
-            RefreshTokenStore tokenStore, RefreshTokenProperties properties, IClock clock) {
+    public RefreshTokenIssuer(
+            RefreshTokenStore tokenStore,
+            RefreshTokenProperties properties,
+            IClock clock) {
         this.tokenStore = tokenStore;
         this.properties = properties;
         this.clock = clock;
@@ -88,5 +91,15 @@ public class RefreshTokenService {
             String rawToken
     ) {
         tokenStore.delete(hash(rawToken));
+    }
+
+    public Optional<RefreshTokenSession> consume(
+            String rawToken
+    ) {
+        if(rawToken == null || rawToken.isBlank()) {
+            return Optional.empty();
+        }
+
+        return tokenStore.consume(hash(rawToken));
     }
 }

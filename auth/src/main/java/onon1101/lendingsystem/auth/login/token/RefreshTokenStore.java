@@ -14,4 +14,6 @@ public interface RefreshTokenStore {
     Optional<RefreshTokenSession> find(String tokenHash);
 
     void delete(String tokenHash);
+
+    Optional<RefreshTokenSession> consume(String tokenHash);
 }

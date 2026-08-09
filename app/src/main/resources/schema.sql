@@ -2,7 +2,7 @@
 -- DROP TABLE IF EXISTS user_password_credentials CASCADE;
 -- DROP TABLE IF EXISTS user_auth_identities CASCADE;
 -- DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS items CASCADE;
+-- DROP TABLE IF EXISTS items CASCADE;
 
 -- 存放使用者資訊
 CREATE TABLE IF NOT EXISTS users

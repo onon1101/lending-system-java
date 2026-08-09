@@ -2,8 +2,8 @@ package onon1101.lendingsystem.user.register.audit;
 
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
 import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.UserPublicIdAuditEventAttribute;
-import onon1101.lendingsystem.configurations.audit.UsernameAuditEventAttribute;
+import onon1101.lendingsystem.configurations.audit.eventAttributes.UserPublicIdAuditEventAttribute;
+import onon1101.lendingsystem.configurations.audit.eventAttributes.UsernameAuditEventAttribute;
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.user.register.RegisterCommand;
 import onon1101.lendingsystem.user.register.RegisterResult;

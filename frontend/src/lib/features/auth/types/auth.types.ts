@@ -37,3 +37,15 @@ export type MessageResponse = {
 export type ResendEmailVerificationRequest = {
   email: string;
 };
+
+export type RefreshTokenRequest = {
+  refreshToken: string;
+};
+
+export type RefreshTokenResponse = {
+  accessToken: string;
+  tokenType: string;
+  expiresIn: number;
+  refreshToken: string;
+  refreshTokenExpiresIn: number;
+};

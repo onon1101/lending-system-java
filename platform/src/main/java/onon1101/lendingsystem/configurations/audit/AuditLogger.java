@@ -1,6 +1,8 @@
 package onon1101.lendingsystem.configurations.audit;
 
 import java.util.Map;
+
+import onon1101.lendingsystem.configurations.audit.eventAttributes.AuditEventAttribute;
 import org.springframework.stereotype.Component;
 
 @Component

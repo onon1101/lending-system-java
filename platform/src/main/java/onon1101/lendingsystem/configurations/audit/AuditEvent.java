@@ -1,5 +1,7 @@
 package onon1101.lendingsystem.configurations.audit;
 
+import onon1101.lendingsystem.configurations.audit.eventAttributes.AuditEventAttribute;
+
 import java.util.Objects;
 
 public interface AuditEvent {

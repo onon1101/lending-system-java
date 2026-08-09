@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.configurations.audit;
+package onon1101.lendingsystem.configurations.audit.eventAttributes;
 
 import java.util.UUID;
 

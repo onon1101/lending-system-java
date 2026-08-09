@@ -28,6 +28,7 @@ public class RetrieveItemService {
 
     @Transactional(readOnly=true)
     public Result<RetrieveItemResult> retrieve(UUID itemId) {
+
         CurrentUserContext currentUser = currentUserProvider.getCurrentUser();
 
         RetrievedItem item = itemReader.findVisibleItem(itemId,

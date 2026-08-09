@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Repository
 public class RedisRefreshTokenStore
-    implements RefreshTokenStore {
+        implements RefreshTokenStore {
 
     private static final String MODULE = "auth";
     private static final String RESOURCE = "refresh-token";
@@ -43,7 +43,9 @@ public class RedisRefreshTokenStore
 
         try {
             String value = objectMapper.writeValueAsString(session);
-            redisTemplate.opsForValue().set(key, value, expiration);
+            redisTemplate
+                    .opsForValue()
+                    .set(key, value, expiration);
         } catch (JacksonException exception) {
             throw new IllegalStateException(
                     "Unable to serialize refresh-token session",
@@ -64,14 +66,17 @@ public class RedisRefreshTokenStore
         String key = keyFactory.create(MODULE, RESOURCE, tokenHash);
 
         try {
-            String value = redisTemplate.opsForValue().get(key);
+            String value = redisTemplate
+                    .opsForValue()
+                    .get(key);
 
             if (value == null) {
                 return Optional.empty();
             }
 
-            return Optional.of(objectMapper.readValue(value, RefreshTokenSession.class));
-        }  catch (JacksonException exception) {
+            return Optional.of(
+                    objectMapper.readValue(value, RefreshTokenSession.class));
+        } catch (JacksonException exception) {
             redisTemplate.delete(key);
             return Optional.empty();
         } catch (DataAccessException exception) {
@@ -85,10 +90,46 @@ public class RedisRefreshTokenStore
     @Override
     public void delete(String tokenHash) {
         try {
-            redisTemplate.delete(keyFactory.create(MODULE, RESOURCE, tokenHash));
+            redisTemplate.delete(
+                    keyFactory.create(MODULE, RESOURCE, tokenHash));
         } catch (DataAccessException exception) {
             throw new IllegalStateException(
                     "Unable to delete refresh token.",
+                    exception
+            );
+        }
+    }
+
+    @Override
+    public Optional<RefreshTokenSession> consume(
+            String tokenHash
+    ) {
+        String key = keyFactory.create(
+                MODULE,
+                RESOURCE,
+                tokenHash
+        );
+
+        try {
+            String value = redisTemplate
+                    .opsForValue()
+                    .getAndDelete(key);
+
+            if (value == null) {
+                return Optional.empty();
+            }
+
+            return Optional.of(
+                    objectMapper.readValue(
+                            value,
+                            RefreshTokenSession.class
+                    )
+            );
+        } catch (JacksonException exception) {
+            return Optional.empty();
+        } catch( DataAccessException exception) {
+            throw new IllegalStateException(
+                    "Unable to consume refresh token",
                     exception
             );
         }

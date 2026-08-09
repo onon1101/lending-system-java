@@ -47,7 +47,7 @@ public class JdbcRetrieveItemReader implements RetrieveItemReader {
                               );
                         """)
                 .param("itemId", itemId)
-                .param("viewer", viewerId)
+                .param("viewerId", viewerId)
                 .query((resultSet, rowNumber) -> new RetrievedItem(
                                 resultSet.getObject("item_public_id",
                                         UUID.class),

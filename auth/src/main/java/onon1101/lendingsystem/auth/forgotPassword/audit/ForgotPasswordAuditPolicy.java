@@ -4,7 +4,7 @@ import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordCommand;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordResult;
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
 import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.EmailAuditEventAttribute;
+import onon1101.lendingsystem.configurations.audit.eventAttributes.EmailAuditEventAttribute;
 import onon1101.lendingsystem.configurations.domain.Result;
 import org.springframework.stereotype.Component;
 
