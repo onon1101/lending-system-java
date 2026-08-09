@@ -81,7 +81,7 @@
       password = "";
 
       redirectTimer = setTimeout(() => {
-        void goto("/login");
+        void goto("/registation-success");
       }, 2000);
     } catch (error) {
       errorMessage =
