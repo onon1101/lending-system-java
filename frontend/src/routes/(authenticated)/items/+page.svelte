@@ -1,0 +1,2 @@
+<script lang="ts">import { EmptyState, PageContainer } from '$lib/shared/components';</script>
+<svelte:head><title>物品 | Lending System</title></svelte:head><PageContainer><div class="mb-6 flex items-center justify-between"><h1 class="text-3xl font-bold">物品</h1><a href="/items/create" class="rounded-lg bg-sky-500 px-4 py-2 font-semibold text-white">建立物品</a></div><EmptyState message="後端目前沒有物品列表 endpoint；可使用物品 ID 開啟詳細頁。" /></PageContainer>

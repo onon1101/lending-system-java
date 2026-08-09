@@ -1,0 +1,2 @@
+<script lang="ts">import { page } from '$app/state'; import ResetPasswordForm from '$lib/features/auth/components/ResetPasswordForm.svelte'; import { AuthCard } from '$lib/shared/components'; const token = $derived(page.url.searchParams.get('token') ?? '');</script>
+<svelte:head><title>重設密碼 | Lending System</title></svelte:head><AuthCard title="重設密碼" description="設定一組新的登入密碼"><ResetPasswordForm {token} /></AuthCard>

@@ -1,0 +1,2 @@
+<script lang="ts">let { children } = $props();</script>
+<main class="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-12 sm:px-6"><div aria-hidden="true" class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(99,102,241,0.16),transparent_35%)]"></div><div class="relative flex w-full justify-center">{@render children()}</div></main>

@@ -1,0 +1,2 @@
+<script lang="ts">import { page } from '$app/state'; import ConfirmEmailView from '$lib/features/auth/components/ConfirmEmailView.svelte'; import { AuthCard } from '$lib/shared/components'; const token = $derived(page.url.searchParams.get('token') ?? '');</script>
+<svelte:head><title>Email 驗證 | Lending System</title></svelte:head><AuthCard title="Email 驗證" description="正在確認您的 Email"><ConfirmEmailView {token} /></AuthCard>
