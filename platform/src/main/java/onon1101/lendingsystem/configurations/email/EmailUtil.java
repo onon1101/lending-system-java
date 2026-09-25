@@ -6,8 +6,6 @@ public final class EmailUtil {
     private EmailUtil() {}
 
     public static boolean validateEmail(String email) {
-        return email == null || !EmailValidator
-                .getInstance()
-                .isValid(email);
+        return email == null || !EmailValidator.getInstance().isValid(email);
     }
 }

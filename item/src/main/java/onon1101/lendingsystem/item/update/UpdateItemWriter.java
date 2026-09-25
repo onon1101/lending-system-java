@@ -1,8 +1,9 @@
 package onon1101.lendingsystem.item.update;
 
 import onon1101.lendingsystem.item.domain.Item;
+import reactor.core.publisher.Mono;
 
 public interface UpdateItemWriter {
 
-    boolean update(Item item);
+    Mono<Boolean> update(Item item);
 }

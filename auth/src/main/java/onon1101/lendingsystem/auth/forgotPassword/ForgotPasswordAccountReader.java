@@ -1,7 +1,7 @@
 package onon1101.lendingsystem.auth.forgotPassword;
 
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 public interface ForgotPasswordAccountReader {
-    Optional<ForgotPasswordAccount> findByEmail(String email);
+    Mono<ForgotPasswordAccount> findByEmail(String email);
 }

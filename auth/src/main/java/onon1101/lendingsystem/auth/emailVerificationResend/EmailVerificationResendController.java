@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Tag(name = "auth", description = "認證相關 API")
 @RestController
@@ -26,16 +27,15 @@ public class EmailVerificationResendController {
 
     @Operation(
             summary = "重送 Email 驗證信",
-            description =
-                    "若 Email 對應到尚未驗證的有效帳號，系統將重新寄送驗證信。"
-                            + "為避免帳號枚舉，所有帳號狀態皆回傳相同訊息。")
+            description = "若 Email 對應到尚未驗證的有效帳號，系統將重新寄送驗證信。" + "為避免帳號枚舉，所有帳號狀態皆回傳相同訊息。")
     @PostMapping("/resend")
-    public ResponseEntity<ApiResponse<ResendEmailVerificationResponse>> resend(
+    public Mono<ResponseEntity<ApiResponse<ResendEmailVerificationResponse>>> resend(
             @Valid @RequestBody ResendEmailVerificationRequest request) {
-        service.resend(new ResendEmailVerificationCommand(request.email()));
-
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        HttpStatus.OK, new ResendEmailVerificationResponse(GENERIC_MESSAGE)));
+        return service.resend(new ResendEmailVerificationCommand(request.email()))
+                .thenReturn(
+                        ResponseEntity.ok(
+                                ApiResponse.success(
+                                        HttpStatus.OK,
+                                        new ResendEmailVerificationResponse(GENERIC_MESSAGE))));
     }
 }

@@ -7,6 +7,8 @@ import onon1101.lendingsystem.configurations.token.TokenPayload;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 public class ResetPasswordService {
@@ -26,20 +28,21 @@ public class ResetPasswordService {
 
     // todo: 透過 user_public_id 查詢 redis
     @Transactional
-    public Result<ResetPasswordResult> execute(ResetPasswordCommand command) {
+    public Mono<Result<ResetPasswordResult>> execute(ResetPasswordCommand command) {
         TokenPayload payload = tokenService.decode(command.resetToken());
 
-        String encodedPassword = passwordEncoder.encode(command.newPassword());
-
-        boolean updated =
-                passwordWriter.updatePassword(
-                        payload.publicUserId(), encodedPassword, payload.issuedAt());
-
-        if (!updated) {
-            return Result.failure(new InvalidResetTokenDomainError());
-        }
-
-        // todo 使用 email
-        return Result.success(new ResetPasswordResult());
+        return Mono.fromCallable(() -> passwordEncoder.encode(command.newPassword()))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(
+                        encodedPassword ->
+                                passwordWriter.updatePassword(
+                                        payload.publicUserId(),
+                                        encodedPassword,
+                                        payload.issuedAt()))
+                .map(
+                        updated ->
+                                updated
+                                        ? Result.success(new ResetPasswordResult())
+                                        : Result.failure(new InvalidResetTokenDomainError()));
     }
 }

@@ -13,12 +13,10 @@ class EmailVerificationResendListenerTests {
     @Test
     void sendsVerificationEmail() {
         EmailVerificationMailService mailService = mock(EmailVerificationMailService.class);
-        EmailVerificationResendListener listener =
-                new EmailVerificationResendListener(mailService);
+        EmailVerificationResendListener listener = new EmailVerificationResendListener(mailService);
 
         listener.handle(
-                new EmailVerificationResendRequested(
-                        "alice@example.com", "alice", "email-token"));
+                new EmailVerificationResendRequested("alice@example.com", "alice", "email-token"));
 
         verify(mailService).send("alice@example.com", "alice", "email-token");
     }

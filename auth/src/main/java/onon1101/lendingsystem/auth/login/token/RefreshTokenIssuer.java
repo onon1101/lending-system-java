@@ -1,16 +1,15 @@
 package onon1101.lendingsystem.auth.login.token;
 
-import org.springframework.stereotype.Service;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HexFormat;
-import java.util.Optional;
 import java.util.UUID;
 import onon1101.lendingsystem.configurations.time.IClock;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class RefreshTokenIssuer {
@@ -23,40 +22,24 @@ public class RefreshTokenIssuer {
     private final IClock clock;
 
     public RefreshTokenIssuer(
-            RefreshTokenStore tokenStore,
-            RefreshTokenProperties properties,
-            IClock clock) {
+            RefreshTokenStore tokenStore, RefreshTokenProperties properties, IClock clock) {
         this.tokenStore = tokenStore;
         this.properties = properties;
         this.clock = clock;
     }
 
-    public String createToken(
-            long privateUserId,
-            UUID publicUserId,
-            String username
-    ) {
+    public Mono<String> createToken(long privateUserId, UUID publicUserId, String username) {
         byte[] tokenBytes = new byte[TOKEN_BYTES];
         secureRandom.nextBytes(tokenBytes);
 
-        String rawToken =
-                Base64.getUrlEncoder()
-                        .withoutPadding()
-                        .encodeToString(tokenBytes);
+        String rawToken = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
 
         RefreshTokenSession session =
-                new RefreshTokenSession(
-                        privateUserId,
-                        publicUserId,
-                        username,
-                        clock.now());
+                new RefreshTokenSession(privateUserId, publicUserId, username, clock.now());
 
-        tokenStore.save(
-                hash(rawToken),
-                session,
-                properties.expiration());
-
-        return rawToken;
+        return tokenStore
+                .save(hash(rawToken), session, properties.expiration())
+                .thenReturn(rawToken);
     }
 
     public long expiresInSeconds() {
@@ -65,39 +48,28 @@ public class RefreshTokenIssuer {
 
     public String hash(String rawToken) {
         if (rawToken == null || rawToken.isBlank()) {
-            throw new IllegalStateException(
-                    "Refresh token must not be blank."
-            );
+            throw new IllegalStateException("Refresh token must not be blank.");
         }
 
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-            byte[] hashed =
-                    digest.digest(
-                            rawToken.getBytes(StandardCharsets.UTF_8));
+            byte[] hashed = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
 
             return HexFormat.of().formatHex(hashed);
 
         } catch (NoSuchAlgorithmException exception) {
-            throw new IllegalStateException(
-                    "SHA-256 is not available.",
-                    exception
-            );
+            throw new IllegalStateException("SHA-256 is not available.", exception);
         }
     }
 
-    public void revoke(
-            String rawToken
-    ) {
-        tokenStore.delete(hash(rawToken));
+    public Mono<Void> revoke(String rawToken) {
+        return tokenStore.delete(hash(rawToken));
     }
 
-    public Optional<RefreshTokenSession> consume(
-            String rawToken
-    ) {
-        if(rawToken == null || rawToken.isBlank()) {
-            return Optional.empty();
+    public Mono<RefreshTokenSession> consume(String rawToken) {
+        if (rawToken == null || rawToken.isBlank()) {
+            return Mono.empty();
         }
 
         return tokenStore.consume(hash(rawToken));

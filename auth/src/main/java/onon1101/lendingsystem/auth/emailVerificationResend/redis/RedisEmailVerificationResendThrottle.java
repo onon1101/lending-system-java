@@ -7,22 +7,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 @Repository
-public class RedisEmailVerificationResendThrottle
-        implements EmailVerificationResendThrottle {
+public class RedisEmailVerificationResendThrottle implements EmailVerificationResendThrottle {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger(RedisEmailVerificationResendThrottle.class);
 
-    private final StringRedisTemplate redisTemplate;
+    private final ReactiveStringRedisTemplate redisTemplate;
     private final RedisKeyFactory keyFactory;
     private final Duration cooldown;
 
     public RedisEmailVerificationResendThrottle(
-            StringRedisTemplate redisTemplate,
+            ReactiveStringRedisTemplate redisTemplate,
             RedisKeyFactory keyFactory,
             @Value("${lending.email-verification.resend-cooldown:PT1M}") Duration cooldown) {
         this.redisTemplate = redisTemplate;
@@ -31,14 +31,19 @@ public class RedisEmailVerificationResendThrottle
     }
 
     @Override
-    public boolean acquire(UUID publicUserId) {
+    public Mono<Boolean> acquire(UUID publicUserId) {
         String key = keyFactory.create("auth", "email-verification-resend", publicUserId);
 
-        try {
-            return Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(key, "1", cooldown));
-        } catch (DataAccessException exception) {
-            LOGGER.warn("Unable to acquire email-verification resend throttle", exception);
-            return false;
-        }
+        return redisTemplate
+                .opsForValue()
+                .setIfAbsent(key, "1", cooldown)
+                .onErrorResume(
+                        DataAccessException.class,
+                        exception -> {
+                            LOGGER.warn(
+                                    "Unable to acquire email-verification resend throttle",
+                                    exception);
+                            return Mono.just(false);
+                        });
     }
 }

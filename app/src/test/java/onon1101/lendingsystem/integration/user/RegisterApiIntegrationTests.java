@@ -8,7 +8,7 @@ import onon1101.lendingsystem.integration.support.TestIdentity;
 import onon1101.lendingsystem.user.register.RegisterRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import tools.jackson.databind.JsonNode;
 
 class RegisterApiIntegrationTests extends AbstractApiIntegrationTest {
@@ -17,12 +17,15 @@ class RegisterApiIntegrationTests extends AbstractApiIntegrationTest {
     void registersPasswordAccount() {
         String username = TestIdentity.username("register");
 
-        ResponseEntity<JsonNode> response =
-                http.postForEntity(
-                        "/api/v1/user/register",
-                        new RegisterRequest(
-                                username, "correct-password", username + "@example.com"),
-                        JsonNode.class);
+        EntityExchangeResult<JsonNode> response =
+                http.post()
+                        .uri("/api/v1/user/register")
+                        .bodyValue(
+                                new RegisterRequest(
+                                        username, "correct-password", username + "@example.com"))
+                        .exchange()
+                        .expectBody(JsonNode.class)
+                        .returnResult();
 
         JsonNode data = assertSuccessful(response, HttpStatus.OK.value());
         assertThat(data.path("userId").asString()).isNotBlank();

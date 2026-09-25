@@ -1,19 +1,15 @@
 package onon1101.lendingsystem.auth.login.token;
 
 import java.time.Duration;
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 public interface RefreshTokenStore {
 
-    void save(
-            String tokenHash,
-            RefreshTokenSession session,
-            Duration expiration
-    );
+    Mono<Void> save(String tokenHash, RefreshTokenSession session, Duration expiration);
 
-    Optional<RefreshTokenSession> find(String tokenHash);
+    Mono<RefreshTokenSession> find(String tokenHash);
 
-    void delete(String tokenHash);
+    Mono<Void> delete(String tokenHash);
 
-    Optional<RefreshTokenSession> consume(String tokenHash);
+    Mono<RefreshTokenSession> consume(String tokenHash);
 }

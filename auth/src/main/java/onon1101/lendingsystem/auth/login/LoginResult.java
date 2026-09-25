@@ -6,5 +6,5 @@ public record LoginResult(
         String accessToken,
         long accessTokenExpiresIn,
         String refreshToken,
-        long refreshTokenExpiresIn
-) implements CommandResult {}
+        long refreshTokenExpiresIn)
+        implements CommandResult {}

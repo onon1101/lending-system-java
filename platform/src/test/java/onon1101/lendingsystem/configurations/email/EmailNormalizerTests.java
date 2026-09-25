@@ -9,9 +9,7 @@ class EmailNormalizerTests {
 
     @Test
     void trimsAndConvertsEmailToLowercase() {
-        assertEquals(
-                "member001@example.com",
-                EmailNormalizer.normalize(" Member001@Example.COM "));
+        assertEquals("member001@example.com", EmailNormalizer.normalize(" Member001@Example.COM "));
     }
 
     @Test

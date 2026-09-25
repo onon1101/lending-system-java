@@ -51,7 +51,8 @@ class RegistrationAuditPolicyTests {
                         success -> {
                             assertThat(success.eventType()).isEqualTo(eventType);
                             assertThat(success.attribute().get(0).Key()).isEqualTo(attributeKey);
-                            assertThat(success.attribute().get(0).Value()).isEqualTo(attributeValue);
+                            assertThat(success.attribute().get(0).Value())
+                                    .isEqualTo(attributeValue);
                         });
     }
 
@@ -67,7 +68,8 @@ class RegistrationAuditPolicyTests {
                         rejected -> {
                             assertThat(rejected.eventType()).isEqualTo(eventType);
                             assertThat(rejected.attribute().get(0).Key()).isEqualTo(attributeKey);
-                            assertThat(rejected.attribute().get(0).Value()).isEqualTo(attributeValue);
+                            assertThat(rejected.attribute().get(0).Value())
+                                    .isEqualTo(attributeValue);
                             assertThat(rejected.reason()).isEqualTo(reason);
                         });
     }

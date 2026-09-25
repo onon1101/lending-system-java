@@ -9,7 +9,7 @@ import onon1101.lendingsystem.integration.support.TestIdentity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import tools.jackson.databind.JsonNode;
 
 class LoginApiIntegrationTests extends AbstractApiIntegrationTest {
@@ -21,7 +21,7 @@ class LoginApiIntegrationTests extends AbstractApiIntegrationTest {
         String username = TestIdentity.username("login");
         testData.activePasswordUser(username, "correct-password");
 
-        ResponseEntity<JsonNode> response = login(username, "correct-password");
+        EntityExchangeResult<JsonNode> response = login(username, "correct-password");
 
         JsonNode data = assertSuccessful(response, HttpStatus.OK.value());
         assertThat(data.path("accessToken").asString()).isNotBlank();
@@ -34,7 +34,7 @@ class LoginApiIntegrationTests extends AbstractApiIntegrationTest {
         String username = TestIdentity.username("normalize");
         testData.activePasswordUser(username, "correct-password");
 
-        ResponseEntity<JsonNode> response =
+        EntityExchangeResult<JsonNode> response =
                 login("  " + username.toUpperCase() + "  ", "correct-password");
 
         assertSuccessful(response, HttpStatus.OK.value());
@@ -45,30 +45,34 @@ class LoginApiIntegrationTests extends AbstractApiIntegrationTest {
         String username = TestIdentity.username("invalid");
         testData.activePasswordUser(username, "correct-password");
 
-        ResponseEntity<JsonNode> response = login(username, "wrong-password");
+        EntityExchangeResult<JsonNode> response = login(username, "wrong-password");
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().path("isSuccess").asBoolean()).isFalse();
-        assertThat(response.getBody().path("errorCode").asString())
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getResponseBody()).isNotNull();
+        assertThat(response.getResponseBody().path("isSuccess").asBoolean()).isFalse();
+        assertThat(response.getResponseBody().path("errorCode").asString())
                 .isEqualTo("Auth.InvalidCredentials");
-        assertThat(response.getBody().path("data").isNull()).isTrue();
+        assertThat(response.getResponseBody().path("data").isNull()).isTrue();
     }
 
     @Test
     void returnsBadRequestForBlankUsername() {
-        ResponseEntity<JsonNode> response = login("", "some-password");
+        EntityExchangeResult<JsonNode> response = login("", "some-password");
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().path("code").asInt()).isEqualTo(400);
-        assertThat(response.getBody().path("isSuccess").asBoolean()).isFalse();
-        assertThat(response.getBody().path("errorCode").asString())
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getResponseBody()).isNotNull();
+        assertThat(response.getResponseBody().path("code").asInt()).isEqualTo(400);
+        assertThat(response.getResponseBody().path("isSuccess").asBoolean()).isFalse();
+        assertThat(response.getResponseBody().path("errorCode").asString())
                 .isEqualTo("Validation.InvalidRequest");
     }
 
-    private ResponseEntity<JsonNode> login(String username, String password) {
-        return http.postForEntity(
-                "/api/v1/auth/login", new LoginRequest(username, password), JsonNode.class);
+    private EntityExchangeResult<JsonNode> login(String username, String password) {
+        return http.post()
+                .uri("/api/v1/auth/login")
+                .bodyValue(new LoginRequest(username, password))
+                .exchange()
+                .expectBody(JsonNode.class)
+                .returnResult();
     }
 }

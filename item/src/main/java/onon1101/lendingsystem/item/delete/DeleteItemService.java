@@ -1,17 +1,13 @@
 package onon1101.lendingsystem.item.delete;
 
-import onon1101.lendingsystem.configurations.context.user.CurrentUserContext;
+import java.time.Instant;
 import onon1101.lendingsystem.configurations.context.user.CurrentUserProvider;
-
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.time.IClock;
-
 import onon1101.lendingsystem.item.delete.error.ItemNotFoundDomainError;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
+import reactor.core.publisher.Mono;
 
 @Service
 public class DeleteItemService {
@@ -21,33 +17,26 @@ public class DeleteItemService {
     private final IClock clock;
 
     public DeleteItemService(
-            DeleteItemWriter itemWriter,
-            CurrentUserProvider currentUserProvider,
-            IClock clock
-    ) {
+            DeleteItemWriter itemWriter, CurrentUserProvider currentUserProvider, IClock clock) {
         this.itemWriter = itemWriter;
         this.currentUserProvider = currentUserProvider;
         this.clock = clock;
     }
 
     @Transactional
-    public Result<DeleteItemResult> delete(DeleteItemCommand command) {
-        CurrentUserContext currentUser = currentUserProvider.getCurrentUser();
-
+    public Mono<Result<DeleteItemResult>> delete(DeleteItemCommand command) {
         Instant archivedAt = clock.now();
-
-        boolean archived = itemWriter.archiveOwnedItem(
-                command.itemId(),
-                currentUser.privateUserId(),
-                archivedAt
-        );
-
-        if (!archived) {
-            return Result.failure(
-                    new ItemNotFoundDomainError()
-            );
-        }
-
-        return Result.success(new DeleteItemResult(command.itemId(), archivedAt));
+        return currentUserProvider
+                .getCurrentUser()
+                .flatMap(
+                        currentUser ->
+                                itemWriter.archiveOwnedItem(
+                                        command.itemId(), currentUser.privateUserId(), archivedAt))
+                .map(
+                        archived ->
+                                archived
+                                        ? Result.success(
+                                                new DeleteItemResult(command.itemId(), archivedAt))
+                                        : Result.failure(new ItemNotFoundDomainError()));
     }
 }

@@ -1,12 +1,12 @@
 package onon1101.lendingsystem.configurations.context.user;
 
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 public interface UserCache {
 
-    Optional<CurrentUserContext> find(long privateUserId);
+    Mono<CurrentUserContext> find(long privateUserId);
 
-    void save(CurrentUserContext user);
+    Mono<Void> save(CurrentUserContext user);
 
-    void evict(long privateUserId);
+    Mono<Void> evict(long privateUserId);
 }

@@ -1,5 +1,6 @@
 package onon1101.lendingsystem.user.register.audit;
 
+import java.util.List;
 import onon1101.lendingsystem.configurations.audit.AuditEvent;
 import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
 import onon1101.lendingsystem.configurations.audit.eventAttributes.UserPublicIdAuditEventAttribute;
@@ -8,8 +9,6 @@ import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.user.register.RegisterCommand;
 import onon1101.lendingsystem.user.register.RegisterResult;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /** Maps registration command outcomes to registration audit events. */
 @Component
@@ -24,9 +23,7 @@ public final class RegistrationAuditPolicy
             case Result.Success<RegisterResult> success ->
                     new AuditEvent.Success(
                             "registration_succeeded",
-                            List.of(
-                                    new UserPublicIdAuditEventAttribute(
-                                            success.value().userId())));
+                            List.of(new UserPublicIdAuditEventAttribute(success.value().userId())));
             case Result.Failure<RegisterResult> failure ->
                     new AuditEvent.Rejected(
                             "registration_failed",

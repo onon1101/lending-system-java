@@ -9,5 +9,4 @@ public record ConfirmEmailRequest(
                         description = "Email 驗證 token",
                         example = "email-token",
                         accessMode = Schema.AccessMode.WRITE_ONLY)
-                @NotBlank
-                String token) {}
+                @NotBlank String token) {}

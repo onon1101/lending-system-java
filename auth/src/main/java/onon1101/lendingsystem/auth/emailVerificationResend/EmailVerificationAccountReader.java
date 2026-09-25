@@ -1,8 +1,8 @@
 package onon1101.lendingsystem.auth.emailVerificationResend;
 
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 public interface EmailVerificationAccountReader {
 
-    Optional<EmailVerificationAccount> findPendingByEmail(String email);
+    Mono<EmailVerificationAccount> findPendingByEmail(String email);
 }

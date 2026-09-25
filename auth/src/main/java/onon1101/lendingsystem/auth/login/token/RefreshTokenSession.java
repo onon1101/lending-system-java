@@ -4,9 +4,4 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record RefreshTokenSession(
-        long privateUserId,
-        UUID publicUserId,
-        String username,
-        Instant issuedAt
-) {
-}
+        long privateUserId, UUID publicUserId, String username, Instant issuedAt) {}

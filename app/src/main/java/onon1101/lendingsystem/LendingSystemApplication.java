@@ -6,6 +6,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
+// todo: jwt token 裡面加入 session id，控制會話
+// todo: 改成 Async
 @OpenAPIDefinition(
         info = @Info(title = "Lending System API", version = "v1", description = "借貸系統後端 API 文件"))
 @SpringBootApplication

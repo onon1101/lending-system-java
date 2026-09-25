@@ -1,30 +1,32 @@
 package onon1101.lendingsystem.user.register;
 
-import onon1101.lendingsystem.configurations.email.EmailUtil;
 import onon1101.lendingsystem.configurations.audit.AuditedCommand;
 import onon1101.lendingsystem.configurations.domain.Result;
+import onon1101.lendingsystem.configurations.email.EmailUtil;
 import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenService;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;
 import onon1101.lendingsystem.user.register.error.InvalidRegistrationDomainError;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalEventPublisher;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 public class RegisterService {
 
     private final RegisterAccountWriter accountWriter;
     private final PasswordEncoder passwordEncoder;
-    private final ApplicationEventPublisher eventPublisher;
+    private final TransactionalEventPublisher eventPublisher;
     private final EmailValidateTokenService emailValidateTokenService;
 
     public RegisterService(
             RegisterAccountWriter accountWriter,
             PasswordEncoder passwordEncoder,
-            ApplicationEventPublisher eventPublisher,
+            TransactionalEventPublisher eventPublisher,
             EmailValidateTokenService emailValidateTokenService) {
         this.accountWriter = accountWriter;
         this.passwordEncoder = passwordEncoder;
@@ -34,30 +36,32 @@ public class RegisterService {
 
     @Transactional
     @AuditedCommand(RegistrationAuditPolicy.class)
-    public Result<RegisterResult> register(RegisterCommand command) {
+    public Mono<Result<RegisterResult>> register(RegisterCommand command) {
         String username = command.username();
         String email = command.email();
         String password = command.password();
 
         if (EmailUtil.validateEmail(email)) {
-            return Result.failure(new InvalidEmailDomainError());
+            return Mono.just(Result.failure(new InvalidEmailDomainError()));
         }
 
-        String passwordEncoded = passwordEncoder.encode(password);
-
-        RegisterAccount account =
-                accountWriter.registerAccount(username, passwordEncoded, email).orElse(null);
-
-        if (account == null) {
-            return Result.failure(new InvalidRegistrationDomainError());
-        }
-
-        // 驗證 Email 是否有效 Token
-        String emailValidateToken =
-                emailValidateTokenService.createToken(account.publicUserId(), username);
-        eventPublisher.publishEvent(
-                new EmailValidateRequested(email, username, emailValidateToken));
-
-        return Result.success(new RegisterResult(account.publicUserId()));
+        return Mono.fromCallable(() -> passwordEncoder.encode(password))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(encoded -> accountWriter.registerAccount(username, encoded, email))
+                .flatMap(
+                        account -> {
+                            String token =
+                                    emailValidateTokenService.createToken(
+                                            account.publicUserId(), username);
+                            return eventPublisher
+                                    .publishEvent(
+                                            new EmailValidateRequested(email, username, token))
+                                    .thenReturn(
+                                            Result.success(
+                                                    new RegisterResult(account.publicUserId())));
+                        })
+                .switchIfEmpty(
+                        Mono.fromSupplier(
+                                () -> Result.failure(new InvalidRegistrationDomainError())));
     }
 }

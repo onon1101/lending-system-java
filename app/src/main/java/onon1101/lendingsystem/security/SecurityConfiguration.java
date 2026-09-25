@@ -3,30 +3,34 @@ package onon1101.lendingsystem.security;
 import onon1101.lendingsystem.auth.login.token.AccessTokenProperties;
 import onon1101.lendingsystem.configurations.controller.RequestContextFilter;
 import onon1101.lendingsystem.configurations.token.JwtDecoderProvider;
-import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import reactor.core.publisher.Mono;
 
 @Configuration(proxyBeanMethods = false)
 public class SecurityConfiguration {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoderProvider decoderProvider)
-            throws Exception {
+    SecurityWebFilterChain securityFilterChain(
+            ServerHttpSecurity http, JwtDecoderProvider decoderProvider) {
         JwtDecoder accessTokenDecoder = decoderProvider.getDecoder(AccessTokenProperties.PURPOSE);
+        ReactiveJwtDecoder reactiveAccessTokenDecoder =
+                token -> Mono.fromCallable(() -> accessTokenDecoder.decode(token));
+
         return http.csrf(csrf -> csrf.disable())
-                .addFilterBefore(new RequestContextFilter(), SecurityContextHolderFilter.class)
-                .sessionManagement(
-                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+                .addFilterBefore(
+                        new RequestContextFilter(), SecurityWebFiltersOrder.REACTOR_CONTEXT)
+                .authorizeExchange(
                         authorize ->
                                 authorize
-                                        .requestMatchers(
+                                        .pathMatchers(
                                                 "/api/v1/auth/login",
                                                 "/api/v1/auth/logout",
                                                 "/api/v1/auth/refresh",
@@ -36,18 +40,19 @@ public class SecurityConfiguration {
                                                 "/api/v1/auth/email-verification/confirm",
                                                 "/api/v1/auth/email-verification/resend")
                                         .permitAll()
-                                        .requestMatchers(EndpointRequest.to("health"))
+                                        .pathMatchers("/actuator/health", "/actuator/health/**")
                                         .permitAll()
-                                        .requestMatchers(
+                                        .pathMatchers(
                                                 "/swagger-ui/**",
                                                 "/swagger-ui.html",
                                                 "/v3/api-docs/**")
                                         .permitAll()
-                                        .anyRequest()
+                                        .anyExchange()
                                         .authenticated())
                 .oauth2ResourceServer(
                         resourceServer ->
-                                resourceServer.jwt(jwt -> jwt.decoder(accessTokenDecoder)))
+                                resourceServer.jwt(
+                                        jwt -> jwt.jwtDecoder(reactiveAccessTokenDecoder)))
                 .build();
     }
 }

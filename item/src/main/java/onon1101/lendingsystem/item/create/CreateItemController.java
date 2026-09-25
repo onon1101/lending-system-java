@@ -16,33 +16,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Tag(name = "item", description = "物品相關 API")
 @Validated
 @RestController
 @RequestMapping("/api/v1/items/create")
 public class CreateItemController {
-  TEIMSTAMPE
-  private final CreateItemService createItemService;
+    private final CreateItemService createItemService;
 
-  public CreateItemController(CreateItemService createItemService) {
-    this.createItemService = createItemService;
-  }
+    public CreateItemController(CreateItemService createItemService) {
+        this.createItemService = createItemService;
+    }
 
-  @Operation(summary = "建立物品")
-  @PostMapping
-  public ResponseEntity<ApiResponse<CreateItemResponse>>
-  create(@RequestHeader("Idempotency-Key") @NotBlank @Size(max = 128)
-         @Pattern(regexp = "^[A-Za-z0-9._:-]+$") String idempotencyKey,
-         @Valid @RequestBody CreateItemRequest request) {
-    CreateItemResult result = createItemService.create(new CreateItemCommand(
-        idempotencyKey, request.name(), request.description()));
-
-    CreateItemResponse response = new CreateItemResponse(result.itemId());
-
-    URI location = URI.create("/api/v1/items/" + result.itemId());
-
-    return ResponseEntity.created(location).body(
-        ApiResponse.success(HttpStatus.CREATED, response));
-  }
+    @Operation(summary = "建立物品")
+    @PostMapping
+    public Mono<ResponseEntity<ApiResponse<CreateItemResponse>>> create(
+            @RequestHeader("Idempotency-Key")
+                    @NotBlank @Size(max = 128) @Pattern(regexp = "^[A-Za-z0-9._:-]+$") String idempotencyKey,
+            @Valid @RequestBody CreateItemRequest request) {
+        return createItemService
+                .create(
+                        new CreateItemCommand(
+                                idempotencyKey, request.name(), request.description()))
+                .map(
+                        result -> {
+                            CreateItemResponse response = new CreateItemResponse(result.itemId());
+                            URI location = URI.create("/api/v1/items/" + result.itemId());
+                            return ResponseEntity.created(location)
+                                    .body(ApiResponse.success(HttpStatus.CREATED, response));
+                        });
+    }
 }

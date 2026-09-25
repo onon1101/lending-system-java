@@ -6,19 +6,20 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import java.util.UUID;
 import onon1101.lendingsystem.auth.commons.PasswordTokenService;
 import onon1101.lendingsystem.auth.forgotPassword.email.PasswordResetEmailRequested;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.transaction.reactive.TransactionalEventPublisher;
+import reactor.core.publisher.Mono;
 
 class ForgotPasswordServiceTests {
 
     private final ForgotPasswordAccountReader accountReader =
             mock(ForgotPasswordAccountReader.class);
     private final PasswordTokenService tokenService = mock(PasswordTokenService.class);
-    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+    private final TransactionalEventPublisher eventPublisher =
+            mock(TransactionalEventPublisher.class);
     private final ForgotPasswordService service =
             new ForgotPasswordService(accountReader, tokenService, eventPublisher);
 
@@ -26,10 +27,12 @@ class ForgotPasswordServiceTests {
     void publishesPasswordResetEmailEventForExistingAccount() {
         UUID publicUserId = UUID.randomUUID();
         when(accountReader.findByEmail("user@example.com"))
-                .thenReturn(Optional.of(new ForgotPasswordAccount(publicUserId, "test-user")));
+                .thenReturn(Mono.just(new ForgotPasswordAccount(publicUserId, "test-user")));
         when(tokenService.createToken(publicUserId, "test-user")).thenReturn("reset-token");
+        when(eventPublisher.publishEvent(any(PasswordResetEmailRequested.class)))
+                .thenReturn(Mono.empty());
 
-        service.handle(new ForgotPasswordCommand(" User@Example.com "));
+        service.handle(new ForgotPasswordCommand(" User@Example.com ")).block();
 
         verify(eventPublisher)
                 .publishEvent(
@@ -39,9 +42,9 @@ class ForgotPasswordServiceTests {
 
     @Test
     void doesNotPublishEventWhenAccountDoesNotExist() {
-        when(accountReader.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+        when(accountReader.findByEmail("missing@example.com")).thenReturn(Mono.empty());
 
-        service.handle(new ForgotPasswordCommand("missing@example.com"));
+        service.handle(new ForgotPasswordCommand("missing@example.com")).block();
 
         verify(eventPublisher, never()).publishEvent(any());
     }

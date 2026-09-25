@@ -14,53 +14,60 @@ import onon1101.lendingsystem.item.domain.ItemId;
 import onon1101.lendingsystem.item.domain.ItemName;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 @Service
 public class CreateItemService {
 
-  private final CreateItemWriter itemWriter;
-  private final CurrentUserProvider currentUserProvider;
-  private final IdempotencyService idempotencyService;
-  private final IClock clock;
+    private final CreateItemWriter itemWriter;
+    private final CurrentUserProvider currentUserProvider;
+    private final IdempotencyService idempotencyService;
+    private final IClock clock;
 
-  public CreateItemService(CreateItemWriter itemWriter,
-                           CurrentUserProvider currentUserContext, IClock clock,
-                           IdempotencyService idempotencyService) {
-    this.itemWriter = itemWriter;
-    this.currentUserProvider = currentUserContext;
-    this.clock = clock;
-    this.idempotencyService = idempotencyService;
-  }
+    public CreateItemService(
+            CreateItemWriter itemWriter,
+            CurrentUserProvider currentUserContext,
+            IClock clock,
+            IdempotencyService idempotencyService) {
+        this.itemWriter = itemWriter;
+        this.currentUserProvider = currentUserContext;
+        this.clock = clock;
+        this.idempotencyService = idempotencyService;
+    }
 
-  @Transactional
-  @AuditedCommand(CreateItemAuditPolicy.class)
-  public CreateItemResult create(CreateItemCommand command) {
-    CurrentUserContext currentUserContext =
-        currentUserProvider.getCurrentUser();
+    @Transactional
+    @AuditedCommand(CreateItemAuditPolicy.class)
+    public Mono<CreateItemResult> create(CreateItemCommand command) {
+        CraeteItemPayload payload = new CraeteItemPayload(command.name(), command.description());
 
-    CraeteItemPayload payload =
-        new CraeteItemPayload(command.name(), command.description());
+        return currentUserProvider
+                .getCurrentUser()
+                .flatMap(
+                        currentUserContext ->
+                                idempotencyService.execute(
+                                        currentUserContext.publicUserId().toString(),
+                                        "item.create",
+                                        command.idempotencyKey(),
+                                        payload,
+                                        CreateItemResult.class,
+                                        () -> createItem(currentUserContext, command)));
+    }
 
-    return idempotencyService.execute(
-        currentUserContext.publicUserId().toString(), "item.create",
-        command.idempotencyKey(), payload, CreateItemResult.class,
-        () -> createItem(currentUserContext, command));
-  }
+    private Mono<CreateItemResult> createItem(
+            CurrentUserContext currentUser, CreateItemCommand command) {
 
-  public CreateItemResult createItem(CurrentUserContext currentUser,
-                                     CreateItemCommand command) {
+        Instant now = clock.now();
 
-    Instant now = clock.now();
+        Item item =
+                Item.create(
+                        ItemId.of(UuidCreator.getTimeOrderedEpoch()),
+                        currentUser.privateUserId(),
+                        ItemName.of(command.name()),
+                        ItemDescription.of(command.description()),
+                        now);
 
-    Item item =
-        Item.create(ItemId.of(UuidCreator.getTimeOrderedEpoch()),
-                    currentUser.privateUserId(), ItemName.of(command.name()),
-                    ItemDescription.of(command.description()), now);
+        return itemWriter.create(item).thenReturn(new CreateItemResult(item.id().value()));
+    }
 
-    itemWriter.create(item);
-
-    return new CreateItemResult(item.id().value());
-  }
-
-  private record CraeteItemPayload(String name, String description) {}
+    private record CraeteItemPayload(String name, String description) {}
 }

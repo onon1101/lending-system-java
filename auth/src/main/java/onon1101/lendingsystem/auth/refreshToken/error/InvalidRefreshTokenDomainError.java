@@ -7,7 +7,6 @@ public final class InvalidRefreshTokenDomainError extends DomainError {
     public InvalidRefreshTokenDomainError() {
         super(
                 "Auth.InvalidRefreshToken",
-                "Refresh token is invalid, expired, or has already been used."
-        );
+                "Refresh token is invalid, expired, or has already been used.");
     }
 }

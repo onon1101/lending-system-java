@@ -13,6 +13,8 @@ import onon1101.lendingsystem.configurations.time.IClock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 public class LoginService {
@@ -48,58 +50,60 @@ public class LoginService {
     // TODO Add refresh token support.
     @Transactional()
     @AuditedCommand(AuthenticationAuditPolicy.class)
-    public Result<LoginResult> login(LoginCommand command) {
+    public Mono<Result<LoginResult>> login(LoginCommand command) {
         Instant now = clock.now();
 
         String username = command.username();
         String password = command.password();
 
-        LoginAccount account = accountReader.findByUsername(username).orElse(null);
+        return accountReader
+                .findByUsername(username)
+                .flatMap(account -> authenticate(account, password, now))
+                .switchIfEmpty(
+                        Mono.fromSupplier(
+                                () -> Result.failure(new InvalidCredentialsDomainError())));
+    }
 
-        // 帳號不存在
-        if (account == null) {
-            return Result.failure(new InvalidCredentialsDomainError());
-        }
-
-        // 嘗試太多次
+    private Mono<Result<LoginResult>> authenticate(
+            LoginAccount account, String password, Instant now) {
         if (account.lockedUntil() != null && account.lockedUntil().isAfter(now)) {
-            return Result.failure(new TooManyAttemptsDomainError());
+            return Mono.just(Result.failure(new TooManyAttemptsDomainError()));
         }
 
-        // 輸入密碼錯誤
-        if (!passwordEncoder.matches(password, account.passwordHash())) {
-            // 失敗次數寫入資料庫
-            FailedAttemptResult attempt =
-                    accountWriter.recordFailedAttempt(
-                            account.passwordId(), MAX_FAILED_ATTEMPTS, now.plus(LOCK_DURATION));
+        return Mono.fromCallable(() -> passwordEncoder.matches(password, account.passwordHash()))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(matches -> matches ? successfulLogin(account) : failedLogin(account, now));
+    }
 
-            if (attempt.locked()) {
-                return Result.failure(new TooManyAttemptsDomainError());
-            }
+    private Mono<Result<LoginResult>> failedLogin(LoginAccount account, Instant now) {
+        return accountWriter
+                .recordFailedAttempt(
+                        account.passwordId(), MAX_FAILED_ATTEMPTS, now.plus(LOCK_DURATION))
+                .map(
+                        attempt ->
+                                attempt.locked()
+                                        ? Result.failure(new TooManyAttemptsDomainError())
+                                        : Result.failure(new InvalidCredentialsDomainError()));
+    }
 
-            return Result.failure(new InvalidCredentialsDomainError());
-        }
-
-        // 清洗更新次數
-        accountWriter.resetFailedAttempts(account.passwordId());
-
+    private Mono<Result<LoginResult>> successfulLogin(LoginAccount account) {
         String accessToken =
                 accessTokenService.createToken(
-                        account.privateUserId(),
-                        account.publicUserId(),
-                        account.username());
+                        account.privateUserId(), account.publicUserId(), account.username());
 
-        String refreshToken =
-                refreshTokenIssuer.createToken(
-                        account.privateUserId(),
-                        account.publicUserId(),
-                        account.username());
-
-        return Result.success(
-                new LoginResult(
-                        accessToken,
-                        accessTokenService.expiresInSeconds(),
-                        refreshToken,
-                        refreshTokenIssuer.expiresInSeconds()));
+        return accountWriter
+                .resetFailedAttempts(account.passwordId())
+                .then(
+                        refreshTokenIssuer.createToken(
+                                account.privateUserId(),
+                                account.publicUserId(),
+                                account.username()))
+                .map(
+                        refreshToken ->
+                                Result.success(
+                                        new LoginResult(
+                                                accessToken, accessTokenService.expiresInSeconds(),
+                                                refreshToken,
+                                                        refreshTokenIssuer.expiresInSeconds())));
     }
 }

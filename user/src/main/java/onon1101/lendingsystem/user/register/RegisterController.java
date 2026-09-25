@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Tag(name = "user", description = "使用者服務相關 API")
 @RestController
@@ -49,18 +50,24 @@ public class RegisterController {
                 content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegisterResponse>> register(
+    public Mono<ResponseEntity<ApiResponse<RegisterResponse>>> register(
             @Valid @RequestBody RegisterRequest request) {
         return registerService
                 .register(
                         new RegisterCommand(
                                 request.username(), request.password(), request.email()))
-                .match(
-                        result -> {
-                            RegisterResponse data = new RegisterResponse(result.userId());
-                            return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, data));
-                        },
-                        errorCode ->
-                                ResponseEntity.ok(ApiResponse.failure(HttpStatus.OK, errorCode)));
+                .map(
+                        outcome ->
+                                outcome.match(
+                                        result -> {
+                                            RegisterResponse data =
+                                                    new RegisterResponse(result.userId());
+                                            return ResponseEntity.ok(
+                                                    ApiResponse.success(HttpStatus.OK, data));
+                                        },
+                                        errorCode ->
+                                                ResponseEntity.ok(
+                                                        ApiResponse.failure(
+                                                                HttpStatus.OK, errorCode))));
     }
 }

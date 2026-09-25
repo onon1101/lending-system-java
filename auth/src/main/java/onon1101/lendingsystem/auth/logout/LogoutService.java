@@ -1,8 +1,8 @@
 package onon1101.lendingsystem.auth.logout;
 
 import onon1101.lendingsystem.auth.login.token.RefreshTokenIssuer;
-
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class LogoutService {
@@ -13,7 +13,7 @@ public class LogoutService {
         this.refreshTokenIssuer = refreshTokenIssuer;
     }
 
-    public void logout(LogoutCommand command) {
-        refreshTokenIssuer.revoke(command.refreshToken());
+    public Mono<Void> logout(LogoutCommand command) {
+        return refreshTokenIssuer.revoke(command.refreshToken());
     }
 }

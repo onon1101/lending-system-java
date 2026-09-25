@@ -1,13 +1,9 @@
 package onon1101.lendingsystem.item.domain;
 
-import org.jspecify.annotations.Nullable;
-
 import java.time.Instant;
 import java.util.Objects;
 
-/**
- * 物品 domain model
- */
+/** 物品 domain model */
 public final class Item {
 
     private final ItemId id;
@@ -37,8 +33,7 @@ public final class Item {
             ItemDescription description,
             ItemAvailability availability,
             Instant createdAt,
-            Instant updatedAt
-    ) {
+            Instant updatedAt) {
         this.id = Objects.requireNonNull(id, "Item ID must not be null.");
 
         if (ownerId <= 0) {
@@ -47,8 +42,10 @@ public final class Item {
 
         this.ownerId = ownerId;
         this.name = Objects.requireNonNull(name, "Item name must not be null.");
-        this.description = Objects.requireNonNull(description, "Item Description must not be null.");
-        this.availability = Objects.requireNonNull(availability, "Item Availability must not be null.");
+        this.description =
+                Objects.requireNonNull(description, "Item Description must not be null.");
+        this.availability =
+                Objects.requireNonNull(availability, "Item Availability must not be null.");
         this.createdAt = Objects.requireNonNull(createdAt, "Item CreatedAt must not be null.");
         this.updatedAt = Objects.requireNonNull(updatedAt, "Item UpdatedAt must not be null.");
 
@@ -67,19 +64,8 @@ public final class Item {
      * @param now 建立於
      */
     public static Item create(
-            ItemId id,
-            long ownerId,
-            ItemName name,
-            ItemDescription description,
-            Instant now) {
-        return new Item(
-                id,
-                ownerId,
-                name,
-                description,
-                ItemAvailability.AVAILABLE,
-                now,
-                now);
+            ItemId id, long ownerId, ItemName name, ItemDescription description, Instant now) {
+        return new Item(id, ownerId, name, description, ItemAvailability.AVAILABLE, now, now);
     }
 
     /**
@@ -102,14 +88,7 @@ public final class Item {
             ItemAvailability availability,
             Instant createdAt,
             Instant updatedAt) {
-        return new Item(
-                id,
-                ownerId,
-                name,
-                description,
-                availability,
-                createdAt,
-                updatedAt);
+        return new Item(id, ownerId, name, description, availability, createdAt, updatedAt);
     }
 
     /**
@@ -119,15 +98,11 @@ public final class Item {
      * @param description 物品描述
      * @param now 現在時間
      */
-    public void updateDetails(
-            ItemName name,
-            ItemDescription description,
-            Instant now) {
+    public void updateDetails(ItemName name, ItemDescription description, Instant now) {
         ensureNotArchived();
 
         this.name = Objects.requireNonNull(name, "Item name must not be null");
-        this.description =
-                Objects.requireNonNull(description, "Item description must not be null");
+        this.description = Objects.requireNonNull(description, "Item description must not be null");
         touch(now);
     }
 
@@ -182,9 +157,7 @@ public final class Item {
         return ownerId == userId;
     }
 
-    /**
-     * 確保物品並不是已下架的狀態。
-     */
+    /** 確保物品並不是已下架的狀態。 */
     private void ensureNotArchived() {
         if (availability == ItemAvailability.ARCHIVED) {
             throw new ItemDomainException("Archived item cannot be changed");
@@ -193,6 +166,7 @@ public final class Item {
 
     /**
      * 調整更新時間。
+     *
      * @param now 現在時間。
      */
     private void touch(Instant now) {
@@ -232,5 +206,4 @@ public final class Item {
     public Instant updatedAt() {
         return updatedAt;
     }
-
 }

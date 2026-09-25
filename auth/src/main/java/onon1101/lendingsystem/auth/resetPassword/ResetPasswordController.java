@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @Tag(name = "auth", description = "認證相關 API")
 @RestController
@@ -49,16 +50,22 @@ public class ResetPasswordController {
                 content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @PostMapping("/reset-password")
-    ResponseEntity<ApiResponse<ResetPasswordResponse>> resetPassword(
+    Mono<ResponseEntity<ApiResponse<ResetPasswordResponse>>> resetPassword(
             @Valid @RequestBody ResetPasswordRequest request) {
         return service.execute(
                         new ResetPasswordCommand(request.resetToken(), request.newPassword()))
-                .match(
-                        result ->
-                                ResponseEntity.ok(
-                                        ApiResponse.success(
-                                                HttpStatus.OK, new ResetPasswordResponse("已修改密碼"))),
-                        errorCode ->
-                                ResponseEntity.ok(ApiResponse.failure(HttpStatus.OK, errorCode)));
+                .map(
+                        outcome ->
+                                outcome.match(
+                                        result ->
+                                                ResponseEntity.ok(
+                                                        ApiResponse.success(
+                                                                HttpStatus.OK,
+                                                                new ResetPasswordResponse(
+                                                                        "已修改密碼"))),
+                                        errorCode ->
+                                                ResponseEntity.ok(
+                                                        ApiResponse.failure(
+                                                                HttpStatus.OK, errorCode))));
     }
 }

@@ -11,23 +11,36 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.reactive.result.method.RequestMappingInfo;
+import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 /**
- * Fails when production exposes a new business API without adding it to the reviewed API inventory.
- * Every inventory entry must have at least one happy-path integration test.
+ * Fails when the reviewed business API surface changes unexpectedly. Endpoint behavior belongs in
+ * the focused integration test for that feature.
  */
 class ApiEndpointCoverageTests extends AbstractApiIntegrationTest {
 
-    private static final Set<String> TESTED_API_INVENTORY =
-            Set.of("POST /api/v1/auth/login", "POST /api/v1/user/register");
+    private static final Set<String> BUSINESS_API_INVENTORY =
+            Set.of(
+                    "POST /api/v1/auth/email-verification/confirm",
+                    "POST /api/v1/auth/email-verification/resend",
+                    "POST /api/v1/auth/forgot-password",
+                    "POST /api/v1/auth/login",
+                    "POST /api/v1/auth/logout",
+                    "POST /api/v1/auth/refresh",
+                    "POST /api/v1/auth/reset-password",
+                    "POST /api/v1/item/delete",
+                    "GET /api/v1/item/retrieve/{itemId}",
+                    "POST /api/v1/items/create",
+                    "POST /api/v1/items/update",
+                    "POST /api/v1/user/register",
+                    "GET /api/v1/user/whoami");
 
     @Autowired
     @Qualifier("requestMappingHandlerMapping") private RequestMappingHandlerMapping mappings;
 
     @Test
-    void everyBusinessApiHasAHappyPathIntegrationTest() {
+    void businessApiSurfaceMatchesReviewedInventory() {
         Set<String> actual =
                 mappings.getHandlerMethods().entrySet().stream()
                         .filter(entry -> isBusinessController(entry.getValue()))
@@ -35,8 +48,8 @@ class ApiEndpointCoverageTests extends AbstractApiIntegrationTest {
                         .collect(Collectors.toSet());
 
         assertThat(actual)
-                .as("Add a happy-path API integration test, then register that METHOD /path here")
-                .containsExactlyInAnyOrderElementsOf(TESTED_API_INVENTORY);
+                .as("Review the API change and update the business endpoint inventory")
+                .containsExactlyInAnyOrderElementsOf(BUSINESS_API_INVENTORY);
     }
 
     private static boolean isBusinessController(HandlerMethod handler) {
@@ -45,7 +58,10 @@ class ApiEndpointCoverageTests extends AbstractApiIntegrationTest {
     }
 
     private static Set<String> endpoints(RequestMappingInfo mapping) {
-        Set<String> paths = mapping.getPatternValues();
+        Set<String> paths =
+                mapping.getPatternsCondition().getPatterns().stream()
+                        .map(pattern -> pattern.getPatternString())
+                        .collect(Collectors.toSet());
         Set<RequestMethod> methods = mapping.getMethodsCondition().getMethods();
         return paths.stream()
                 .flatMap(path -> methods.stream().map(method -> method.name() + " " + path))

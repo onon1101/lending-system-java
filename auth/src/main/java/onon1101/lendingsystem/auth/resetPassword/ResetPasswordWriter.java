@@ -2,8 +2,9 @@ package onon1101.lendingsystem.auth.resetPassword;
 
 import java.time.Instant;
 import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 public interface ResetPasswordWriter {
 
-    boolean updatePassword(UUID publicUserId, String encodedPassword, Instant tokenIssuedAt);
+    Mono<Boolean> updatePassword(UUID publicUserId, String encodedPassword, Instant tokenIssuedAt);
 }

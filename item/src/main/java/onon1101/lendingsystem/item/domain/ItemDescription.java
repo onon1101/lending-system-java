@@ -9,8 +9,7 @@ public record ItemDescription(String value) {
 
         if (value.length() > MAX_LENGTH) {
             throw new IllegalArgumentException(
-                    "Item description must not exceed " + MAX_LENGTH + " characters"
-            );
+                    "Item description must not exceed " + MAX_LENGTH + " characters");
         }
     }
 

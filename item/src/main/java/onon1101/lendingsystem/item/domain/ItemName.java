@@ -6,17 +6,14 @@ public record ItemName(String value) {
 
     public ItemName {
         if (value == null || value.isBlank()) {
-            throw new ItemDomainException(
-                    "Item name must not be blank."
-            );
+            throw new ItemDomainException("Item name must not be blank.");
         }
 
         value = value.strip();
 
         if (value.length() > MAX_LENGTH) {
             throw new ItemDomainException(
-                    "Item name must not exceed " + MAX_LENGTH + " characters."
-            );
+                    "Item name must not exceed " + MAX_LENGTH + " characters.");
         }
     }
 

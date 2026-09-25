@@ -1,23 +1,18 @@
 package onon1101.lendingsystem.configurations.audit;
 
-import java.lang.reflect.Method;
 import onon1101.lendingsystem.configurations.services.Command;
 import onon1101.lendingsystem.configurations.services.CommandResult;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.Ordered;
-import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-/** Publishes audit events after the command transaction has completed. */
+/** Publishes audit events when a command publisher actually terminates. */
 @Aspect
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
@@ -32,173 +27,57 @@ public class CommandAuditAspect {
         this.eventPublisher = eventPublisher;
     }
 
-    @AfterReturning(
-            pointcut = "@annotation(auditedCommand)",
-            returning = "result",
-            argNames = "joinPoint,auditedCommand,result")
-    public void afterReturning(JoinPoint joinPoint, AuditedCommand auditedCommand, Object result) {
-
-        ValidatedInvocation invocation =
-                validateInvocation(joinPoint, auditedCommand, result, true);
-
+    @Around("@annotation(auditedCommand)")
+    public Object audit(ProceedingJoinPoint joinPoint, AuditedCommand auditedCommand)
+            throws Throwable {
+        Command command = requireCommand(joinPoint);
         CommandAuditPolicy<?, ?, ?> policy = applicationContext.getBean(auditedCommand.value());
 
-        AuditEvent event = invokeReturned(policy, invocation.command(), invocation.result());
-
-        publish(event);
-    }
-
-    @AfterThrowing(
-            pointcut = "@annotation(auditedCommand)",
-            throwing = "throwable",
-            argNames = "joinPoint,auditedCommand,throwable")
-    public void afterThrowing(
-            JoinPoint joinPoint, AuditedCommand auditedCommand, Throwable throwable) {
-
-        ValidatedInvocation invocation = validateInvocation(joinPoint, auditedCommand, null, false);
-
-        CommandAuditPolicy<?, ?, ?> policy = applicationContext.getBean(auditedCommand.value());
-
-        AuditEvent event = invokeThrown(policy, invocation.command(), throwable);
-
-        publish(event);
-    }
-
-    private ValidatedInvocation validateInvocation(
-            JoinPoint joinPoint,
-            AuditedCommand auditedCommand,
-            Object result,
-            boolean validateResult) {
-
-        Method method = resolveMethod(joinPoint);
-
-        if (method.getParameterCount() != 1) {
-            throw new IllegalStateException(
-                    "@AuditedCommand method must have exactly one command parameter: "
-                            + method.toGenericString());
+        Object returned;
+        try {
+            returned = joinPoint.proceed();
+        } catch (Throwable throwable) {
+            publish(invokeThrown(policy, command, throwable));
+            throw throwable;
         }
 
-        ResolvableType methodCommandType = ResolvableType.forMethodParameter(method, 0);
+        if (returned instanceof Mono<?> mono) {
+            return mono.doOnNext(
+                            result ->
+                                    publish(invokeReturned(policy, command, requireResult(result))))
+                    .doOnError(throwable -> publish(invokeThrown(policy, command, throwable)));
+        }
 
-        ResolvableType methodResultType = ResolvableType.forMethodReturnType(method);
+        publish(invokeReturned(policy, command, requireResult(returned)));
+        return returned;
+    }
 
-        ResolvableType policyType =
-                ResolvableType.forClass(auditedCommand.value()).as(CommandAuditPolicy.class);
-
-        ResolvableType policyCommandType = policyType.getGeneric(0);
-        ResolvableType policyResultType = policyType.getGeneric(1);
-
-        validateResolvedType("command", method, methodCommandType, policyCommandType);
-
-        validateResolvedType("result", method, methodResultType, policyResultType);
-
+    private Command requireCommand(ProceedingJoinPoint joinPoint) {
         Object[] arguments = joinPoint.getArgs();
-
-        if (arguments.length != 1) {
+        if (arguments.length != 1 || !(arguments[0] instanceof Command command)) {
             throw new IllegalStateException(
-                    "Expected exactly one intercepted argument for "
-                            + method.toGenericString()
-                            + ", but received "
-                            + arguments.length);
+                    "@AuditedCommand method must have exactly one Command argument: "
+                            + joinPoint.getSignature().toLongString());
         }
-
-        Class<?> commandClass = methodCommandType.resolve();
-
-        if (commandClass == null) {
-            throw new IllegalStateException(
-                    "Cannot resolve command type for " + method.toGenericString());
-        }
-
-        Object commandValue = commandClass.cast(arguments[0]);
-
-        if (!(commandValue instanceof Command command)) {
-            throw new IllegalStateException(
-                    "Command type must implement ICommand: " + commandClass.getTypeName());
-        }
-
-        if (!validateResult) {
-            return new ValidatedInvocation(command, null);
-        }
-
-        Class<?> resultClass = methodResultType.resolve();
-
-        if (resultClass == null) {
-            throw new IllegalStateException(
-                    "Cannot resolve result type for " + method.toGenericString());
-        }
-
-        if (result == null) {
-            throw new IllegalStateException(
-                    "@AuditedCommand method returned null: " + method.toGenericString());
-        }
-
-        Object resultValue = resultClass.cast(result);
-
-        if (!(resultValue instanceof CommandResult typedResult)) {
-            throw new IllegalStateException(
-                    "Result type must implement IResult: " + resultClass.getTypeName());
-        }
-
-        return new ValidatedInvocation(command, typedResult);
+        return command;
     }
 
-    private void validateResolvedType(
-            String typeName, Method method, ResolvableType methodType, ResolvableType policyType) {
-
-        if (methodType == ResolvableType.NONE || methodType.resolve() == null) {
-            throw new IllegalStateException(
-                    "Cannot resolve " + typeName + " type for " + method.toGenericString());
+    private CommandResult requireResult(Object result) {
+        if (!(result instanceof CommandResult commandResult)) {
+            throw new IllegalStateException("@AuditedCommand publisher must emit a CommandResult");
         }
-
-        if (policyType == ResolvableType.NONE || policyType.resolve() == null) {
-            throw new IllegalStateException(
-                    "Cannot resolve audit policy "
-                            + typeName
-                            + " type for "
-                            + method.toGenericString());
-        }
-
-        boolean sameType =
-                methodType.isAssignableFrom(policyType) && policyType.isAssignableFrom(methodType);
-
-        if (!sameType) {
-            throw new IllegalStateException(
-                    "Audit policy "
-                            + typeName
-                            + " type mismatch for "
-                            + method.toGenericString()
-                            + ": method declares "
-                            + methodType
-                            + ", but policy declares "
-                            + policyType);
-        }
-    }
-
-    private Method resolveMethod(JoinPoint joinPoint) {
-        Method signatureMethod = ((MethodSignature) joinPoint.getSignature()).getMethod();
-
-        Object target = joinPoint.getTarget();
-
-        if (target == null) {
-            return BridgeMethodResolver.findBridgedMethod(signatureMethod);
-        }
-
-        Method specificMethod = AopUtils.getMostSpecificMethod(signatureMethod, target.getClass());
-
-        return BridgeMethodResolver.findBridgedMethod(specificMethod);
+        return commandResult;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private AuditEvent invokeReturned(
             CommandAuditPolicy<?, ?, ?> policy, Command command, CommandResult result) {
-
         return ((CommandAuditPolicy) policy).onReturned(command, result);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private AuditEvent invokeThrown(
             CommandAuditPolicy<?, ?, ?> policy, Command command, Throwable throwable) {
-
         return ((CommandAuditPolicy) policy).onThrown(command, throwable);
     }
 
@@ -207,6 +86,4 @@ public class CommandAuditAspect {
             eventPublisher.publishEvent(event);
         }
     }
-
-    private record ValidatedInvocation(Command command, CommandResult result) {}
 }

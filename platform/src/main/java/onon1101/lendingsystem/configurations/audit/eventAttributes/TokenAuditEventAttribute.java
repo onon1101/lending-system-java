@@ -1,7 +1,6 @@
 package onon1101.lendingsystem.configurations.audit.eventAttributes;
 
 import java.util.Objects;
-
 import onon1101.lendingsystem.configurations.token.JwtTokenService;
 import onon1101.lendingsystem.configurations.token.TokenPayload;
 import onon1101.lendingsystem.configurations.token.TokenProperties;

@@ -1,11 +1,9 @@
 package onon1101.lendingsystem.item.retrieve;
 
-
-import onon1101.lendingsystem.configurations.services.CommandResult;
-import onon1101.lendingsystem.item.domain.ItemAvailability;
-
 import java.time.Instant;
 import java.util.UUID;
+import onon1101.lendingsystem.configurations.services.CommandResult;
+import onon1101.lendingsystem.item.domain.ItemAvailability;
 
 public record RetrieveItemResult(
         UUID itemId,

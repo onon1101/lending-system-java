@@ -1,24 +1,24 @@
 package onon1101.lendingsystem.auth.login;
 
 import java.time.OffsetDateTime;
-import java.util.Optional;
 import java.util.UUID;
 import onon1101.lendingsystem.auth.commons.IdentityProvider;
 import onon1101.lendingsystem.auth.commons.UserStatus;
-import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 @Repository
-public class JdbcLoginAccountReader implements LoginAccountReader {
+public class R2dbcLoginAccountReader implements LoginAccountReader {
 
-    private final JdbcClient jdbcClient;
+    private final DatabaseClient databaseClient;
 
-    public JdbcLoginAccountReader(JdbcClient jdbcClient) {
-        this.jdbcClient = jdbcClient;
+    public R2dbcLoginAccountReader(DatabaseClient databaseClient) {
+        this.databaseClient = databaseClient;
     }
 
     @Override
-    public Optional<LoginAccount> findByUsername(String username) {
+    public Mono<LoginAccount> findByUsername(String username) {
         String sql =
                 """
                         SELECT
@@ -40,25 +40,30 @@ public class JdbcLoginAccountReader implements LoginAccountReader {
                         LIMIT 1
                         """;
 
-        return jdbcClient
+        return databaseClient
                 .sql(sql)
-                .param("username", username)
-                .param("provider", IdentityProvider.PASSWORD.value())
-                .param("active", UserStatus.ACTIVE.value())
-                .query(
-                        (resultSet, rowNumber) -> {
+                .bind("username", username)
+                .bind("provider", IdentityProvider.PASSWORD.value())
+                .bind("active", UserStatus.ACTIVE.value())
+                .map(
+                        (row, metadata) -> {
                             OffsetDateTime lockedUntil =
-                                    resultSet.getObject("locked_until", OffsetDateTime.class);
+                                    row.get("locked_until", OffsetDateTime.class);
 
                             return new LoginAccount(
-                                    resultSet.getLong("private_user_id"),
-                                    resultSet.getObject("public_id", UUID.class),
-                                    resultSet.getString("username"),
-                                    resultSet.getString("password_hash"),
-                                    resultSet.getString("email"),
-                                    resultSet.getInt("auth_identity_id"),
+                                    require(row.get("private_user_id", Long.class)),
+                                    require(row.get("public_id", UUID.class)),
+                                    require(row.get("username", String.class)),
+                                    require(row.get("password_hash", String.class)),
+                                    require(row.get("email", String.class)),
+                                    require(row.get("auth_identity_id", Long.class)),
                                     lockedUntil == null ? null : lockedUntil.toInstant());
                         })
-                .optional();
+                .one();
+    }
+
+    private static <T> T require(T value) {
+        if (value == null) throw new IllegalStateException("Required login column was null");
+        return value;
     }
 }

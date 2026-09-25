@@ -1,22 +1,23 @@
 package onon1101.lendingsystem.auth.resetPassword;
 
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.UUID;
-import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 @Repository
-class JdbcResetPasswordWriter implements ResetPasswordWriter {
+class R2dbcResetPasswordWriter implements ResetPasswordWriter {
 
-    private final JdbcClient jdbcClient;
+    private final DatabaseClient databaseClient;
 
-    JdbcResetPasswordWriter(JdbcClient jdbcClient) {
-        this.jdbcClient = jdbcClient;
+    R2dbcResetPasswordWriter(DatabaseClient databaseClient) {
+        this.databaseClient = databaseClient;
     }
 
     @Override
-    public boolean updatePassword(
+    public Mono<Boolean> updatePassword(
             UUID publicUserId, String encodedPassword, Instant tokenIssuedAt) {
 
         String sql =
@@ -37,12 +38,13 @@ class JdbcResetPasswordWriter implements ResetPasswordWriter {
                 AND password_changed_at <= :tokenIssuedAt
                 """;
 
-        return jdbcClient
-                        .sql(sql)
-                        .param("passwordHash", encodedPassword)
-                        .param("publicUserId", publicUserId)
-                        .param("tokenIssuedAt", Timestamp.from(tokenIssuedAt))
-                        .update()
-                == 1;
+        return databaseClient
+                .sql(sql)
+                .bind("passwordHash", encodedPassword)
+                .bind("publicUserId", publicUserId)
+                .bind("tokenIssuedAt", tokenIssuedAt.atOffset(ZoneOffset.UTC))
+                .fetch()
+                .rowsUpdated()
+                .map(rows -> rows == 1);
     }
 }

@@ -1,7 +1,7 @@
 package onon1101.lendingsystem.auth.login;
 
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 public interface LoginAccountReader {
-    Optional<LoginAccount> findByUsername(String username);
+    Mono<LoginAccount> findByUsername(String username);
 }

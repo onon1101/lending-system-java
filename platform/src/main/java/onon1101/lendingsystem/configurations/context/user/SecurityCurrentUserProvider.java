@@ -4,10 +4,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Component
 public class SecurityCurrentUserProvider implements CurrentUserProvider {
@@ -21,23 +22,27 @@ public class SecurityCurrentUserProvider implements CurrentUserProvider {
     }
 
     @Override
-    public CurrentUserContext getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public Mono<CurrentUserContext> getCurrentUser() {
+        return ReactiveSecurityContextHolder.getContext()
+                .map(context -> context.getAuthentication())
+                .switchIfEmpty(
+                        Mono.error(
+                                new AuthenticationCredentialsNotFoundException(
+                                        "Authenticated JWT is required")))
+                .flatMap(this::resolveUser)
+                .filter(CurrentUserContext::active)
+                .switchIfEmpty(Mono.error(new AccessDeniedException("User account is not active")));
+    }
 
+    private Mono<CurrentUserContext> resolveUser(Authentication authentication) {
         if (!(authentication instanceof JwtAuthenticationToken jwtAuthentication)) {
-            throw new AuthenticationCredentialsNotFoundException("Authenticated JWT is required");
+            return Mono.error(
+                    new AuthenticationCredentialsNotFoundException(
+                            "Authenticated JWT is required"));
         }
 
         long privateUserId = requirePrivateUserId(jwtAuthentication.getToken());
-
-        CurrentUserContext user =
-                userCache.find(privateUserId).orElseGet(() -> loadFromDatabase(privateUserId));
-
-        if (!user.active()) {
-            throw new AccessDeniedException("User account is not active");
-        }
-
-        return user;
+        return userCache.find(privateUserId).switchIfEmpty(loadFromDatabase(privateUserId));
     }
 
     private long requirePrivateUserId(Jwt jwt) {
@@ -55,14 +60,11 @@ public class SecurityCurrentUserProvider implements CurrentUserProvider {
         return privateUserId;
     }
 
-    private CurrentUserContext loadFromDatabase(long privateUserId) {
-        CurrentUserContext user =
-                userReader
-                        .findByPrivateId(privateUserId)
-                        .orElseThrow(
-                                () -> new BadCredentialsException("Token user no longer exists"));
-
-        userCache.save(user);
-        return user;
+    private Mono<CurrentUserContext> loadFromDatabase(long privateUserId) {
+        return userReader
+                .findByPrivateId(privateUserId)
+                .switchIfEmpty(
+                        Mono.error(new BadCredentialsException("Token user no longer exists")))
+                .flatMap(user -> userCache.save(user).thenReturn(user));
     }
 }

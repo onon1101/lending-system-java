@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class RedisKeyFactory {
+public class RedisKeyFactory {
 
     private static final String APPLICATION = "lending-system";
     private static final String VERSION = "v1";

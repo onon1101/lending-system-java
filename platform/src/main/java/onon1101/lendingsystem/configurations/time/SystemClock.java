@@ -5,7 +5,7 @@ import java.time.Instant;
 import org.springframework.stereotype.Component;
 
 @Component
-public final class SystemClock implements IClock {
+public class SystemClock implements IClock {
 
     private final Clock clock;
 

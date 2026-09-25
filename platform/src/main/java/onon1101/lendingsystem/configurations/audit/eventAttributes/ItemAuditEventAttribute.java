@@ -2,7 +2,7 @@ package onon1101.lendingsystem.configurations.audit.eventAttributes;
 
 import java.util.Objects;
 
-public class ItemAuditEventAttribute implements AuditEventAttribute{
+public class ItemAuditEventAttribute implements AuditEventAttribute {
 
     private final String value;
 
@@ -11,10 +11,13 @@ public class ItemAuditEventAttribute implements AuditEventAttribute{
         this.value = value;
     }
 
+    @Override
+    public String Key() {
+        return "itemRef";
+    }
 
     @Override
-    public String Key() { return "itemRef"; }
-
-    @Override
-    public String Value() {return value;}
+    public String Value() {
+        return value;
+    }
 }

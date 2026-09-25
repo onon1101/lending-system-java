@@ -1,11 +1,10 @@
 package onon1101.lendingsystem.item.update;
 
-import onon1101.lendingsystem.item.domain.Item;
-
-import java.util.Optional;
 import java.util.UUID;
+import onon1101.lendingsystem.item.domain.Item;
+import reactor.core.publisher.Mono;
 
 public interface UpdateItemReader {
 
-    Optional<Item> finOwnedItem(UUID itemId, long ownerId);
+    Mono<Item> finOwnedItem(UUID itemId, long ownerId);
 }

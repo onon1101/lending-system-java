@@ -5,10 +5,10 @@ import onon1101.lendingsystem.auth.emailVerificationResend.redis.EmailVerificati
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.email.EmailUtil;
 import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenService;
-
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.reactive.TransactionalEventPublisher;
+import reactor.core.publisher.Mono;
 
 @Service
 public class EmailVerificationResendService {
@@ -16,13 +16,13 @@ public class EmailVerificationResendService {
     private final EmailVerificationAccountReader accountReader;
     private final EmailVerificationResendThrottle throttle;
     private final EmailValidateTokenService tokenService;
-    private final ApplicationEventPublisher eventPublisher;
+    private final TransactionalEventPublisher eventPublisher;
 
     public EmailVerificationResendService(
             EmailVerificationAccountReader accountReader,
             EmailVerificationResendThrottle throttle,
             EmailValidateTokenService tokenService,
-            ApplicationEventPublisher eventPublisher) {
+            TransactionalEventPublisher eventPublisher) {
         this.accountReader = accountReader;
         this.throttle = throttle;
         this.tokenService = tokenService;
@@ -30,26 +30,32 @@ public class EmailVerificationResendService {
     }
 
     @Transactional(readOnly = true)
-    public Result<ResendEmailVerificationResult> resend(ResendEmailVerificationCommand command) {
+    public Mono<Result<ResendEmailVerificationResult>> resend(
+            ResendEmailVerificationCommand command) {
         if (EmailUtil.validateEmail(command.email())) {
-            return genericSuccess();
+            return Mono.just(genericSuccess());
         }
 
-        EmailVerificationAccount account =
-                accountReader.findPendingByEmail(command.email()).orElse(null);
+        return accountReader
+                .findPendingByEmail(command.email())
+                .flatMap(
+                        account ->
+                                throttle.acquire(account.publicUserId())
+                                        .flatMap(
+                                                acquired ->
+                                                        acquired
+                                                                ? publish(account)
+                                                                : Mono.just(genericSuccess())))
+                .switchIfEmpty(Mono.fromSupplier(this::genericSuccess));
+    }
 
-        if (account == null || !throttle.acquire(account.publicUserId())) {
-            return genericSuccess();
-        }
-
+    private Mono<Result<ResendEmailVerificationResult>> publish(EmailVerificationAccount account) {
         String token = tokenService.createToken(account.publicUserId(), account.username());
-
-        eventPublisher.publishEvent(
-                new EmailVerificationResendRequested(
-                        account.email(),
-                        account.username(), token));
-
-        return genericSuccess();
+        return eventPublisher
+                .publishEvent(
+                        new EmailVerificationResendRequested(
+                                account.email(), account.username(), token))
+                .thenReturn(genericSuccess());
     }
 
     private Result<ResendEmailVerificationResult> genericSuccess() {

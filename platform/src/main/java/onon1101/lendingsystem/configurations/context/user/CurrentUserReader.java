@@ -1,8 +1,8 @@
 package onon1101.lendingsystem.configurations.context.user;
 
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 public interface CurrentUserReader {
 
-    Optional<CurrentUserContext> findByPrivateId(long privateUserId);
+    Mono<CurrentUserContext> findByPrivateId(long privateUserId);
 }

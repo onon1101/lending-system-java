@@ -1,21 +1,16 @@
 package onon1101.lendingsystem.item.update;
 
-import onon1101.lendingsystem.configurations.context.user.CurrentUserContext;
+import java.time.Instant;
 import onon1101.lendingsystem.configurations.context.user.CurrentUserProvider;
-
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.time.IClock;
-
 import onon1101.lendingsystem.item.domain.Item;
-
 import onon1101.lendingsystem.item.domain.ItemDescription;
 import onon1101.lendingsystem.item.domain.ItemName;
 import onon1101.lendingsystem.item.update.error.ItemNotFoundDomainError;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
+import reactor.core.publisher.Mono;
 
 @Service
 public class UpdateItemService {
@@ -29,8 +24,7 @@ public class UpdateItemService {
             UpdateItemReader itemReader,
             UpdateItemWriter itemWriter,
             CurrentUserProvider currentUserProvider,
-            IClock clock
-    ) {
+            IClock clock) {
         this.itemReader = itemReader;
         this.itemWriter = itemWriter;
         this.currentUserProvider = currentUserProvider;
@@ -38,37 +32,33 @@ public class UpdateItemService {
     }
 
     @Transactional
-    public Result<UpdateItemResult> update(UpdateItemCommand command) {
-        CurrentUserContext currentUser = currentUserProvider.getCurrentUser();
+    public Mono<Result<UpdateItemResult>> update(UpdateItemCommand command) {
+        return currentUserProvider
+                .getCurrentUser()
+                .flatMap(
+                        currentUser ->
+                                itemReader.finOwnedItem(
+                                        command.itemId(), currentUser.privateUserId()))
+                .flatMap(item -> updateItem(item, command))
+                .switchIfEmpty(
+                        Mono.fromSupplier(() -> Result.failure(new ItemNotFoundDomainError())));
+    }
 
-        Item item =
-                itemReader
-                        .finOwnedItem(
-                                command.itemId(),
-                                currentUser.privateUserId())
-                        .orElse(null);
-
-        if (item == null) {
-            return Result.failure(new ItemNotFoundDomainError());
-        }
-
+    private Mono<Result<UpdateItemResult>> updateItem(Item item, UpdateItemCommand command) {
         Instant now = clock.now();
+        item.updateDetails(
+                ItemName.of(command.name()), ItemDescription.of(command.description()), now);
 
-        item.updateDetails(ItemName.of(command.name()),
-                ItemDescription.of(command.description()),
-                now);
-
-        if (!itemWriter.update(item)) {
-            return Result.failure(new ItemNotFoundDomainError());
-        }
-
-        return Result.success(
-                new UpdateItemResult(
-                        item.id().value(),
-                        item.name().value(),
-                        item.description().value(),
-                        item.updatedAt()
-                )
-        );
+        return itemWriter
+                .update(item)
+                .map(
+                        updated ->
+                                updated
+                                        ? Result.success(
+                                                new UpdateItemResult(
+                                                        item.id().value(), item.name().value(),
+                                                        item.description().value(),
+                                                                item.updatedAt()))
+                                        : Result.failure(new ItemNotFoundDomainError()));
     }
 }

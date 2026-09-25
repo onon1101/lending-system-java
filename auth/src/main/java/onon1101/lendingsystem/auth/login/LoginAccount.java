@@ -9,5 +9,5 @@ public record LoginAccount(
         String username,
         String passwordHash,
         String email,
-        Integer passwordId,
+        Long passwordId,
         Instant lockedUntil) {}

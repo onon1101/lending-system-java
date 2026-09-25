@@ -6,10 +6,7 @@ import java.util.UUID;
 public record ItemId(UUID value) {
 
     public ItemId {
-        Objects.requireNonNull(
-                value,
-                "Item ID must not be null."
-        );
+        Objects.requireNonNull(value, "Item ID must not be null.");
     }
 
     public static ItemId of(UUID value) {

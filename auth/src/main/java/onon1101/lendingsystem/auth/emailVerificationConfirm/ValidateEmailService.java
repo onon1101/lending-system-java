@@ -1,13 +1,14 @@
 package onon1101.lendingsystem.auth.emailVerificationConfirm;
 
+import onon1101.lendingsystem.auth.emailVerificationConfirm.audit.ValidateEmailAuditPolicy;
+import onon1101.lendingsystem.auth.emailVerificationConfirm.error.InvalidEmailUpdatedDomainError;
 import onon1101.lendingsystem.configurations.audit.AuditedCommand;
 import onon1101.lendingsystem.configurations.domain.Result;
 import onon1101.lendingsystem.configurations.token.TokenPayload;
 import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenService;
-import onon1101.lendingsystem.auth.emailVerificationConfirm.audit.ValidateEmailAuditPolicy;
-import onon1101.lendingsystem.auth.emailVerificationConfirm.error.InvalidEmailUpdatedDomainError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 @Service
 public class ValidateEmailService {
@@ -23,17 +24,17 @@ public class ValidateEmailService {
 
     @Transactional()
     @AuditedCommand(ValidateEmailAuditPolicy.class)
-    public Result<ValidateEmailResult> execute(ValidateEmailCommand command) {
+    public Mono<Result<ValidateEmailResult>> execute(ValidateEmailCommand command) {
         String token = command.validateToken();
 
         TokenPayload payload = tokenService.decode(token);
 
-        boolean updated = validateEmailWriter.updateStateByPublicId(payload.publicUserId());
-
-        if (!updated) {
-            return Result.failure(new InvalidEmailUpdatedDomainError());
-        }
-
-        return Result.success(new ValidateEmailResult());
+        return validateEmailWriter
+                .updateStateByPublicId(payload.publicUserId())
+                .map(
+                        updated ->
+                                updated
+                                        ? Result.success(new ValidateEmailResult())
+                                        : Result.failure(new InvalidEmailUpdatedDomainError()));
     }
 }

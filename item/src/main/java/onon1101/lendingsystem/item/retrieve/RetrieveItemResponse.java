@@ -1,11 +1,9 @@
 package onon1101.lendingsystem.item.retrieve;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
-import onon1101.lendingsystem.item.domain.ItemAvailability;
-
 import java.time.Instant;
 import java.util.UUID;
+import onon1101.lendingsystem.item.domain.ItemAvailability;
 
 @Schema(description = "物品詳細資訊")
 public record RetrieveItemResponse(
@@ -20,8 +18,7 @@ public record RetrieveItemResponse(
         Instant createdAt,
         Instant updatedAt) {
 
-    public static RetrieveItemResponse from(
-            RetrieveItemResult result) {
+    public static RetrieveItemResponse from(RetrieveItemResult result) {
         return new RetrieveItemResponse(
                 result.itemId(),
                 result.ownerId(),

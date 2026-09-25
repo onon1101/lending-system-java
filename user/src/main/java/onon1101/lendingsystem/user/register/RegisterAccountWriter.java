@@ -1,7 +1,7 @@
 package onon1101.lendingsystem.user.register;
 
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 public interface RegisterAccountWriter {
-    Optional<RegisterAccount> registerAccount(String username, String password, String email);
+    Mono<RegisterAccount> registerAccount(String username, String password, String email);
 }

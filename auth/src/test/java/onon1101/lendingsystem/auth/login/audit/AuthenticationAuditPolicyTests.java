@@ -18,7 +18,8 @@ class AuthenticationAuditPolicyTests {
     void mapsSuccessfulResult() {
         Object event =
                 policy.onReturned(
-                        command(" Alice "), Result.success(new LoginResult("token", 300)));
+                        command(" Alice "),
+                        Result.success(new LoginResult("token", 300, "refresh", 3600)));
 
         assertSuccess(event, "authentication_succeeded", "accountRef", "alice");
     }
