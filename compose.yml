@@ -1,0 +1,61 @@
+name: lending-system
+
+services:
+  backend:
+    image: maven:3.9-eclipse-temurin-25
+    restart: unless-stopped
+    working_dir: /workspace
+    command:
+      - /bin/sh
+      - -ec
+      - mvn -pl app -am package -DskipTests && exec java -jar app/target/app-0.0.1-SNAPSHOT.jar
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-r2dbc:postgresql://postgres.onon1101.org:5432/lending_prod}
+      DB_USER: ${DB_USER:-lending_app}
+      DB_PASSWORD: ${DB_PASSWORD:-change-me}
+      REDIS_URL: ${REDIS_URL:-redis://redis.onon1101.org:6379}
+      MINIO_HEALTH_ENABLED: "true"
+      # RustFS exposes an S3-compatible API, so the existing MinIO client can be reused.
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://rustfs.onon1101.org:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-rustfsadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-rustfsadmin}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-lending-prod}
+      JWT_SECRET: ${JWT_SECRET:-development-secret-key-at-least-32-bytes}
+      AUDIT_HMAC_KEY: ${AUDIT_HMAC_KEY:-development-audit-hmac-key-do-not-use-in-production}
+      MAIL_HOST: ${MAIL_HOST:-host.docker.internal}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-false}
+      MAIL_STARTTLS: ${MAIL_STARTTLS:-false}
+      MAIL_SENDER: ${MAIL_SENDER:-no-reply@lending-system.local}
+      RESET_PASSWORD_URL: ${RESET_PASSWORD_URL:-http://localhost:3000/reset-password}
+      EMAIL_VALIDATION_URL: ${EMAIL_VALIDATION_URL:-http://localhost:3000/email-verification}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+      # frontend shares this network namespace so Vite's localhost API proxy reaches the backend.
+      - "${FRONTEND_PORT:-3000}:3000"
+    volumes:
+      - .:/workspace
+      - maven_cache:/root/.m2
+      - backend_logs:/workspace/logs
+  frontend:
+    image: node:24-alpine
+    restart: unless-stopped
+    working_dir: /workspace
+    command: /bin/sh -ec "npm ci && exec npm run dev -- --host 0.0.0.0 --port 3000"
+    environment:
+      NODE_ENV: production
+    network_mode: service:backend
+    volumes:
+      - ./frontend:/workspace
+      - frontend_node_modules:/workspace/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  maven_cache:
+  backend_logs:
+  frontend_node_modules:

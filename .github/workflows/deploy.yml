@@ -1,0 +1,141 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+
+    steps:
+      - name: Diagnose SSH configuration
+        shell: bash
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST_FINGERPRINT: ${{ secrets.SSH_HOST_FINGERPRINT }}
+        run: |
+          set -uo pipefail
+
+          # drone-ssh negotiates the server's ECDSA host key on this endpoint.
+          EXPECTED_FINGERPRINT="SHA256:IFGYQjP0vrwgKfO9XNzqtlQYBQOWb48tBT4oG5eV6OY"
+          KEY_FILE="${RUNNER_TEMP}/deploy-key"
+          trap 'rm -f "${KEY_FILE}"' EXIT
+
+          printf '%s\n' "=== SSH 設定診斷 ==="
+          printf 'SSH_HOST=%s\n' "${SSH_HOST:-<未設定>}"
+          printf 'SSH_PORT=%s\n' "${SSH_PORT:-<未設定>}"
+          printf 'SSH_USERNAME=%s\n' "${SSH_USERNAME:-<未設定>}"
+          printf 'SSH_HOST_FINGERPRINT=%s\n' "${SSH_HOST_FINGERPRINT:-<未設定>}"
+          printf 'SSH_PRIVATE_KEY_LENGTH=%s\n' "${#SSH_PRIVATE_KEY}"
+
+          # GitHub Secrets may omit the final newline required by ssh-keygen.
+          printf '%s\n' "${SSH_PRIVATE_KEY}" > "${KEY_FILE}"
+          chmod 600 "${KEY_FILE}"
+
+          printf 'SSH_PRIVATE_KEY_FIRST_LINE=%s\n' "$(head -n 1 "${KEY_FILE}")"
+          printf 'SSH_PRIVATE_KEY_LAST_LINE=%s\n' "$(tail -n 1 "${KEY_FILE}")"
+          printf 'SSH_PRIVATE_KEY_SHA256=%s\n' "$(sha256sum "${KEY_FILE}" | awk '{print $1}')"
+
+          if [ "${SSH_HOST_FINGERPRINT:-}" = "${EXPECTED_FINGERPRINT}" ]; then
+            echo "SSH_HOST_FINGERPRINT_MATCH=true"
+          else
+            echo "SSH_HOST_FINGERPRINT_MATCH=false"
+            echo "EXPECTED_FINGERPRINT=${EXPECTED_FINGERPRINT}"
+          fi
+
+          if ssh-keygen -y -f "${KEY_FILE}" >/dev/null 2>&1; then
+            echo "SSH_PRIVATE_KEY_VALID=true"
+          else
+            echo "SSH_PRIVATE_KEY_VALID=false"
+          fi
+
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          REPO_URL: https://github.com/${{ github.repository }}.git
+          DEPLOY_BRANCH: ${{ github.ref_name }}
+          DEPLOY_COMMIT: ${{ github.sha }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          fingerprint: ${{ secrets.SSH_HOST_FINGERPRINT }}
+          envs: REPO_URL,DEPLOY_BRANCH,DEPLOY_COMMIT
+          script: |
+            set -Eeuo pipefail
+
+            DEPLOY_DIR="${HOME}/lending-system"
+            ENV_SOURCE="${HOME}/.env"
+
+            echo "=== 開始部署 ==="
+            echo "Branch: ${DEPLOY_BRANCH}"
+            echo "Commit: ${DEPLOY_COMMIT}"
+            echo "Directory: ${DEPLOY_DIR}"
+
+            if [ ! -f "${ENV_SOURCE}" ]; then
+              echo "錯誤：找不到 ${ENV_SOURCE}"
+              exit 1
+            fi
+
+            if ! command -v git >/dev/null 2>&1; then
+              echo "錯誤：伺服器尚未安裝 Git"
+              exit 1
+            fi
+
+            if ! /usr/bin/docker compose version >/dev/null 2>&1; then
+              echo "錯誤：伺服器尚未安裝 Docker Compose"
+              exit 1
+            fi
+
+            if ! command -v python3 >/dev/null 2>&1; then
+              echo "錯誤：伺服器尚未安裝 Python 3"
+              exit 1
+            fi
+
+            echo "=== 取得程式碼 ==="
+
+            if [ ! -d "${DEPLOY_DIR}/.git" ]; then
+              rm -rf "${DEPLOY_DIR}"
+              git clone \
+                --branch "${DEPLOY_BRANCH}" \
+                --single-branch \
+                "${REPO_URL}" \
+                "${DEPLOY_DIR}"
+            else
+              cd "${DEPLOY_DIR}"
+              git remote set-url origin "${REPO_URL}"
+              git fetch origin "${DEPLOY_BRANCH}"
+              git reset --hard "${DEPLOY_COMMIT}"
+            fi
+
+            cd "${DEPLOY_DIR}"
+            git fetch origin "${DEPLOY_COMMIT}"
+            git reset --hard "${DEPLOY_COMMIT}"
+
+            echo "=== 安裝環境設定 ==="
+            install -m 600 "${ENV_SOURCE}" "${DEPLOY_DIR}/.env"
+
+            echo "=== 驗證 Compose 設定 ==="
+            /usr/bin/docker compose -f compose.yml config --quiet
+
+            echo "=== 建置並啟動服務 ==="
+            python3 scripts/deploy.py
+
+            echo "✅ 部署完成：${DEPLOY_COMMIT}"

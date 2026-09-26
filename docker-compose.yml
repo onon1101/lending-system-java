@@ -1,0 +1,3 @@
+# Compatibility entry point for tooling that explicitly expects docker-compose.yml.
+include:
+  - compose.yml

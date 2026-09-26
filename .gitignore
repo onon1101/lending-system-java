@@ -1,4 +1,7 @@
 HELP.md
+.env
+__pycache__/
+*.py[cod]
 .DS_Store
 target/
 .mvn/wrapper/maven-wrapper.jar
