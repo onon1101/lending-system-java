@@ -2,9 +2,9 @@ spring:
   application:
     name: LendingSystem
   r2dbc:
-    url: "${DATABASE_URL:r2dbc:postgresql://192.168.1.120:5432/postgres}"
-    username: "${DB_USER:lending_user}"
-    password: "${DB_PASSWORD:calcal321}"
+    url: "${DATABASE_URL:r2dbc:postgresql://postgres.onon1101.org:5432/lending_db}"
+    username: "${DB_USER:onon1101}"
+    password: "${DB_PASSWORD:Fdsadfqwer123@}"
   sql:
     init:
       mode: always
@@ -23,7 +23,7 @@ spring:
             enable: "${MAIL_STARTTLS:false}"
   data:
     redis:
-      url: "${REDIS_URL:redis://192.168.1.115:6379}"
+      url: "${REDIS_URL:redis://redis.onon1101.org:6379}"
       connect-timeout: "${REDIS_CONNECT_TIMEOUT:2s}"
       timeout: "${REDIS_COMMAND_TIMEOUT:2s}"
       database: "${REDIS_DATABASE:0}"
@@ -51,7 +51,7 @@ management:
 lending:
   minio:
     enabled: "${MINIO_HEALTH_ENABLED:false}"
-    endpoint: "${MINIO_ENDPOINT:http://localhost:9000}"
+    endpoint: "${MINIO_ENDPOINT:http://rustfs.onon1101.org:9000}"
     access-key: "${MINIO_ACCESS_KEY:minioadmin}"
     secret-key: "${MINIO_SECRET_KEY:minioadmin}"
     bucket: "${MINIO_BUCKET_NAME:lending-system}"
