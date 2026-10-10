@@ -1,13 +1,15 @@
 package onon1101.lendingsystem.user.register;
 
-import onon1101.lendingsystem.configurations.audit.AuditedCommand;
-import onon1101.lendingsystem.configurations.domain.Result;
-import onon1101.lendingsystem.configurations.email.EmailUtil;
-import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenService;
+import onon1101.lendingsystem.application.audit.AuditedCommand;
+import onon1101.lendingsystem.shared.domain.Result;
+import onon1101.lendingsystem.shared.email.EmailUtil;
+import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;
 import onon1101.lendingsystem.user.register.error.InvalidRegistrationDomainError;
+import onon1101.lendingsystem.user.register.error.RegistrationConflictDomainError;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,16 +20,19 @@ import reactor.core.scheduler.Schedulers;
 @Service
 public class RegisterService {
 
+    private final RegisterAccountReader accountReader;
     private final RegisterAccountWriter accountWriter;
     private final PasswordEncoder passwordEncoder;
     private final TransactionalEventPublisher eventPublisher;
     private final EmailValidateTokenService emailValidateTokenService;
 
     public RegisterService(
+            RegisterAccountReader accountReader,
             RegisterAccountWriter accountWriter,
             PasswordEncoder passwordEncoder,
             TransactionalEventPublisher eventPublisher,
             EmailValidateTokenService emailValidateTokenService) {
+        this.accountReader = accountReader;
         this.accountWriter = accountWriter;
         this.passwordEncoder = passwordEncoder;
         this.eventPublisher = eventPublisher;
@@ -44,6 +49,22 @@ public class RegisterService {
         if (EmailUtil.validateEmail(email)) {
             return Mono.just(Result.failure(new InvalidEmailDomainError()));
         }
+
+        return accountReader
+                .existsByUsernameOrEmail(username, email)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.<Result<RegisterResult>>just(
+                                Result.failure(
+                                        new RegistrationConflictDomainError()));
+                    }
+
+                    return createAccount(username, password, email);
+                });
+
+    }
+
+    private Mono<Result<RegisterResult>> createAccount(String username, String password, String email) {
 
         return Mono.fromCallable(() -> passwordEncoder.encode(password))
                 .subscribeOn(Schedulers.boundedElastic())

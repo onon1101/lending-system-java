@@ -2,7 +2,7 @@ package onon1101.lendingsystem.auth.emailVerificationResend.redis;
 
 import java.time.Duration;
 import java.util.UUID;
-import onon1101.lendingsystem.configurations.redis.RedisKeyFactory;
+import onon1101.lendingsystem.infrastructure.cache.redis.RedisKeyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

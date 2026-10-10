@@ -1,7 +1,7 @@
 package onon1101.lendingsystem.auth.login;
 
 import java.util.Locale;
-import onon1101.lendingsystem.configurations.services.Command;
+import onon1101.lendingsystem.shared.command.Command;
 
 public record LoginCommand(String username, String password) implements Command {
 

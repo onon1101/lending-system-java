@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
-import onon1101.lendingsystem.configurations.controller.ApiResponse;
+import onon1101.lendingsystem.web.response.ApiResponse;
 
-import onon1101.lendingsystem.configurations.pagination.PaginationRequest;
+import onon1101.lendingsystem.web.pagination.PaginationRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

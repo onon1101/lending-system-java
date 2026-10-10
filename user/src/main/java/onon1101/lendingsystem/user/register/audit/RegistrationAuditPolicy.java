@@ -1,11 +1,11 @@
 package onon1101.lendingsystem.user.register.audit;
 
 import java.util.List;
-import onon1101.lendingsystem.configurations.audit.AuditEvent;
-import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.eventAttributes.UserPublicIdAuditEventAttribute;
-import onon1101.lendingsystem.configurations.audit.eventAttributes.UsernameAuditEventAttribute;
-import onon1101.lendingsystem.configurations.domain.Result;
+import onon1101.lendingsystem.application.audit.AuditEvent;
+import onon1101.lendingsystem.application.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.application.audit.attributes.UserPublicIdAuditEventAttribute;
+import onon1101.lendingsystem.application.audit.attributes.UsernameAuditEventAttribute;
+import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.user.register.RegisterCommand;
 import onon1101.lendingsystem.user.register.RegisterResult;
 import org.springframework.stereotype.Component;

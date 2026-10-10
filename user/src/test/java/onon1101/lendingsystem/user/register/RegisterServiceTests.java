@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.UUID;
-import onon1101.lendingsystem.configurations.domain.Result;
-import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenService;
+import onon1101.lendingsystem.shared.domain.Result;
+import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,17 +22,20 @@ import reactor.core.publisher.Mono;
 @ExtendWith(MockitoExtension.class)
 class RegisterServiceTests {
 
+    private final RegisterAccountReader accountReader = mock(RegisterAccountReader.class);
     private final RegisterAccountWriter accountWriter = mock(RegisterAccountWriter.class);
     private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private final TransactionalEventPublisher eventPublisher =
             mock(TransactionalEventPublisher.class);
     private final EmailValidateTokenService tokenService = mock(EmailValidateTokenService.class);
     private final RegisterService service =
-            new RegisterService(accountWriter, passwordEncoder, eventPublisher, tokenService);
+            new RegisterService(accountReader, accountWriter, passwordEncoder, eventPublisher, tokenService);
 
     @Test
     void registersNormalizedAccount() {
         UUID userId = UUID.randomUUID();
+        when(accountReader.existsByUsernameOrEmail("alice", "alice@example.com"))
+                .thenReturn(Mono.just(false));
         when(passwordEncoder.encode("password")).thenReturn("encoded");
         when(accountWriter.registerAccount("alice", "encoded", "alice@example.com"))
                 .thenReturn(Mono.just(new RegisterAccount(1L, userId)));
@@ -64,6 +67,8 @@ class RegisterServiceTests {
 
     @Test
     void returnsFailureWhenAccountConflicts() {
+        when(accountReader.existsByUsernameOrEmail("alice", "alice@example.com"))
+                .thenReturn(Mono.just(false));
         when(passwordEncoder.encode("password")).thenReturn("encoded");
         when(accountWriter.registerAccount("alice", "encoded", "alice@example.com"))
                 .thenReturn(Mono.empty());
@@ -78,6 +83,8 @@ class RegisterServiceTests {
 
     @Test
     void propagatesUnexpectedFailure() {
+        when(accountReader.existsByUsernameOrEmail("alice", "alice@example.com"))
+                .thenReturn(Mono.just(false));
         RuntimeException expected = new RuntimeException("encoder unavailable");
         when(passwordEncoder.encode("password")).thenThrow(expected);
 

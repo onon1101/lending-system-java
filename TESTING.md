@@ -61,4 +61,4 @@ Surefire 會重用同一 JVM 與 Spring Context，避免每個測試重啟應用
 - API integration：10 分鐘。
 - 啟動、報告與 CI 波動：3 分鐘。
 
-每支 API 至少一個 happy-path，但不要為每個案例重啟 Spring。外部 MinIO、OAuth、gRPC 在 integration profile 關閉或以 deterministic fake 取代；真正依賴容器或外部服務的 end-to-end 測試應拆成另一個較低頻率 pipeline。當 integration 超過約 8 分鐘時，先依 module 分片到多個 CI job；若要同 JVM 平行，先完成資料隔離。
+每支 API 至少一個 happy-path，但不要為每個案例重啟 Spring。外部 RustFS、OAuth、gRPC 在 integration profile 關閉或以 deterministic fake 取代；真正依賴容器或外部服務的 end-to-end 測試應拆成另一個較低頻率 pipeline。當 integration 超過約 8 分鐘時，先依 module 分片到多個 CI job；若要同 JVM 平行，先完成資料隔離。

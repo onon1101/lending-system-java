@@ -14,7 +14,8 @@ public record ListedItem(
         ItemAvailability availability,
         boolean ownedByViewer,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        String imageObjectKey
 ) {
 
     public boolean canRequestBorrow() {

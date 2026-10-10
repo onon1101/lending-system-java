@@ -7,7 +7,7 @@
   <title>註冊成功 | Lending System</title>
 </svelte:head>
 
-<AuthCard title="建立成功" description="請前往信箱完成 Email 驗證">
+<AuthCard title="建立成功" description="完成 Email 驗證">
   <div class="space-y-5">
     <div class="flex flex-col gap-3 text-center mb-5">
       <RegistrationSuccessNotice />

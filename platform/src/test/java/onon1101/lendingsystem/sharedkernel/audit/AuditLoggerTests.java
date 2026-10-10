@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
-import onon1101.lendingsystem.configurations.audit.AccountReferenceEncoder;
-import onon1101.lendingsystem.configurations.audit.AuditLogger;
-import onon1101.lendingsystem.configurations.audit.AuditRecord;
-import onon1101.lendingsystem.configurations.audit.eventAttributes.AuditEventAttribute;
+import onon1101.lendingsystem.application.audit.AccountReferenceEncoder;
+import onon1101.lendingsystem.application.audit.AuditLogger;
+import onon1101.lendingsystem.application.audit.AuditRecord;
+import onon1101.lendingsystem.application.audit.attributes.AuditEventAttribute;
 import org.junit.jupiter.api.Test;
 
 class AuditLoggerTests {

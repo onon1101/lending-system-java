@@ -41,7 +41,7 @@
     <java.version>25</java.version>
     <mapstruct.version>1.6.3</mapstruct.version>
     <spring-modulith.version>2.1.0</spring-modulith.version>
-    <minio.version>9.0.3</minio.version>
+    <aws-sdk.version>2.55.12</aws-sdk.version>
     <springdoc.version>3.0.3</springdoc.version>
     <spotless.version>3.6.0</spotless.version>
     <grpc.version>1.81.0</grpc.version>
@@ -99,9 +99,9 @@
       <artifactId>spring-boot-starter-aspectj</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.minio</groupId>
-      <artifactId>minio</artifactId>
-      <version>${minio.version}</version>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+      <version>${aws-sdk.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springdoc</groupId>

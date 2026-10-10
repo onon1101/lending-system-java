@@ -5,12 +5,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import onon1101.lendingsystem.configurations.audit.AuditEvent;
-import onon1101.lendingsystem.configurations.audit.AuditedCommand;
-import onon1101.lendingsystem.configurations.audit.CommandAuditAspect;
-import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.services.Command;
-import onon1101.lendingsystem.configurations.services.CommandResult;
+import onon1101.lendingsystem.application.audit.AuditEvent;
+import onon1101.lendingsystem.application.audit.AuditedCommand;
+import onon1101.lendingsystem.application.audit.CommandAuditAspect;
+import onon1101.lendingsystem.application.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.shared.command.Command;
+import onon1101.lendingsystem.shared.command.CommandResult;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;

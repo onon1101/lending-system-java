@@ -1,9 +1,9 @@
 package onon1101.lendingsystem.item.delete;
 
 import java.time.Instant;
-import onon1101.lendingsystem.configurations.context.user.CurrentUserProvider;
-import onon1101.lendingsystem.configurations.domain.Result;
-import onon1101.lendingsystem.configurations.time.IClock;
+import onon1101.lendingsystem.application.currentuser.CurrentUserProvider;
+import onon1101.lendingsystem.shared.domain.Result;
+import onon1101.lendingsystem.shared.time.IClock;
 import onon1101.lendingsystem.item.delete.error.ItemNotFoundDomainError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

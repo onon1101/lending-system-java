@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.auth.refreshToken;
 
-import onon1101.lendingsystem.configurations.services.CommandResult;
+import onon1101.lendingsystem.shared.command.CommandResult;
 
 public record RefreshTokenResult(
         String accessToken,

@@ -1,6 +1,7 @@
 const registerErrorMessage: Record<string, string> = {
   "User.InvalidEmail": "Email 格式不正確, 請重新確認。",
   "User.InvalidRegistration": "帳號資料無法使用，請修改後再是一次。",
+  "User.RegistrationConflict": "使用者帳號或者 Email 已存在。",
 };
 
 export function getRegisterErrorMessage(errorCode: string | null): string {

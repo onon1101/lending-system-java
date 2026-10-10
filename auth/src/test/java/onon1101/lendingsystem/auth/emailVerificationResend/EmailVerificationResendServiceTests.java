@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.UUID;
 import onon1101.lendingsystem.auth.emailVerificationResend.email.EmailVerificationResendRequested;
 import onon1101.lendingsystem.auth.emailVerificationResend.redis.EmailVerificationResendThrottle;
-import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenService;
+import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;
 import reactor.core.publisher.Mono;

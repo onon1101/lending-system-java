@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.item.list;
 
-import onon1101.lendingsystem.configurations.pagination.PaginationRequest;
+import onon1101.lendingsystem.web.pagination.PaginationRequest;
 
 import onon1101.lendingsystem.item.domain.ItemAvailability;
 
@@ -31,15 +31,16 @@ public class R2dbcListItemsReader implements ListItemsReader {
                 .sql(
                         """
                          SELECT
-                                 	item.public_id AS item_public_id
-                                 	owner.public_id AS owner_public_id
+                                 	item.public_id AS item_public_id,
+                                 	owner.public_id AS owner_public_id,
                                  	owner.username AS owner_username,
                                  	item.name,
                                  	item.description,
                                  	item.status,
                                  	(item.owner_id = :viewerId) AS owned_by_viewer,
                                  	item.created_at,
-                                 	item.updated_at
+                                    item.updated_at,
+                                    item.image_object_key
                                  FROM items AS item
                                  INNER JOIN users AS owner
                                  	ON owner.id = item.owner_id
@@ -71,9 +72,10 @@ public class R2dbcListItemsReader implements ListItemsReader {
                                                 require(row.get("status", String.class))
                                                         .toUpperCase(Locale.ROOT)
                                         ),
-                                        Boolean.TRUE.equals(row.get("ownered_by_viewer", Boolean.class)),
+                                        Boolean.TRUE.equals(row.get("owned_by_viewer", Boolean.class)),
                                         require(row.get("created_at", OffsetDateTime.class)).toInstant(),
-                                        require(row.get("updated_at", OffsetDateTime.class)).toInstant()
+                                        require(row.get("updated_at", OffsetDateTime.class)).toInstant(),
+                                        row.get("image_object_key", String.class)
                                 )
                 )
                 .all();

@@ -31,7 +31,8 @@ public class R2dbcRetrieveItemReader implements RetrieveItemReader {
                             item.status,
                             (item.owner_id = :viewerId) AS owned_by_viewer,
                             item.created_at,
-                            item.updated_at
+                            item.updated_at,
+                            item.image_object_key
                         FROM items AS item
                         INNER JOIN users AS owner
                             ON owner.id = item.owner_id
@@ -63,7 +64,8 @@ public class R2dbcRetrieveItemReader implements RetrieveItemReader {
                                         require(row.get("created_at", OffsetDateTime.class))
                                                 .toInstant(),
                                         require(row.get("updated_at", OffsetDateTime.class))
-                                                .toInstant()))
+                                                .toInstant(),
+                                        row.get("image_object_key", String.class)))
                 .one();
     }
 

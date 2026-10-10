@@ -2,10 +2,10 @@ package onon1101.lendingsystem.auth.emailVerificationConfirm;
 
 import onon1101.lendingsystem.auth.emailVerificationConfirm.audit.ValidateEmailAuditPolicy;
 import onon1101.lendingsystem.auth.emailVerificationConfirm.error.InvalidEmailUpdatedDomainError;
-import onon1101.lendingsystem.configurations.audit.AuditedCommand;
-import onon1101.lendingsystem.configurations.domain.Result;
-import onon1101.lendingsystem.configurations.token.TokenPayload;
-import onon1101.lendingsystem.configurations.token.emailvalidation.EmailValidateTokenService;
+import onon1101.lendingsystem.application.audit.AuditedCommand;
+import onon1101.lendingsystem.shared.domain.Result;
+import onon1101.lendingsystem.infrastructure.security.token.TokenPayload;
+import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;

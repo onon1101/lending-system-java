@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.auth.login;
 
-import onon1101.lendingsystem.configurations.services.CommandResult;
+import onon1101.lendingsystem.shared.command.CommandResult;
 
 public record LoginResult(
         String accessToken,

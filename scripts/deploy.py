@@ -25,7 +25,7 @@ SERVICES = {
         "default_url": "redis://redis.onon1101.org:6379",
     },
     "rustfs": {
-        "env": "MINIO_ENDPOINT",
+        "env": "RUSTFS_ENDPOINT",
         "default_port": 9000,
         "default_url": "http://rustfs.onon1101.org:9000",
     },

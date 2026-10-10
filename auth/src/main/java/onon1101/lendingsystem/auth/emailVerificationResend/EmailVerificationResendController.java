@@ -3,7 +3,7 @@ package onon1101.lendingsystem.auth.emailVerificationResend;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import onon1101.lendingsystem.configurations.controller.ApiResponse;
+import onon1101.lendingsystem.web.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

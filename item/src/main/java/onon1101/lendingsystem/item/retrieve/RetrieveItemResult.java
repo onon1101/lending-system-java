@@ -2,7 +2,7 @@ package onon1101.lendingsystem.item.retrieve;
 
 import java.time.Instant;
 import java.util.UUID;
-import onon1101.lendingsystem.configurations.services.CommandResult;
+import onon1101.lendingsystem.shared.command.CommandResult;
 import onon1101.lendingsystem.item.domain.ItemAvailability;
 
 public record RetrieveItemResult(
@@ -15,10 +15,15 @@ public record RetrieveItemResult(
         boolean ownedByCurrentUser,
         boolean canRequestBorrow,
         Instant createdAt,
-        Instant updatedAt)
+        Instant updatedAt,
+        String imageUrl)
         implements CommandResult {
 
     public static RetrieveItemResult from(RetrievedItem item) {
+        return from(item, null);
+    }
+
+    public static RetrieveItemResult from(RetrievedItem item, String imageUrl) {
         return new RetrieveItemResult(
                 item.itemId(),
                 item.ownerId(),
@@ -29,6 +34,7 @@ public record RetrieveItemResult(
                 item.ownedByViewer(),
                 item.canRequestBorrow(),
                 item.createdAt(),
-                item.updatedAt());
+                item.updatedAt(),
+                imageUrl);
     }
 }

@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.auth.commons;
 
-import onon1101.lendingsystem.configurations.domain.Enumeration;
+import onon1101.lendingsystem.shared.domain.Enumeration;
 
 public final class UserStatus extends Enumeration<Integer, String> {
 

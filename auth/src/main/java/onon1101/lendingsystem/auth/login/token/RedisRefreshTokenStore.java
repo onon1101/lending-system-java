@@ -1,7 +1,7 @@
 package onon1101.lendingsystem.auth.login.token;
 
 import java.time.Duration;
-import onon1101.lendingsystem.configurations.redis.RedisKeyFactory;
+import onon1101.lendingsystem.infrastructure.cache.redis.RedisKeyFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.stereotype.Repository;

@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.item.delete.error;
 
-import onon1101.lendingsystem.configurations.domain.DomainError;
+import onon1101.lendingsystem.shared.domain.DomainError;
 
 public final class ItemNotFoundDomainError extends DomainError {
 

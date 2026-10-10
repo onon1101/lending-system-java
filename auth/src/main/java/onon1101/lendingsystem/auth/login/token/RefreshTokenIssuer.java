@@ -7,7 +7,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.UUID;
-import onon1101.lendingsystem.configurations.time.IClock;
+import onon1101.lendingsystem.shared.time.IClock;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 

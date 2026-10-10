@@ -49,12 +49,13 @@ management:
         enabled: true
 
 lending:
-  minio:
-    enabled: "${MINIO_HEALTH_ENABLED:false}"
-    endpoint: "${MINIO_ENDPOINT:http://rustfs.onon1101.org:9000}"
-    access-key: "${MINIO_ACCESS_KEY:minioadmin}"
-    secret-key: "${MINIO_SECRET_KEY:minioadmin}"
-    bucket: "${MINIO_BUCKET_NAME:lending-system}"
+  rustfs:
+    enabled: "${RUSTFS_ENABLED:true}"
+    region: "${RUSTFS_REGION:us-east-1}"
+    endpoint: "${RUSTFS_ENDPOINT:http://rustfs.onon1101.org:9000}"
+    access-key: "${RUSTFS_ACCESS_KEY:P6usfY9eODeYrVOUGkVo}"
+    secret-key: "${RUSTFS_SECRET_KEY:9Y5F03T8SpLdhDbcUmTcotqWhOJT2M7Dp6QjJmsW}"
+    bucket: "${RUSTFS_BUCKET_NAME:lending-system}"
   video-downloader:
     enabled: "${VIDEO_HEALTH_ENABLED:false}"
     target: "${VIDEO_SERVICE_ADDR:localhost:50051}"

@@ -3,7 +3,7 @@ package onon1101.lendingsystem.user.register;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import onon1101.lendingsystem.configurations.email.EmailNormalizer;
+import onon1101.lendingsystem.shared.email.EmailNormalizer;
 
 @Schema(description = "註冊請求")
 public record RegisterRequest(

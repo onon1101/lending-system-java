@@ -3,10 +3,10 @@ package onon1101.lendingsystem.auth.forgotPassword.audit;
 import java.util.List;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordCommand;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordResult;
-import onon1101.lendingsystem.configurations.audit.AuditEvent;
-import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.eventAttributes.EmailAuditEventAttribute;
-import onon1101.lendingsystem.configurations.domain.Result;
+import onon1101.lendingsystem.application.audit.AuditEvent;
+import onon1101.lendingsystem.application.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.application.audit.attributes.EmailAuditEventAttribute;
+import onon1101.lendingsystem.shared.domain.Result;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -16,7 +16,8 @@ public record RetrieveItemResponse(
         boolean ownedByCurrentUser,
         boolean canRequestBorrow,
         Instant createdAt,
-        Instant updatedAt) {
+        Instant updatedAt,
+        String imageUrl) {
 
     public static RetrieveItemResponse from(RetrieveItemResult result) {
         return new RetrieveItemResponse(
@@ -29,6 +30,7 @@ public record RetrieveItemResponse(
                 result.ownedByCurrentUser(),
                 result.canRequestBorrow(),
                 result.createdAt(),
-                result.updatedAt());
+                result.updatedAt(),
+                result.imageUrl());
     }
 }

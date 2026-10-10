@@ -1,6 +1,6 @@
 package onon1101.lendingsystem.user.register.email;
 
-import onon1101.lendingsystem.configurations.email.EmailVerificationMailService;
+import onon1101.lendingsystem.infrastructure.mail.EmailVerificationMailService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;

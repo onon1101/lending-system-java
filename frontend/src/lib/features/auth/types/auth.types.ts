@@ -47,5 +47,5 @@ export type RefreshTokenResponse = {
   tokenType: string;
   expiresIn: number;
   refreshToken: string;
-  refreshTokenExpiresIn: number;
+  refreshTokenExpires: number;
 };

@@ -1,7 +1,7 @@
 package onon1101.lendingsystem.auth.forgotPassword;
 
-import onon1101.lendingsystem.configurations.email.EmailNormalizer;
-import onon1101.lendingsystem.configurations.services.Command;
+import onon1101.lendingsystem.shared.email.EmailNormalizer;
+import onon1101.lendingsystem.shared.command.Command;
 
 public record ForgotPasswordCommand(String email) implements Command {
 

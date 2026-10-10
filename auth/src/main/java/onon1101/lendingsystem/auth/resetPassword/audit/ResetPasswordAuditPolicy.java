@@ -4,11 +4,11 @@ import java.util.List;
 import onon1101.lendingsystem.auth.commons.PasswordProperties;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordCommand;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResult;
-import onon1101.lendingsystem.configurations.audit.AuditEvent;
-import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.eventAttributes.TokenAuditEventAttribute;
-import onon1101.lendingsystem.configurations.domain.Result;
-import onon1101.lendingsystem.configurations.token.JwtTokenService;
+import onon1101.lendingsystem.application.audit.AuditEvent;
+import onon1101.lendingsystem.application.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.infrastructure.audit.attributes.TokenAuditEventAttribute;
+import onon1101.lendingsystem.shared.domain.Result;
+import onon1101.lendingsystem.infrastructure.security.token.JwtTokenService;
 import org.springframework.stereotype.Component;
 
 @Component

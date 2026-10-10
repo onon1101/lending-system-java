@@ -11,10 +11,10 @@ import onon1101.lendingsystem.auth.commons.PasswordProperties;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordCommand;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResult;
 import onon1101.lendingsystem.auth.resetPassword.error.InvalidResetTokenDomainError;
-import onon1101.lendingsystem.configurations.audit.AuditEvent;
-import onon1101.lendingsystem.configurations.domain.Result;
-import onon1101.lendingsystem.configurations.token.JwtTokenService;
-import onon1101.lendingsystem.configurations.token.TokenPayload;
+import onon1101.lendingsystem.application.audit.AuditEvent;
+import onon1101.lendingsystem.shared.domain.Result;
+import onon1101.lendingsystem.infrastructure.security.token.JwtTokenService;
+import onon1101.lendingsystem.infrastructure.security.token.TokenPayload;
 import org.junit.jupiter.api.Test;
 
 class ResetPasswordAuditPolicyTests {

@@ -1,10 +1,10 @@
 package onon1101.lendingsystem.auth.refreshToken;
 
-import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
+import onon1101.lendingsystem.auth.refreshToken.error.InvalidRefreshTokenDomainError;
 import onon1101.lendingsystem.auth.login.token.AccessTokenService;
 import onon1101.lendingsystem.auth.login.token.RefreshTokenIssuer;
 import onon1101.lendingsystem.auth.login.token.RefreshTokenSession;
-import onon1101.lendingsystem.configurations.domain.Result;
+import onon1101.lendingsystem.shared.domain.Result;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -23,10 +23,10 @@ public class RefreshTokenService {
     public Mono<Result<RefreshTokenResult>> refresh(RefreshTokenCommand command) {
         return refreshTokenIssuer
                 .consume(command.refreshToken())
-                .flatMap(session -> issue(session))
+                .flatMap(this::issue)
                 .switchIfEmpty(
                         Mono.fromSupplier(
-                                () -> Result.failure(new InvalidCredentialsDomainError())));
+                                () -> Result.failure(new InvalidRefreshTokenDomainError())));
     }
 
     private Mono<Result<RefreshTokenResult>> issue(RefreshTokenSession session) {

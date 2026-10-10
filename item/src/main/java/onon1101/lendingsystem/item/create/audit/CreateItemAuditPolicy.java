@@ -1,10 +1,10 @@
 package onon1101.lendingsystem.item.create.audit;
 
 import java.util.List;
-import onon1101.lendingsystem.configurations.audit.AuditEvent;
-import onon1101.lendingsystem.configurations.audit.CommandAuditPolicy;
-import onon1101.lendingsystem.configurations.audit.eventAttributes.ItemAuditEventAttribute;
-import onon1101.lendingsystem.configurations.audit.eventAttributes.ItemCreationAuditEventAttribute;
+import onon1101.lendingsystem.application.audit.AuditEvent;
+import onon1101.lendingsystem.application.audit.CommandAuditPolicy;
+import onon1101.lendingsystem.application.audit.attributes.ItemAuditEventAttribute;
+import onon1101.lendingsystem.application.audit.attributes.ItemCreationAuditEventAttribute;
 import onon1101.lendingsystem.item.create.CreateItemCommand;
 import onon1101.lendingsystem.item.create.CreateItemResult;
 import org.springframework.stereotype.Component;
