@@ -1,9 +1,7 @@
 package onon1101.lendingsystem.item.uploadCover.repository;
 
-import reactor.core.publisher.Mono;
-
 import java.util.UUID;
-
+import reactor.core.publisher.Mono;
 
 public interface UploadCoverReader {
 

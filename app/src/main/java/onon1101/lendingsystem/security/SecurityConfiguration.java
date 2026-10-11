@@ -1,10 +1,11 @@
 package onon1101.lendingsystem.security;
 
 import onon1101.lendingsystem.auth.login.token.AccessTokenProperties;
-import onon1101.lendingsystem.web.context.RequestContextFilter;
 import onon1101.lendingsystem.infrastructure.security.token.JwtDecoderProvider;
+import onon1101.lendingsystem.web.context.RequestContextFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -46,6 +47,8 @@ public class SecurityConfiguration {
                                                 "/swagger-ui/**",
                                                 "/swagger-ui.html",
                                                 "/v3/api-docs/**")
+                                        .permitAll()
+                                        .pathMatchers(HttpMethod.GET, "/item/list")
                                         .permitAll()
                                         .anyExchange()
                                         .authenticated())

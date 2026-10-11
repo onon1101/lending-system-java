@@ -7,14 +7,14 @@ import static org.mockito.Mockito.when;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import onon1101.lendingsystem.application.audit.AuditEvent;
 import onon1101.lendingsystem.auth.commons.PasswordProperties;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordCommand;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResult;
 import onon1101.lendingsystem.auth.resetPassword.error.InvalidResetTokenDomainError;
-import onon1101.lendingsystem.application.audit.AuditEvent;
-import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.infrastructure.security.token.JwtTokenService;
 import onon1101.lendingsystem.infrastructure.security.token.TokenPayload;
+import onon1101.lendingsystem.shared.domain.Result;
 import org.junit.jupiter.api.Test;
 
 class ResetPasswordAuditPolicyTests {

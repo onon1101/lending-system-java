@@ -1,9 +1,8 @@
 package onon1101.lendingsystem.item.uploadCover.repository;
 
-import reactor.core.publisher.Mono;
-
 import java.time.Instant;
 import java.util.UUID;
+import reactor.core.publisher.Mono;
 
 public interface UploadCoverWriter {
     Mono<Boolean> replace(

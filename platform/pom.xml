@@ -9,4 +9,11 @@
   </parent>
   <artifactId>platform</artifactId>
   <packaging>jar</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>com.twelvemonkeys.imageio</groupId>
+      <artifactId>imageio-webp</artifactId>
+      <version>3.13.1</version>
+    </dependency>
+  </dependencies>
 </project>

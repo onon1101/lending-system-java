@@ -1,32 +1,21 @@
 package onon1101.lendingsystem.infrastructure.image;
 
-import onon1101.lendingsystem.item.uploadCover.ValidatedImage;
-
-import onon1101.lendingsystem.item.uploadCover.exception.UploadCoverValidationException;
-
-import org.springframework.stereotype.Component;
-
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import javax.imageio.ImageIO;
-import javax.imageio.stream.MemoryCacheImageInputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Locale;
+import javax.imageio.ImageIO;
+import javax.imageio.stream.MemoryCacheImageInputStream;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Component
 public class ImageValidator {
 
     private static final long MAX_PIXELS = 16_000_000;
 
-    public Mono<ValidatedImage> validate(
-            byte[] bytes
-    ) {
-        return Mono
-                .fromCallable(() -> decode(bytes))
-                .subscribeOn(Schedulers.boundedElastic());
+    public Mono<ValidatedImage> validate(byte[] bytes) {
+        return Mono.fromCallable(() -> decode(bytes)).subscribeOn(Schedulers.boundedElastic());
     }
 
     private ValidatedImage decode(byte[] bytes) {
@@ -74,14 +63,14 @@ public class ImageValidator {
             } finally {
                 reader.dispose();
             }
-        } catch (UploadCoverValidationException exception) {
+        } catch (ImageValidationException exception) {
             throw exception;
         } catch (IOException | RuntimeException exception) {
             throw invalidImage();
         }
     }
 
-    private static UploadCoverValidationException invalidImage() {
-        return new UploadCoverValidationException("Item.InvalidCover");
+    private static ImageValidationException invalidImage() {
+        return new ImageValidationException("Item.InvalidCover");
     }
 }

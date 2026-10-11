@@ -2,6 +2,7 @@ package onon1101.lendingsystem.item.retrieve;
 
 import java.util.UUID;
 import onon1101.lendingsystem.application.currentuser.CurrentUserProvider;
+import onon1101.lendingsystem.infrastructure.image.ImagePreviewUrlResolver;
 import onon1101.lendingsystem.infrastructure.image.ImageStorage;
 import onon1101.lendingsystem.item.retrieve.error.ItemNotFoundDomainError;
 import onon1101.lendingsystem.shared.domain.Result;
@@ -15,15 +16,15 @@ public class RetrieveItemService {
 
     private final RetrieveItemReader itemReader;
     private final CurrentUserProvider currentUserProvider;
-    private final ObjectProvider<ImageStorage> imageStorageProvider;
+    private final ImagePreviewUrlResolver imageResolver;
 
     public RetrieveItemService(
             RetrieveItemReader itemReader,
             CurrentUserProvider currentUserProvider,
-            ObjectProvider<ImageStorage> imageStorageProvider) {
+            ImagePreviewUrlResolver imageResolver){
         this.itemReader = itemReader;
         this.currentUserProvider = currentUserProvider;
-        this.imageStorageProvider = imageStorageProvider;
+        this.imageResolver = imageResolver;
     }
 
     @Transactional(readOnly = true)
@@ -33,20 +34,11 @@ public class RetrieveItemService {
                 .flatMap(
                         currentUser ->
                                 itemReader.findVisibleItem(itemId, currentUser.privateUserId()))
-                .flatMap(this::toResult)
+                .flatMap(item ->
+                    imageResolver.resolve(item.coverObjectKey())
+                            .map(url -> Result.success(RetrieveItemResult.from(item, url)))
+                )
                 .switchIfEmpty(
                         Mono.fromSupplier(() -> Result.failure(new ItemNotFoundDomainError())));
-    }
-
-    private Mono<Result<RetrieveItemResult>> toResult(RetrievedItem item) {
-        ImageStorage storage = imageStorageProvider.getIfAvailable();
-        String key = item.coverObjectKey();
-
-        if (storage == null || key == null || key.isBlank()) {
-            return Mono.just(Result.success(RetrieveItemResult.from(item)));
-        }
-
-        return storage.previewUrl(key)
-                .map(url -> Result.<RetrieveItemResult>success(RetrieveItemResult.from(item, url)));
     }
 }

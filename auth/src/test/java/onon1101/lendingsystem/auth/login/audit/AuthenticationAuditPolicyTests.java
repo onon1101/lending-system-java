@@ -2,11 +2,11 @@ package onon1101.lendingsystem.auth.login.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import onon1101.lendingsystem.application.audit.AuditEvent;
 import onon1101.lendingsystem.auth.login.LoginCommand;
 import onon1101.lendingsystem.auth.login.LoginResult;
 import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
 import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
-import onon1101.lendingsystem.application.audit.AuditEvent;
 import onon1101.lendingsystem.shared.domain.Result;
 import org.junit.jupiter.api.Test;
 

@@ -13,14 +13,15 @@ import static org.mockito.Mockito.when;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
-import onon1101.lendingsystem.item.uploadCover.repository.OwnedItemCover;
 import java.util.concurrent.atomic.AtomicBoolean;
 import onon1101.lendingsystem.application.currentuser.CurrentUserContext;
 import onon1101.lendingsystem.application.currentuser.CurrentUserProvider;
 import onon1101.lendingsystem.infrastructure.image.ImageStorage;
-import onon1101.lendingsystem.shared.time.IClock;
+import onon1101.lendingsystem.infrastructure.image.ValidatedImage;
+import onon1101.lendingsystem.item.uploadCover.repository.OwnedItemCover;
 import onon1101.lendingsystem.item.uploadCover.repository.UploadCoverReader;
 import onon1101.lendingsystem.item.uploadCover.repository.UploadCoverWriter;
+import onon1101.lendingsystem.shared.time.IClock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -51,14 +52,12 @@ class UploadCoverServiceTests {
     }
 
     private UploadCoverCommand command() {
-        return new UploadCoverCommand(
-                itemId, Mono.just(new ValidatedImage(bytes, "image/png")));
+        return new UploadCoverCommand(itemId, Mono.just(new ValidatedImage(bytes, "image/png")));
     }
 
     private void prepareUpload() {
         when(reader.findOwnedItem(itemId, 7L)).thenReturn(Mono.just(new OwnedItemCover("old-key")));
-        when(storage.upload(itemId, bytes, "image/png"))
-                .thenReturn(Mono.just("new-key"));
+        when(storage.upload(itemId, bytes, "image/png")).thenReturn(Mono.just("new-key"));
         when(storage.previewUrl("new-key")).thenReturn(Mono.just("https://example.com/image"));
         when(clock.now()).thenReturn(now);
     }

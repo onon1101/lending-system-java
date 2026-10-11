@@ -6,7 +6,7 @@ export const API_ROUTES = {
     logout: "/api/v1/auth/logout",
     refresh: "/api/v1/auth/refresh",
     forgotPassword: "/api/v1/auth/forgot-password",
-    resetPassword: "/api/v1/auth",
+    resetPassword: "/api/v1/auth/reset-password",
     confirmEmail: "/api/v1/auth/email-verification/confirm",
     resendEmailVerification: "/api/v1/auth/email-verification/resend",
   },

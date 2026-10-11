@@ -1,17 +1,11 @@
 package onon1101.lendingsystem.infrastructure.image;
 
-import onon1101.lendingsystem.item.uploadCover.ValidatedImage;
-
-import onon1101.lendingsystem.item.uploadCover.exception.UploadCoverValidationException;
-
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
-
 import reactor.core.publisher.Mono;
-
 
 @Component
 public class ImageReader {
@@ -29,8 +23,7 @@ public class ImageReader {
     }
 
     private static Mono<byte[]> invalidImage() {
-        return Mono.error(
-                new UploadCoverValidationException("Item.InvalidCover"));
+        return Mono.error(new ImageValidationException("Item.InvalidCover"));
     }
 
     private static byte[] readImage(DataBuffer buffer) {
@@ -44,14 +37,12 @@ public class ImageReader {
     }
 
     public Mono<ValidatedImage> read(FilePart file) {
-        return Mono
-                .defer(() -> convert2DataBuffer(file))
+        return Mono.defer(() -> convert2DataBuffer(file))
                 .map(ImageReader::readImage)
                 .switchIfEmpty(invalidImage())
                 .onErrorMap(
                         DataBufferLimitException.class,
-                        error -> new UploadCoverValidationException(
-                                "Item.CoverTooLarge"))
+                        error -> new ImageValidationException("Item.CoverTooLarge"))
                 .flatMap(validator::validate);
     }
 }

@@ -33,6 +33,7 @@ class ApiEndpointCoverageTests extends AbstractApiIntegrationTest {
                     "GET /api/v1/item/retrieve/{itemId}",
                     "GET /api/v1/items",
                     "POST /api/v1/items/{itemId}/cover",
+                    "POST /api/v1/items/{itemId}/images",
                     "POST /api/v1/items/create",
                     "POST /api/v1/items/update",
                     "POST /api/v1/user/register",

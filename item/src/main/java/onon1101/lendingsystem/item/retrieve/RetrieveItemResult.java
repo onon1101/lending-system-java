@@ -2,8 +2,8 @@ package onon1101.lendingsystem.item.retrieve;
 
 import java.time.Instant;
 import java.util.UUID;
-import onon1101.lendingsystem.shared.command.CommandResult;
 import onon1101.lendingsystem.item.domain.ItemAvailability;
+import onon1101.lendingsystem.shared.command.CommandResult;
 
 public record RetrieveItemResult(
         UUID itemId,

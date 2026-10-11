@@ -1,9 +1,9 @@
 package onon1101.lendingsystem.item.uploadIamge.repository;
 
+import java.util.UUID;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
-import java.util.UUID;
 
 @Repository
 public class R2dbcUploadImageReader implements UploadImageReader {
@@ -15,7 +15,9 @@ public class R2dbcUploadImageReader implements UploadImageReader {
 
     @Override
     public Mono<Boolean> isOwnedItem(UUID itemId, long ownerId) {
-        return databaseClient.sql("""
+        return databaseClient
+                .sql(
+                        """
                         SELECT id FROM items
                         WHERE public_id = :itemId
                           AND owner_id = :ownerId

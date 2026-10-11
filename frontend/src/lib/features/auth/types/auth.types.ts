@@ -8,7 +8,7 @@ export type LoginRequest = {
 export type LoginResponse = {
   accessToken: string;
   tokenType: string;
-  expiresIn: number;
+  accessTokenExpiresIn: number;
   refreshToken: string;
   refreshTokenExpiresIn: number;
 };

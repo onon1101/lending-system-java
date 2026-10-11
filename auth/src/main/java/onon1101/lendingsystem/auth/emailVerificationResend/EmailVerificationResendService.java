@@ -2,9 +2,9 @@ package onon1101.lendingsystem.auth.emailVerificationResend;
 
 import onon1101.lendingsystem.auth.emailVerificationResend.email.EmailVerificationResendRequested;
 import onon1101.lendingsystem.auth.emailVerificationResend.redis.EmailVerificationResendThrottle;
+import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
 import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.shared.email.EmailUtil;
-import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.reactive.TransactionalEventPublisher;

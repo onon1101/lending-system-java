@@ -1,15 +1,14 @@
 package onon1101.lendingsystem.user.register;
 
 import onon1101.lendingsystem.application.audit.AuditedCommand;
+import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
 import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.shared.email.EmailUtil;
-import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
 import onon1101.lendingsystem.user.register.audit.RegistrationAuditPolicy;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import onon1101.lendingsystem.user.register.error.InvalidEmailDomainError;
 import onon1101.lendingsystem.user.register.error.InvalidRegistrationDomainError;
 import onon1101.lendingsystem.user.register.error.RegistrationConflictDomainError;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,19 +51,19 @@ public class RegisterService {
 
         return accountReader
                 .existsByUsernameOrEmail(username, email)
-                .flatMap(exists -> {
-                    if (exists) {
-                        return Mono.<Result<RegisterResult>>just(
-                                Result.failure(
-                                        new RegistrationConflictDomainError()));
-                    }
+                .flatMap(
+                        exists -> {
+                            if (exists) {
+                                return Mono.<Result<RegisterResult>>just(
+                                        Result.failure(new RegistrationConflictDomainError()));
+                            }
 
-                    return createAccount(username, password, email);
-                });
-
+                            return createAccount(username, password, email);
+                        });
     }
 
-    private Mono<Result<RegisterResult>> createAccount(String username, String password, String email) {
+    private Mono<Result<RegisterResult>> createAccount(
+            String username, String password, String email) {
 
         return Mono.fromCallable(() -> passwordEncoder.encode(password))
                 .subscribeOn(Schedulers.boundedElastic())

@@ -5,9 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
-import onon1101.lendingsystem.web.response.ApiResponse;
-
 import onon1101.lendingsystem.web.pagination.PaginationRequest;
+import onon1101.lendingsystem.web.response.ApiResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,25 +24,22 @@ public class ListItemsController {
 
     private final ListItemsService listItemsService;
 
-    public ListItemsController(
-            ListItemsService listItemsService
-    ) {
+    public ListItemsController(ListItemsService listItemsService) {
         this.listItemsService = listItemsService;
     }
 
     @Operation(summary = "查詢可察看的物品列表")
     @GetMapping
     public Mono<ResponseEntity<ApiResponse<ListItemResponse>>> list(
-            @Valid
-            @ModelAttribute
-            PaginationRequest pagination
-    ) {
+            @Valid @ModelAttribute PaginationRequest pagination) {
+
         return listItemsService
                 .list(pagination)
                 .map(ListItemsController::successfulResponse);
     }
 
-    private static ResponseEntity<ApiResponse<ListItemResponse>> successfulResponse(ListItemResponse response) {
+    private static ResponseEntity<ApiResponse<ListItemResponse>> successfulResponse(
+            ListItemResponse response) {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, response));
     }
 }

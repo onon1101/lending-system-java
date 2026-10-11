@@ -1,14 +1,14 @@
 package onon1101.lendingsystem.auth.resetPassword.audit;
 
 import java.util.List;
+import onon1101.lendingsystem.application.audit.AuditEvent;
+import onon1101.lendingsystem.application.audit.CommandAuditPolicy;
 import onon1101.lendingsystem.auth.commons.PasswordProperties;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordCommand;
 import onon1101.lendingsystem.auth.resetPassword.ResetPasswordResult;
-import onon1101.lendingsystem.application.audit.AuditEvent;
-import onon1101.lendingsystem.application.audit.CommandAuditPolicy;
 import onon1101.lendingsystem.infrastructure.audit.attributes.TokenAuditEventAttribute;
-import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.infrastructure.security.token.JwtTokenService;
+import onon1101.lendingsystem.shared.domain.Result;
 import org.springframework.stereotype.Component;
 
 @Component

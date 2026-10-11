@@ -11,8 +11,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import javax.imageio.ImageIO;
-import onon1101.lendingsystem.item.uploadCover.exception.UploadCoverValidationException;
 import onon1101.lendingsystem.infrastructure.image.ImageReader;
+import onon1101.lendingsystem.infrastructure.image.ImageValidationException;
 import onon1101.lendingsystem.infrastructure.image.ImageValidator;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
@@ -24,13 +24,14 @@ class UploadCoverInputTests {
 
     private FilePart file(byte[] bytes) {
         var file = mock(FilePart.class);
-        when(file.content()).thenReturn(Flux.just(DefaultDataBufferFactory.sharedInstance.wrap(bytes)));
+        when(file.content())
+                .thenReturn(Flux.just(DefaultDataBufferFactory.sharedInstance.wrap(bytes)));
         return file;
     }
 
     @Test
     void acceptsDecodedPngAndJpeg() throws Exception {
-        for (String format : new String[]{"png", "jpeg"}) {
+        for (String format : new String[] {"png", "jpeg"}) {
             var output = new ByteArrayOutputStream();
             ImageIO.write(new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB), format, output);
             byte[] bytes = output.toByteArray();
@@ -42,9 +43,11 @@ class UploadCoverInputTests {
 
     @Test
     void rejectsEmptyAndFakeImageContent() {
-        for (byte[] bytes : new byte[][]{new byte[0], {1, 2, 3}}) {
-            var error = assertThrows(UploadCoverValidationException.class,
-                    () -> reader.read(file(bytes)).block(Duration.ofSeconds(5)));
+        for (byte[] bytes : new byte[][] {new byte[0], {1, 2, 3}}) {
+            var error =
+                    assertThrows(
+                            ImageValidationException.class,
+                            () -> reader.read(file(bytes)).block(Duration.ofSeconds(5)));
             assertEquals("Item.InvalidCover", error.errorCode());
         }
     }
@@ -53,15 +56,21 @@ class UploadCoverInputTests {
     void rejectsMissingContent() {
         var file = mock(FilePart.class);
         when(file.content()).thenReturn(Flux.empty());
-        var error = assertThrows(UploadCoverValidationException.class,
-                () -> reader.read(file).block(Duration.ofSeconds(5)));
+        var error =
+                assertThrows(
+                        ImageValidationException.class,
+                        () -> reader.read(file).block(Duration.ofSeconds(5)));
         assertEquals("Item.InvalidCover", error.errorCode());
     }
 
     @Test
     void mapsOversizeContentToImageTooLarge() {
-        var error = assertThrows(UploadCoverValidationException.class,
-                () -> reader.read(file(new byte[5 * 1024 * 1024 + 1])).block(Duration.ofSeconds(5)));
+        var error =
+                assertThrows(
+                        ImageValidationException.class,
+                        () ->
+                                reader.read(file(new byte[5 * 1024 * 1024 + 1]))
+                                        .block(Duration.ofSeconds(5)));
         assertEquals("Item.CoverTooLarge", error.errorCode());
     }
 

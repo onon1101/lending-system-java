@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.UUID;
-import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.infrastructure.security.token.emailvalidation.EmailValidateTokenService;
+import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.user.register.email.EmailValidateRequested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +29,8 @@ class RegisterServiceTests {
             mock(TransactionalEventPublisher.class);
     private final EmailValidateTokenService tokenService = mock(EmailValidateTokenService.class);
     private final RegisterService service =
-            new RegisterService(accountReader, accountWriter, passwordEncoder, eventPublisher, tokenService);
+            new RegisterService(
+                    accountReader, accountWriter, passwordEncoder, eventPublisher, tokenService);
 
     @Test
     void registersNormalizedAccount() {

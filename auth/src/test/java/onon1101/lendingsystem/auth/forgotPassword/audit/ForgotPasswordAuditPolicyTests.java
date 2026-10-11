@@ -3,10 +3,10 @@ package onon1101.lendingsystem.auth.forgotPassword.audit;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.UUID;
+import onon1101.lendingsystem.application.audit.AuditEvent;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordCommand;
 import onon1101.lendingsystem.auth.forgotPassword.ForgotPasswordResult;
 import onon1101.lendingsystem.auth.forgotPassword.error.InvalidEmailDomainError;
-import onon1101.lendingsystem.application.audit.AuditEvent;
 import onon1101.lendingsystem.shared.domain.Result;
 import org.junit.jupiter.api.Test;
 

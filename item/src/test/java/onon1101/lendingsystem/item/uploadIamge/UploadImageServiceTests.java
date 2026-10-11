@@ -4,7 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,10 +16,10 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import onon1101.lendingsystem.application.currentuser.CurrentUserContext;
 import onon1101.lendingsystem.application.currentuser.CurrentUserProvider;
-import onon1101.lendingsystem.infrastructure.image.ImageStorage;
-import onon1101.lendingsystem.item.uploadCover.ValidatedImage;
-import onon1101.lendingsystem.item.uploadCover.exception.UploadCoverValidationException;
 import onon1101.lendingsystem.infrastructure.image.ImageReader;
+import onon1101.lendingsystem.infrastructure.image.ImageStorage;
+import onon1101.lendingsystem.infrastructure.image.ImageValidationException;
+import onon1101.lendingsystem.infrastructure.image.ValidatedImage;
 import onon1101.lendingsystem.item.uploadIamge.repository.SavedImage;
 import onon1101.lendingsystem.item.uploadIamge.repository.UploadImageReader;
 import onon1101.lendingsystem.item.uploadIamge.repository.UploadImageWriter;
@@ -46,8 +50,15 @@ class UploadImageServiceTests {
 
     @BeforeEach
     void setup() {
-        when(users.getCurrentUser()).thenReturn(Mono.just(new CurrentUserContext(
-                7L, UUID.randomUUID(), "owner", "owner@example.com", "active")));
+        when(users.getCurrentUser())
+                .thenReturn(
+                        Mono.just(
+                                new CurrentUserContext(
+                                        7L,
+                                        UUID.randomUUID(),
+                                        "owner",
+                                        "owner@example.com",
+                                        "active")));
     }
 
     private MultiValueMap<String, Part> form(FilePart... files) {
@@ -59,11 +70,13 @@ class UploadImageServiceTests {
     }
 
     private UploadImageResponse upload(FilePart... files) {
-        var result = service.uploadImage(itemId, Mono.just(form(files)))
-                .block(Duration.ofSeconds(5));
-        return result.match(response -> response, code -> {
-            throw new AssertionError(code);
-        });
+        var result =
+                service.uploadImage(itemId, Mono.just(form(files))).block(Duration.ofSeconds(5));
+        return result.match(
+                response -> response,
+                code -> {
+                    throw new AssertionError(code);
+                });
     }
 
     private void prepareUpload() {
@@ -78,10 +91,12 @@ class UploadImageServiceTests {
     void missingOwnedItemDoesNotSubscribeToMultipartBody() {
         when(itemReader.isOwnedItem(itemId, 7L)).thenReturn(Mono.just(false));
         var subscribed = new AtomicBoolean();
-        var parts = Mono.fromSupplier(() -> {
-            subscribed.set(true);
-            return form(file);
-        });
+        var parts =
+                Mono.fromSupplier(
+                        () -> {
+                            subscribed.set(true);
+                            return form(file);
+                        });
         var result = service.uploadImage(itemId, parts).block(Duration.ofSeconds(5));
         assertEquals("Item.NotFound", result.match(value -> "success", code -> code));
         assertFalse(subscribed.get());
@@ -93,8 +108,8 @@ class UploadImageServiceTests {
         prepareUpload();
         var invalid = mock(FilePart.class);
         var imageId = UUID.randomUUID();
-        when(reader.read(invalid)).thenReturn(Mono.error(
-                new UploadCoverValidationException("Item.CoverTooLarge")));
+        when(reader.read(invalid))
+                .thenReturn(Mono.error(new ImageValidationException("Item.CoverTooLarge")));
         when(writer.append(itemId, 7L, "new-key", "image/png", now))
                 .thenReturn(Mono.just(new SavedImage(imageId, 1)));
 
@@ -110,8 +125,8 @@ class UploadImageServiceTests {
     @Test
     void previewFailureCleansUploadedObjectBeforeDatabaseWrite() {
         prepareUpload();
-        when(storage.previewUrl("new-key")).thenReturn(
-                Mono.error(new IllegalStateException("preview unavailable")));
+        when(storage.previewUrl("new-key"))
+                .thenReturn(Mono.error(new IllegalStateException("preview unavailable")));
         when(storage.delete("new-key")).thenReturn(Mono.empty());
 
         var response = upload(file);
@@ -134,8 +149,7 @@ class UploadImageServiceTests {
     @Test
     void ownershipLostBeforeAppendCleansUploadedObject() {
         prepareUpload();
-        when(writer.append(itemId, 7L, "new-key", "image/png", now))
-                .thenReturn(Mono.empty());
+        when(writer.append(itemId, 7L, "new-key", "image/png", now)).thenReturn(Mono.empty());
         when(storage.delete("new-key")).thenReturn(Mono.empty());
 
         var response = upload(file);

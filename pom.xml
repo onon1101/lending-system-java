@@ -30,6 +30,7 @@
     <module>user</module>
     <module>app</module>
     <module>item</module>
+    <module>order</module>
   </modules>
   <scm>
     <connection/>

@@ -2,16 +2,16 @@ package onon1101.lendingsystem.item.create;
 
 import com.github.f4b6a3.uuid.UuidCreator;
 import java.time.Instant;
-import onon1101.lendingsystem.application.idempotency.IdempotencyService;
 import onon1101.lendingsystem.application.audit.AuditedCommand;
 import onon1101.lendingsystem.application.currentuser.CurrentUserContext;
 import onon1101.lendingsystem.application.currentuser.CurrentUserProvider;
-import onon1101.lendingsystem.shared.time.IClock;
+import onon1101.lendingsystem.application.idempotency.IdempotencyService;
 import onon1101.lendingsystem.item.create.audit.CreateItemAuditPolicy;
 import onon1101.lendingsystem.item.domain.Item;
 import onon1101.lendingsystem.item.domain.ItemDescription;
 import onon1101.lendingsystem.item.domain.ItemId;
 import onon1101.lendingsystem.item.domain.ItemName;
+import onon1101.lendingsystem.shared.time.IClock;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -44,7 +44,7 @@ public class CreateItemService {
                 .getCurrentUser()
                 .flatMap(
                         currentUserContext ->
-                                idempotencyService.execute(
+                                idempotencyService.<CreateItemResult>execute(
                                         currentUserContext.publicUserId().toString(),
                                         "item.create",
                                         command.idempotencyKey(),
