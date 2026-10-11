@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.item.uploadCover.image;
+package onon1101.lendingsystem.infrastructure.image;
 
 import onon1101.lendingsystem.item.uploadCover.ValidatedImage;
 

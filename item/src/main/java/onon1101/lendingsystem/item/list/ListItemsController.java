@@ -40,10 +40,10 @@ public class ListItemsController {
     ) {
         return listItemsService
                 .list(pagination)
-                .map(
-                        response -> ResponseEntity.ok(
-                                ApiResponse.success(HttpStatus.OK, response)
-                        )
-                );
+                .map(ListItemsController::successfulResponse);
+    }
+
+    private static ResponseEntity<ApiResponse<ListItemResponse>> successfulResponse(ListItemResponse response) {
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, response));
     }
 }

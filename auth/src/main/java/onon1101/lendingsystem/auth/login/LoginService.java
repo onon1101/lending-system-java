@@ -2,6 +2,7 @@ package onon1101.lendingsystem.auth.login;
 
 import java.time.Duration;
 import java.time.Instant;
+
 import onon1101.lendingsystem.auth.login.audit.AuthenticationAuditPolicy;
 import onon1101.lendingsystem.auth.login.error.InvalidCredentialsDomainError;
 import onon1101.lendingsystem.auth.login.error.TooManyAttemptsDomainError;
@@ -10,9 +11,11 @@ import onon1101.lendingsystem.auth.login.token.RefreshTokenIssuer;
 import onon1101.lendingsystem.application.audit.AuditedCommand;
 import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.shared.time.IClock;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -61,35 +64,45 @@ public class LoginService {
                 .flatMap(account -> authenticate(account, password, now))
                 .switchIfEmpty(
                         Mono.fromSupplier(
-                                () -> Result.failure(new InvalidCredentialsDomainError())));
+                                () -> Result.failure(
+                                        new InvalidCredentialsDomainError())));
     }
 
     private Mono<Result<LoginResult>> authenticate(
             LoginAccount account, String password, Instant now) {
-        if (account.lockedUntil() != null && account.lockedUntil().isAfter(now)) {
+        if (account.lockedUntil() != null && account
+                .lockedUntil()
+                .isAfter(now)) {
             return Mono.just(Result.failure(new TooManyAttemptsDomainError()));
         }
 
-        return Mono.fromCallable(() -> passwordEncoder.matches(password, account.passwordHash()))
+        return Mono
+                .fromCallable(() -> passwordEncoder.matches(password,
+                        account.passwordHash()))
                 .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(matches -> matches ? successfulLogin(account) : failedLogin(account, now));
+                .flatMap(matches -> matches ? successfulLogin(
+                        account) : failedLogin(account, now));
     }
 
-    private Mono<Result<LoginResult>> failedLogin(LoginAccount account, Instant now) {
+    private Mono<Result<LoginResult>> failedLogin(LoginAccount account,
+                                                  Instant now) {
         return accountWriter
                 .recordFailedAttempt(
-                        account.passwordId(), MAX_FAILED_ATTEMPTS, now.plus(LOCK_DURATION))
-                .map(
-                        attempt ->
-                                attempt.locked()
-                                        ? Result.failure(new TooManyAttemptsDomainError())
-                                        : Result.failure(new InvalidCredentialsDomainError()));
+                        account.passwordId(), MAX_FAILED_ATTEMPTS,
+                        now.plus(LOCK_DURATION))
+                .map(attempt ->
+                        attempt.locked()
+                                ? Result.failure(
+                                new TooManyAttemptsDomainError())
+                                : Result.failure(
+                                new InvalidCredentialsDomainError()));
     }
 
     private Mono<Result<LoginResult>> successfulLogin(LoginAccount account) {
         String accessToken =
                 accessTokenService.createToken(
-                        account.privateUserId(), account.publicUserId(), account.username());
+                        account.privateUserId(), account.publicUserId(),
+                        account.username());
 
         return accountWriter
                 .resetFailedAttempts(account.passwordId())
@@ -102,8 +115,9 @@ public class LoginService {
                         refreshToken ->
                                 Result.success(
                                         new LoginResult(
-                                                accessToken, accessTokenService.expiresInSeconds(),
+                                                accessToken,
+                                                accessTokenService.expiresInSeconds(),
                                                 refreshToken,
-                                                        refreshTokenIssuer.expiresInSeconds())));
+                                                refreshTokenIssuer.expiresInSeconds())));
     }
 }

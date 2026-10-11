@@ -2,7 +2,7 @@ package onon1101.lendingsystem.item.uploadCover;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import onon1101.lendingsystem.item.uploadCover.image.ImageReader;
+import onon1101.lendingsystem.infrastructure.image.ImageReader;
 
 import onon1101.lendingsystem.shared.domain.Result;
 import onon1101.lendingsystem.web.response.ApiResponse;
