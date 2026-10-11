@@ -21,7 +21,7 @@ export const API_ROUTES = {
     update: "/api/v1/items/update",
     delete: "/api/v1/item/delete",
     list: "/api/v1/items",
-    uploadImage: (itemId: string) =>
-      `/api/v1/items/${encodeURIComponent(itemId)}/image`,
+    uploadCover: (itemId: string) =>
+      `/api/v1/items/${encodeURIComponent(itemId)}/cover`,
   },
 } as const;

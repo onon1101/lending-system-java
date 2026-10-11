@@ -3,17 +3,11 @@
   import { Alert, LoadingIndicator } from "$lib/shared/components";
   import { formatDate } from "$lib/shared/utils/format-date";
   import { getItem } from "../api/get-item";
-  import { uploadItemImage } from "../api/upload-item-image";
-  import ItemImagePicker from "./ItemImagePicker.svelte";
   import type { ItemDetail as Item } from "../types/item.types";
 
   let { itemId }: { itemId: string } = $props();
   let item = $state<Item | null>(null);
   let loadError = $state("");
-  let uploadError = $state("");
-  let successMessage = $state("");
-  let selectedFile = $state<File | null>(null);
-  let uploading = $state(false);
   let failedUrl = $state<string | null>(null);
 
   onMount(() => {
@@ -24,24 +18,6 @@
     return () => { active = false; };
   });
 
-  async function upload(event: SubmitEvent) {
-    event.preventDefault();
-    if (!item?.ownedByCurrentUser || !selectedFile || uploading) return;
-    uploading = true;
-    uploadError = "";
-    successMessage = "";
-    try {
-      const result = await uploadItemImage(item.itemId, selectedFile);
-      item = { ...item, imageUrl: result.imageUrl };
-      failedUrl = null;
-      selectedFile = null;
-      successMessage = "圖片已更新。";
-    } catch {
-      uploadError = "圖片上傳失敗，請確認連線後重試。";
-    } finally {
-      uploading = false;
-    }
-  }
 </script>
 
 {#if loadError}
@@ -49,37 +25,163 @@
 {:else if !item}
   <LoadingIndicator />
 {:else}
-  <article class="rounded-2xl border border-white/10 bg-white/5 p-6">
-    <h1 class="text-2xl font-bold">{item.name}</h1>
-    <div class="mt-5">
-      {#if item.ownedByCurrentUser}
-        <form class="space-y-4" onsubmit={upload}>
-          <ItemImagePicker bind:file={selectedFile} currentImageUrl={item.imageUrl ?? null} disabled={uploading} />
-          {#if uploadError}<Alert message={uploadError} />{/if}
-          {#if successMessage && !selectedFile}
-            <p role="status" class="text-sm text-emerald-400">{successMessage}</p>
-          {/if}
-          <button type="submit" disabled={uploading || !selectedFile}
-            class="rounded-lg bg-sky-500 px-4 py-2 font-semibold text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50">
-            {uploading ? "上傳中…" : item.imageUrl ? "更新圖片" : "上傳圖片"}
-          </button>
-        </form>
-      {:else}
-        <div class="flex aspect-[4/3] max-w-lg items-center justify-center overflow-hidden rounded-xl bg-slate-800">
-          {#if item.imageUrl && failedUrl !== item.imageUrl}
-            <img src={item.imageUrl} alt={`${item.name}的圖片`} class="h-full w-full object-contain"
-              onerror={() => { failedUrl = item?.imageUrl ?? null; }} />
-          {:else}
-            <span class="text-sm text-slate-400">{item.imageUrl ? "圖片無法顯示" : "尚未提供圖片"}</span>
+  <article
+    class="grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]"
+  >
+    <!-- 左側：物品描述與相關資訊 -->
+    <div class="min-w-0 space-y-8 rounded-2xl border border-white/10 bg-white/5 p-5 sm:p-6">
+      <header class="space-y-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <span
+            class={`rounded-full border px-3 py-1 text-xs font-medium ${
+              item.availability === "AVAILABLE"
+                ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-300"
+                : "border-slate-400/20 bg-slate-400/10 text-slate-300"
+            }`}
+          >
+            {item.availability === "AVAILABLE"
+              ? "可借閱"
+              : item.availability === "UNAVAILABLE"
+                ? "目前不可借閱"
+                : item.availability}
+          </span>
+
+          {#if item.ownedByCurrentUser}
+            <span class="text-xs text-slate-400">你的物品</span>
           {/if}
         </div>
-      {/if}
+
+        <h1 class="break-words text-3xl font-bold tracking-tight">
+          {item.name}
+        </h1>
+      </header>
+
+      <section aria-labelledby="item-description-heading" class="space-y-3">
+        <h2
+          id="item-description-heading"
+          class="text-lg font-semibold"
+        >
+          物品描述
+        </h2>
+
+        <p class="whitespace-pre-wrap break-words leading-7 text-slate-300">
+          {item.description || "尚未提供物品描述。"}
+        </p>
+      </section>
+
+      <section
+        aria-labelledby="item-information-heading"
+        class="border-t border-white/10 pt-6"
+      >
+        <h2
+          id="item-information-heading"
+          class="text-lg font-semibold"
+        >
+          基本資訊
+        </h2>
+
+        <dl class="mt-4 space-y-4 text-sm">
+          <div class="grid grid-cols-[5rem_minmax(0,1fr)] gap-4">
+            <dt class="text-slate-400">擁有者</dt>
+            <dd class="break-words text-slate-200">
+              {item.ownerUsername}
+            </dd>
+          </div>
+
+          <div class="grid grid-cols-[5rem_minmax(0,1fr)] gap-4">
+            <dt class="text-slate-400">是否可用</dt>
+            <dd class="text-slate-200">
+              {item.availability === "AVAILABLE"
+                ? "可用"
+                : item.availability === "UNAVAILABLE"
+                  ? "不可用"
+                  : item.availability}
+            </dd>
+          </div>
+
+          <div class="grid grid-cols-[5rem_minmax(0,1fr)] gap-4">
+            <dt class="text-slate-400">建立時間</dt>
+            <dd class="break-words text-slate-200">
+              {formatDate(item.createdAt)}
+            </dd>
+          </div>
+
+          <div class="grid grid-cols-[5rem_minmax(0,1fr)] gap-4">
+            <dt class="text-slate-400">更新時間</dt>
+            <dd class="break-words text-slate-200">
+              {formatDate(item.updatedAt)}
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section
+        aria-labelledby="item-history-heading"
+        class="border-t border-white/10 pt-6"
+      >
+        <h2 id="item-history-heading" class="text-lg font-semibold">
+          借閱歷史
+        </h2>
+
+        <!-- 串接 API 後，在此放入借閱紀錄清單 -->
+        <div
+          class="mt-4 rounded-xl border border-dashed border-white/15
+            bg-slate-900/30 px-4 py-6"
+        >
+          <p class="text-sm text-slate-400">
+            尚未串接借閱歷史。
+          </p>
+        </div>
+      </section>
     </div>
-    <p class="mt-5 text-slate-300">{item.description || "沒有描述"}</p>
-    <dl class="mt-6 grid gap-3 text-sm">
-      <div><dt class="text-slate-500">擁有者</dt><dd>{item.ownerUsername}</dd></div>
-      <div><dt class="text-slate-500">狀態</dt><dd>{item.availability}</dd></div>
-      <div><dt class="text-slate-500">更新時間</dt><dd>{formatDate(item.updatedAt)}</dd></div>
-    </dl>
+
+    <!-- 右側：純封面展示，齒輪連結至封面設定頁 -->
+    <section
+      aria-label="物品封面"
+      class="relative min-w-0 lg:sticky lg:top-4"
+    >
+      <div
+        class="flex aspect-[4/3] w-full items-start justify-center
+          lg:aspect-auto lg:h-[max(12rem,calc(100dvh-10rem))]"
+      >
+        <div class="relative flex max-h-full max-w-full items-center justify-center">
+        {#if item.imageUrl && failedUrl !== item.imageUrl}
+          <img
+            src={item.imageUrl}
+            alt={`${item.name}的封面`}
+            class="block h-auto w-auto max-h-[70dvh] max-w-full object-contain
+              lg:max-h-[max(12rem,calc(100dvh-10rem))]"
+            onerror={() => { failedUrl = item?.imageUrl ?? null; }}
+          />
+        {:else}
+          <svg aria-label={item.imageUrl ? "封面無法顯示" : "尚未提供封面"}
+            role="img" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5" class="h-16 w-16 text-slate-600">
+            <rect x="3" y="3" width="18" height="18" rx="3" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <path d="m3 17 5-5 4 4 4-6 5 7" />
+          </svg>
+        {/if}
+      {#if item.ownedByCurrentUser}
+        <a
+          href={`/items/${encodeURIComponent(item.itemId)}/cover`}
+          aria-label="變更物品封面"
+          title="變更物品封面"
+          class="absolute right-3 top-3 flex h-10 w-10 items-center justify-center
+            rounded-full border border-white/15 bg-slate-950/75 text-slate-200
+            shadow-lg backdrop-blur hover:bg-slate-800 hover:text-white
+            focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+            stroke-linejoin="round" class="h-5 w-5">
+            <path d="m9 3-.5 3-2 .9L4 6l-2 3 2 2v2l-2 2 2 3 2.5-.9 2 .9.5 3h4l.5-3 2-.9L18 18l2-3-2-2v-2l2-2-2-3-2.5.9-2-.9L13 3Z" />
+            <circle cx="11" cy="12" r="3" />
+          </svg>
+        </a>
+      {/if}
+        </div>
+      </div>
+    </section>
   </article>
 {/if}

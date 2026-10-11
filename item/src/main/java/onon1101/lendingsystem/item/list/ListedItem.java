@@ -1,9 +1,8 @@
 package onon1101.lendingsystem.item.list;
 
-import onon1101.lendingsystem.item.domain.ItemAvailability;
-
 import java.time.Instant;
 import java.util.UUID;
+import onon1101.lendingsystem.item.domain.ItemAvailability;
 
 public record ListedItem(
         UUID itemId,
@@ -15,8 +14,7 @@ public record ListedItem(
         boolean ownedByViewer,
         Instant createdAt,
         Instant updatedAt,
-        String imageObjectKey
-) {
+        String coverObjectKey) {
 
     public boolean canRequestBorrow() {
         return availability == ItemAvailability.AVAILABLE && !ownedByViewer;

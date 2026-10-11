@@ -11,8 +11,8 @@
     SubmitButton,
   } from "$lib/shared/components";
   import { createItem } from "../api/create-item";
-  import { uploadItemImage } from "../api/upload-item-image";
-  import ItemImagePicker from "./ItemImagePicker.svelte";
+  import { uploadCover } from "../api/upload-cover";
+  import ItemCoverPicker from "./ItemCoverPicker.svelte";
   import { getItemDraftState } from "../state/item-draft-state.svelte";
   import type { CreateItemRequest } from "../types/item.types";
 
@@ -73,11 +73,11 @@
       if (selectedFile && selectedFile !== uploadedFile) {
         const fileToUpload = selectedFile;
         try {
-          await uploadItemImage(createdItemId!, fileToUpload);
+          await uploadCover(createdItemId!, fileToUpload);
           uploadedFile = fileToUpload;
         } catch {
           errorMessage =
-            "物品已建立，但圖片上傳失敗。請重試，或取消選圖後前往物品頁面。";
+            "物品已建立，但封面上傳失敗。請重試，或取消選圖後前往物品頁面。";
           return;
         }
       }
@@ -137,11 +137,11 @@
       disabled={isSubmitting || createdItemId !== null}
     />
   </div>
-  <ItemImagePicker bind:file={selectedFile} disabled={isSubmitting} />
+  <ItemCoverPicker bind:file={selectedFile} disabled={isSubmitting} />
 
   {#if createdItemId}
     <p role="status" class="text-sm text-emerald-400">
-      物品已建立，接下來可完成圖片上傳。
+      物品已建立，接下來可完成封面上傳。
     </p>
   {/if}
 
@@ -149,10 +149,10 @@
     {isSubmitting}
     label={createdItemId
       ? selectedFile && selectedFile !== uploadedFile
-        ? "上傳圖片並前往物品頁面"
+        ? "上傳封面並前往物品頁面"
         : "前往物品頁面"
       : selectedFile
-        ? "建立物品並上傳圖片"
+        ? "建立物品並上傳封面"
         : "建立物品"}
   />
 </form>

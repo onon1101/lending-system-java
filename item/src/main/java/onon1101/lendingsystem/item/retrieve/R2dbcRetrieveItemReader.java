@@ -32,10 +32,14 @@ public class R2dbcRetrieveItemReader implements RetrieveItemReader {
                             (item.owner_id = :viewerId) AS owned_by_viewer,
                             item.created_at,
                             item.updated_at,
-                            item.image_object_key
+                            cover.object_key AS cover_object_key
                         FROM items AS item
                         INNER JOIN users AS owner
                             ON owner.id = item.owner_id
+                        LEFT JOIN item_media AS cover
+                            ON cover.item_id = item.id
+                            AND cover.sort_order = 0
+                            AND cover.media_type = 'image'
                         WHERE item.public_id = :itemId
                           AND item.status <> 'archived'
                           AND (
@@ -65,7 +69,7 @@ public class R2dbcRetrieveItemReader implements RetrieveItemReader {
                                                 .toInstant(),
                                         require(row.get("updated_at", OffsetDateTime.class))
                                                 .toInstant(),
-                                        row.get("image_object_key", String.class)))
+                                        row.get("cover_object_key", String.class)))
                 .one();
     }
 

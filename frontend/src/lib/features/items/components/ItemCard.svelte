@@ -14,7 +14,7 @@
       {#key item.imageUrl}
         <img
           src={item.imageUrl}
-          alt={`${item.name}的圖片`}
+          alt={`${item.name}的封面`}
           class="h-full w-full object-contain"
           loading="lazy"
           decoding="async"
@@ -25,7 +25,7 @@
       {/key}
     {:else}
       <span class="text-sm text-slate-400">
-        {item.imageUrl ? "圖片暫時無法顯示" : "尚未提供圖片"}
+        {item.imageUrl ? "封面暫時無法顯示" : "尚未提供封面"}
       </span>
     {/if}
   </div>

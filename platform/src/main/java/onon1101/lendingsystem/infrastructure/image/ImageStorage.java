@@ -38,11 +38,11 @@ public class ImageStorage {
     // first.
     public Mono<String> upload(UUID itemId, byte[] bytes, String contentType) {
         return Mono
-                .fromCallable(() -> uploadImage(itemId, bytes, contentType))
+                .fromCallable(() -> storeImage(itemId, bytes, contentType))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
-    private String uploadImage(UUID itemId, byte[] bytes, String contentType) {
+    private String storeImage(UUID itemId, byte[] bytes, String contentType) {
         String extension = contentType2ImageExtensionConvertor(contentType);
 
         String key = concatImagePath(itemId, extension);
