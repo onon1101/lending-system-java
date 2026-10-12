@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.create.error;
+package onon1101.lendingsystem.order.create.error;
 
 import onon1101.lendingsystem.shared.domain.DomainError;
 

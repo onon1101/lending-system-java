@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.create;
+package onon1101.lendingsystem.order.create;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

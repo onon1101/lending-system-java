@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.list;
+package onon1101.lendingsystem.order.list;
 
 import java.time.Instant;
 import java.time.LocalDate;

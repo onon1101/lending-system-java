@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.list;
+package onon1101.lendingsystem.order.list;
 
 import onon1101.lendingsystem.application.currentuser.CurrentUserProvider;
 

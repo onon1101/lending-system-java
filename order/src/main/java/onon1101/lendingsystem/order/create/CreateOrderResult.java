@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.create;
+package onon1101.lendingsystem.order.create;
 
 import onon1101.lendingsystem.shared.command.CommandResult;
 

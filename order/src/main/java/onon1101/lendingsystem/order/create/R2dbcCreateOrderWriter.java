@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.create;
+package onon1101.lendingsystem.order.create;
 
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;

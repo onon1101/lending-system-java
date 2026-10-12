@@ -1,4 +1,4 @@
-package onon1101.lendingsystem.list;
+package onon1101.lendingsystem.order.list;
 import java.util.List;
 import onon1101.lendingsystem.shared.pagination.Slice;
 public record ListOrderResult(List<ListedOrder> orders, int page, int size, boolean hasNext) {
