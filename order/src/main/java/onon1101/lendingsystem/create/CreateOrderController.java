@@ -31,9 +31,9 @@ public class CreateOrderController {
     }
 
     @Operation(summary = "建立借閱申請")
-    @PostMapping
-    public Mono<ResponseEntity<ApiResponse<CreateOrderResponse>>>
-    create(@Valid @RequestBody CreateOrderRequest request) {
+    @PostMapping("/create")
+    public Mono<ResponseEntity<ApiResponse<CreateOrderResponse>>> create(
+            @Valid @RequestBody CreateOrderRequest request) {
         CreateOrderCommand command =
                 new CreateOrderCommand(request.itemId(),
                         request.plannedBorrowDate(),
@@ -80,7 +80,8 @@ public class CreateOrderController {
                     );
                 };
 
-        return ResponseEntity.status(status)
+        return ResponseEntity
+                .status(status)
                 .body(ApiResponse.failure(status, errorCode));
     }
 }
