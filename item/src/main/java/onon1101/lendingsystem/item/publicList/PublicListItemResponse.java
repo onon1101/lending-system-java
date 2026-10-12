@@ -6,10 +6,24 @@ import java.util.UUID;
 import onon1101.lendingsystem.item.domain.ItemAvailability;
 import onon1101.lendingsystem.web.pagination.PaginationResponse;
 
-public record PublicListItemResponse(
-        List<PublicItemResponse> items, PaginationResponse response) {
+public record PublicListItemResponse(List<PublicItemResponse> items, PaginationResponse response) {
+
     public PublicListItemResponse {
         items = List.copyOf(items);
+    }
+
+    public static PublicListItemResponse from(PublicListItemsResult result) {
+        var items =
+                result.items().stream()
+                        .map(
+                                preview ->
+                                        PublicItemResponse.fromPublicItem(
+                                                preview.item(), preview.imageUrl()))
+                        .toList();
+
+        var pagination = new PaginationResponse(result.page(), result.size(), result.hasNext());
+
+        return new PublicListItemResponse(items, pagination);
     }
 
     public record PublicItemResponse(
@@ -24,15 +38,25 @@ public record PublicListItemResponse(
             Instant createdAt,
             Instant updatedAt,
             String imageUrl) {
+
         public static PublicItemResponse fromPublicItem(PublicListedItem item) {
             return fromPublicItem(item, null);
         }
 
         public static PublicItemResponse fromPublicItem(PublicListedItem item, String imageUrl) {
+
             return new PublicItemResponse(
-                    item.itemId(), item.ownerId(), item.ownerUsername(),
-                    item.name(), item.description(), item.availability(),
-                    false, false, item.createdAt(), item.updatedAt(), imageUrl);
+                    item.itemId(),
+                    item.ownerId(),
+                    item.ownerUsername(),
+                    item.name(),
+                    item.description(),
+                    item.availability(),
+                    false,
+                    false,
+                    item.createdAt(),
+                    item.updatedAt(),
+                    imageUrl);
         }
     }
 }

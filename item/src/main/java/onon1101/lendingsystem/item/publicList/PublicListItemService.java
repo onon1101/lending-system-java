@@ -1,53 +1,43 @@
 package onon1101.lendingsystem.item.publicList;
 
-import java.util.List;
-import onon1101.lendingsystem.infrastructure.image.ImageStorage;
-import onon1101.lendingsystem.web.pagination.PaginationRequest;
-import onon1101.lendingsystem.web.pagination.PaginationResponse;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 public class PublicListItemService {
-    private final PublicListItemReader publicListItemReader;
-    private final ObjectProvider<ImageStorage> imageStorageProvider;
+    private final PublicListItemReader itemReader;
+    private final PublicItemPreviewUrlReader previewUrlReader;
 
     public PublicListItemService(
-            PublicListItemReader publicListItemReader,
-            ObjectProvider<ImageStorage> imageStorageProvider) {
-        this.publicListItemReader = publicListItemReader;
-        this.imageStorageProvider = imageStorageProvider;
+            PublicListItemReader itemReader, PublicItemPreviewUrlReader previewUrlReader) {
+        this.itemReader = itemReader;
+        this.previewUrlReader = previewUrlReader;
     }
 
-    @Transactional(readOnly = true)
-    public Mono<PublicListItemResponse> listPublic(PaginationRequest pagination) {
-        return publicListItemReader.findAllPublicItems(pagination)
+    public Mono<PublicListItemsResult> listPublic(PublicListItemsQuery query) {
+        return itemReader
+                .findAllPublicItems(query)
                 .collectList()
-                .flatMap(items -> toPublicResponse(items, pagination));
+                .map(items -> PublicListItemsResult.Slice.from(items, query))
+                .flatMap(slice -> resolvePreviews(slice, query));
     }
 
-    private Mono<PublicListItemResponse> toPublicResponse(
-            List<PublicListedItem> items, PaginationRequest pagination) {
-        boolean hasNext = items.size() > pagination.size();
-        var paginationResponse = PaginationResponse.from(pagination, hasNext);
-        return Flux.fromIterable(items)
-                .take(pagination.size())
-                .concatMap(this::toPublicPreviewResponse)
+    private Mono<PublicListItemsResult> resolvePreviews(
+            PublicListItemsResult.Slice slice, PublicListItemsQuery query) {
+        return Flux.fromIterable(slice.items())
+                .concatMap(this::resolvePreview)
                 .collectList()
-                .map(responses -> new PublicListItemResponse(responses, paginationResponse));
+                .map(
+                        items ->
+                                new PublicListItemsResult(
+                                        items, query.page(), query.size(), slice.hasNext()));
     }
 
-    private Mono<PublicListItemResponse.PublicItemResponse> toPublicPreviewResponse(
-            PublicListedItem item) {
-        ImageStorage storage = imageStorageProvider.getIfAvailable();
-        String key = item.coverObjectKey();
-        if (storage == null || key == null || key.isBlank()) {
-            return Mono.just(PublicListItemResponse.PublicItemResponse.fromPublicItem(item));
-        }
-        return storage.previewUrl(key)
-                .map(url -> PublicListItemResponse.PublicItemResponse.fromPublicItem(item, url));
+    private Mono<PublicListItemsResult.ItemPreview> resolvePreview(PublicListedItem item) {
+        return previewUrlReader
+                .resolve(item.coverObjectKey())
+                .map(url -> new PublicListItemsResult.ItemPreview(item, url))
+                .defaultIfEmpty(new PublicListItemsResult.ItemPreview(item, null));
     }
 }

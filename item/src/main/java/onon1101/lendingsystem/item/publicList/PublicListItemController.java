@@ -27,7 +27,15 @@ public class PublicListItemController {
     @GetMapping
     public Mono<ResponseEntity<ApiResponse<PublicListItemResponse>>> listPublic(
             @Valid @ModelAttribute PaginationRequest pagination) {
-        return publicListItemService.listPublic(pagination)
-                .map(response -> ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, response)));
+        var query = new PublicListItemsQuery(pagination.page(), pagination.size());
+        return publicListItemService
+                .listPublic(query)
+                .map(PublicListItemResponse::from)
+                .map(PublicListItemController::successfulResponse);
+    }
+
+    private static ResponseEntity<ApiResponse<PublicListItemResponse>> successfulResponse(
+            PublicListItemResponse response) {
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, response));
     }
 }
