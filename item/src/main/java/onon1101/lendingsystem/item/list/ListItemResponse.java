@@ -6,11 +6,18 @@ import java.util.UUID;
 import onon1101.lendingsystem.item.domain.ItemAvailability;
 import onon1101.lendingsystem.web.pagination.PaginationResponse;
 
-// todo: 把 page response 抽象成一個類
 public record ListItemResponse(List<ItemResponse> items, PaginationResponse response) {
 
     public ListItemResponse {
         items = List.copyOf(items);
+    }
+
+    public static ListItemResponse from(ListItemsResult result) {
+        var items = result.items().stream()
+                .map(preview -> ItemResponse.from(preview.item(), preview.imageUrl()))
+                .toList();
+        return new ListItemResponse(items,
+                new PaginationResponse(result.page(), result.size(), result.hasNext()));
     }
 
     public record ItemResponse(

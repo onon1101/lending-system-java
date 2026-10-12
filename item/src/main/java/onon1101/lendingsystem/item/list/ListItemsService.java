@@ -1,14 +1,9 @@
 package onon1101.lendingsystem.item.list;
 
-import java.util.List;
 
 import onon1101.lendingsystem.application.currentuser.CurrentUserProvider;
-import onon1101.lendingsystem.infrastructure.image.ImagePreviewUrlResolver;
-import onon1101.lendingsystem.web.pagination.PaginationRequest;
-import onon1101.lendingsystem.web.pagination.PaginationResponse;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,47 +13,38 @@ public class ListItemsService {
 
     private final ListItemsReader itemReader;
     private final CurrentUserProvider currentUserProvider;
-    private final ImagePreviewUrlResolver imageResolver;
+    private final ItemPreviewUrlReader previewUrlReader;
 
     public ListItemsService(
-            ListItemsReader itemsReader,
+            ListItemsReader itemReader,
             CurrentUserProvider currentUserProvider,
-            ImagePreviewUrlResolver imageResolver) {
+            ItemPreviewUrlReader previewUrlReader) {
 
-        this.itemReader = itemsReader;
+        this.itemReader = itemReader;
         this.currentUserProvider = currentUserProvider;
-        this.imageResolver = imageResolver;
+        this.previewUrlReader = previewUrlReader;
     }
 
-    @Transactional(readOnly = true)
-    public Mono<ListItemResponse> list(PaginationRequest pagination) {
+    public Mono<ListItemsResult> list(ListItemsQuery query) {
         return currentUserProvider
                 .getCurrentUser()
-                .flatMap(currentUser ->
-                        itemReader
-                                .findVisibleItems(currentUser.privateUserId(),
-                                        pagination)
-                                .collectList())
-                .flatMap(items -> {
+                .flatMapMany(user -> itemReader.findVisibleItems(user.privateUserId(), query))
+                .collectList()
+                .map(items -> ListItemsResult.Slice.from(items, query))
+                .flatMap(slice -> resolvePreviews(slice, query));
+    }
 
-                    boolean hasNext = items.size() > pagination.size();
-                    var paginationResponse = PaginationResponse.from(
-                            pagination, hasNext);
+    private Mono<ListItemsResult> resolvePreviews(ListItemsResult.Slice slice, ListItemsQuery query) {
+        return Flux
+                .fromIterable(slice.items())
+                .concatMap(this::resolvePreview)
+                .collectList()
+                .map(items -> new ListItemsResult(items, query.page(), query.size(), slice.hasNext()));
+    }
 
-                    return Flux
-                            .fromIterable(items)
-                            .take(pagination.size())
-                            .concatMap(item -> imageResolver
-                                    .resolve(item.coverObjectKey())
-                                    .map(url -> ListItemResponse.ItemResponse.from(
-                                            item, url))
-                                    .defaultIfEmpty(
-                                            ListItemResponse.ItemResponse.from(
-                                                    item)))
-                            .collectList()
-                            .map(responses -> new ListItemResponse(
-                                    responses,
-                                    paginationResponse));
-                });
+    private Mono<ListItemsResult.ItemPreview> resolvePreview(ListedItem item) {
+        return previewUrlReader.resolve(item.coverObjectKey())
+                .map(previewUrl -> new ListItemsResult.ItemPreview(item, previewUrl))
+                .defaultIfEmpty(new ListItemsResult.ItemPreview(item, null));
     }
 }

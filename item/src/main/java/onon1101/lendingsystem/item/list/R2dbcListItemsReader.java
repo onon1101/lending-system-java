@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.UUID;
 import onon1101.lendingsystem.item.domain.ItemAvailability;
-import onon1101.lendingsystem.web.pagination.PaginationRequest;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -19,7 +18,7 @@ public class R2dbcListItemsReader implements ListItemsReader {
     }
 
     @Override
-    public Flux<ListedItem> findVisibleItems(long viewerId, PaginationRequest pagination) {
+    public Flux<ListedItem> findVisibleItems(long viewerId, ListItemsQuery query) {
         return databaseClient
                 .sql(
                         """
@@ -54,8 +53,8 @@ public class R2dbcListItemsReader implements ListItemsReader {
                         OFFSET :offset
                         """)
                 .bind("viewerId", viewerId)
-                .bind("limit", pagination.fetchLimit())
-                .bind("offset", pagination.offset())
+                .bind("limit", query.fetchLimit())
+                .bind("offset", query.offset())
                 .map(
                         (row, metadata) ->
                                 new ListedItem(

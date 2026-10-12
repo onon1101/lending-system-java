@@ -34,7 +34,8 @@ public class ListItemsController {
             @Valid @ModelAttribute PaginationRequest pagination) {
 
         return listItemsService
-                .list(pagination)
+                .list(new ListItemsQuery(pagination.page(), pagination.size()))
+                .map(ListItemResponse::from)
                 .map(ListItemsController::successfulResponse);
     }
 
