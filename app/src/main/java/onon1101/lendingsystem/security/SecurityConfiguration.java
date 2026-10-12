@@ -37,6 +37,7 @@ public class SecurityConfiguration {
                                                 "/api/v1/auth/refresh",
                                                 "/api/v1/user/register",
                                                 "/api/v1/auth/forgot-password",
+                                                "/api/v1/auth/reset-password",
                                                 "/api/v1/auth/register",
                                                 "/api/v1/auth/email-verification/confirm",
                                                 "/api/v1/auth/email-verification/resend")
@@ -48,7 +49,7 @@ public class SecurityConfiguration {
                                                 "/swagger-ui.html",
                                                 "/v3/api-docs/**")
                                         .permitAll()
-                                        .pathMatchers(HttpMethod.GET, "/item/list")
+                                        .pathMatchers(HttpMethod.GET, "/item/public-items")
                                         .permitAll()
                                         .anyExchange()
                                         .authenticated())

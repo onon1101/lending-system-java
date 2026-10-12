@@ -227,7 +227,7 @@ CREATE TABLE IF NOT EXISTS loan_records
     closed_at TIMESTAMPTZ,
 
     planned_borrow_date DATE,
-    plaaned_return_date DATE,
+    planned_return_date DATE,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,

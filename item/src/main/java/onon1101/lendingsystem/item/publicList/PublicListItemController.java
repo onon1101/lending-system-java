@@ -1,4 +1,5 @@
 package onon1101.lendingsystem.item.publicList;
+import onon1101.lendingsystem.shared.pagination.PageSpec;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +28,7 @@ public class PublicListItemController {
     @GetMapping
     public Mono<ResponseEntity<ApiResponse<PublicListItemResponse>>> listPublic(
             @Valid @ModelAttribute PaginationRequest pagination) {
-        var query = new PublicListItemsQuery(pagination.page(), pagination.size());
+        var query = new PublicListItemsQuery(new PageSpec(pagination.page(), pagination.size()));
         return publicListItemService
                 .listPublic(query)
                 .map(PublicListItemResponse::from)

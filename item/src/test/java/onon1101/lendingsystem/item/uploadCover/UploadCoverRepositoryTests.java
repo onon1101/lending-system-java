@@ -112,7 +112,8 @@ class UploadCoverRepositoryTests {
         assertNull(reader.findOwnedItem(id, 7).block().objectKey());
         var detailReader = new onon1101.lendingsystem.item.retrieve.R2dbcRetrieveItemReader(db);
         var listReader = new onon1101.lendingsystem.item.list.R2dbcListItemsReader(db);
-        var pagination = new onon1101.lendingsystem.item.list.ListItemsQuery(0, 1);
+        var pagination = new onon1101.lendingsystem.item.list.ListItemsQuery(
+                new onon1101.lendingsystem.shared.pagination.PageSpec(0, 1));
         assertNull(detailReader.findVisibleItem(id, 8).block().coverObjectKey());
         var withoutCover = listReader.findVisibleItems(8, pagination).collectList().block();
         assertEquals(1, withoutCover.size());

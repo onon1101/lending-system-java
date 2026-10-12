@@ -1,4 +1,5 @@
 package onon1101.lendingsystem.item.list;
+import onon1101.lendingsystem.shared.pagination.PageSpec;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +35,7 @@ public class ListItemsController {
             @Valid @ModelAttribute PaginationRequest pagination) {
 
         return listItemsService
-                .list(new ListItemsQuery(pagination.page(), pagination.size()))
+                .list(new ListItemsQuery(new PageSpec(pagination.page(), pagination.size())))
                 .map(ListItemResponse::from)
                 .map(ListItemsController::successfulResponse);
     }

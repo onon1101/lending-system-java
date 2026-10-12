@@ -1,4 +1,5 @@
 package onon1101.lendingsystem.item.list;
+import onon1101.lendingsystem.shared.pagination.PageSpec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,7 +33,7 @@ class ListItemsServiceTests {
 
     @Test
     void trimsLookaheadBeforeResolvingImagesAndPreservesHttpContract() {
-        var query = new ListItemsQuery(2, 1);
+        var query = new ListItemsQuery(new PageSpec(2, 1));
         var first = item("cover");
         when(reader.findVisibleItems(8, query)).thenReturn(Flux.just(first, item("lookahead")));
         when(previews.resolve("cover")).thenReturn(Mono.just("https://example.test/cover"));
@@ -57,7 +58,7 @@ class ListItemsServiceTests {
 
     @Test
     void keepsItemsWithoutPreviewAndTheirOrderOnAFullLastPage() {
-        var query = new ListItemsQuery(0, 2);
+        var query = new ListItemsQuery(new PageSpec(0, 2));
         var first = item(null);
         var second = item("missing");
         when(reader.findVisibleItems(8, query)).thenReturn(Flux.just(first, second));
@@ -73,7 +74,7 @@ class ListItemsServiceTests {
 
     @Test
     void returnsAnEmptyPageWithoutResolvingImages() {
-        var query = new ListItemsQuery(0, 20);
+        var query = new ListItemsQuery(new PageSpec(0, 20));
         when(reader.findVisibleItems(8, query)).thenReturn(Flux.empty());
         var result = service.list(query).block(Duration.ofSeconds(5));
         assertNotNull(result);
@@ -84,7 +85,7 @@ class ListItemsServiceTests {
 
     @Test
     void propagatesPreviewFailures() {
-        var query = new ListItemsQuery(0, 1);
+        var query = new ListItemsQuery(new PageSpec(0, 1));
         var failure = new IllegalStateException("Storage unavailable");
         when(reader.findVisibleItems(8, query)).thenReturn(Flux.just(item("cover")));
         when(previews.resolve("cover")).thenReturn(Mono.error(failure));

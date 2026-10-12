@@ -21,10 +21,9 @@ public class RetrieveItemService {
     private final CurrentUserProvider currentUserProvider;
     private final ImagePreviewUrlResolver imageResolver;
 
-    public RetrieveItemService(
-            RetrieveItemReader itemReader,
-            CurrentUserProvider currentUserProvider,
-            ImagePreviewUrlResolver imageResolver) {
+    public RetrieveItemService(RetrieveItemReader itemReader,
+                               CurrentUserProvider currentUserProvider,
+                               ImagePreviewUrlResolver imageResolver) {
         this.itemReader = itemReader;
         this.currentUserProvider = currentUserProvider;
         this.imageResolver = imageResolver;
@@ -34,18 +33,14 @@ public class RetrieveItemService {
     public Mono<Result<RetrieveItemResult>> retrieve(UUID itemId) {
         return currentUserProvider
                 .getCurrentUser()
-                .flatMap(
-                        currentUser ->
-                                itemReader.findVisibleItem(itemId,
-                                        currentUser.privateUserId()))
-                .flatMap(item ->
-                        imageResolver
-                                .resolve(item.coverObjectKey())
-                                .map(url -> Result.success(
-                                        RetrieveItemResult.from(item, url)))
-                )
-                .switchIfEmpty(
-                        Mono.fromSupplier(() -> Result.failure(
-                                new ItemNotFoundDomainError())));
+                .flatMap(currentUser -> itemReader.findVisibleItem(itemId,
+                        currentUser.privateUserId()))
+                .flatMap(item -> imageResolver
+                        .resolve(item.coverObjectKey())
+                        .map(url -> RetrieveItemResult.from(item, url))
+                        .defaultIfEmpty(RetrieveItemResult.from(item))
+                        .map(Result::success))
+                .switchIfEmpty(Mono.fromSupplier(
+                        () -> Result.failure(new ItemNotFoundDomainError())));
     }
 }

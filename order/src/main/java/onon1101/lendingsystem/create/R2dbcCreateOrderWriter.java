@@ -38,7 +38,7 @@ public class R2dbcCreateOrderWriter implements CreateOrderWriter {
                             created_at,
                             updated_at
                         )
-                        VALUE (
+                        VALUES (
                             :orderId,
                             :itemId,
                             :borrowerId,

@@ -1,4 +1,5 @@
 package onon1101.lendingsystem.item.list;
+import onon1101.lendingsystem.shared.pagination.Slice;
 
 
 import onon1101.lendingsystem.application.currentuser.CurrentUserProvider;
@@ -30,16 +31,16 @@ public class ListItemsService {
                 .getCurrentUser()
                 .flatMapMany(user -> itemReader.findVisibleItems(user.privateUserId(), query))
                 .collectList()
-                .map(items -> ListItemsResult.Slice.from(items, query))
+                .map(items -> Slice.from(items, query.pagination()))
                 .flatMap(slice -> resolvePreviews(slice, query));
     }
 
-    private Mono<ListItemsResult> resolvePreviews(ListItemsResult.Slice slice, ListItemsQuery query) {
+    private Mono<ListItemsResult> resolvePreviews(Slice<ListedItem> slice, ListItemsQuery query) {
         return Flux
                 .fromIterable(slice.items())
                 .concatMap(this::resolvePreview)
                 .collectList()
-                .map(items -> new ListItemsResult(items, query.page(), query.size(), slice.hasNext()));
+                .map(items -> new ListItemsResult(items, query.pagination().page(), query.pagination().size(), slice.hasNext()));
     }
 
     private Mono<ListItemsResult.ItemPreview> resolvePreview(ListedItem item) {

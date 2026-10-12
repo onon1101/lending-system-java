@@ -53,8 +53,8 @@ public class R2dbcListItemsReader implements ListItemsReader {
                         OFFSET :offset
                         """)
                 .bind("viewerId", viewerId)
-                .bind("limit", query.fetchLimit())
-                .bind("offset", query.offset())
+                .bind("limit", query.pagination().fetchLimit())
+                .bind("offset", query.pagination().offset())
                 .map(
                         (row, metadata) ->
                                 new ListedItem(

@@ -9,18 +9,4 @@ public record PublicListItemsResult(List<ItemPreview> items, int page, int size,
 
     public record ItemPreview(PublicListedItem item, String imageUrl) {}
 
-    public record Slice(List<PublicListedItem> items, boolean hasNext) {
-
-        public Slice {
-            items = List.copyOf(items);
-        }
-
-        public static Slice from(List<PublicListedItem> fetchedItems, PublicListItemsQuery query) {
-            int visibleCount = Math.min(fetchedItems.size(), query.size());
-
-            boolean hasNext = fetchedItems.size() > query.size();
-
-            return new Slice(fetchedItems.subList(0, visibleCount), hasNext);
-        }
-    }
 }

@@ -10,11 +10,4 @@ public record PaginationRequest(@Min(0) Integer page, @Min(1) @Max(100) Integer 
         size = size == null ? 20 : size;
     }
 
-    public long offset() {
-        return (long) page * size;
-    }
-
-    public int fetchLimit() {
-        return size + 1;
-    }
 }

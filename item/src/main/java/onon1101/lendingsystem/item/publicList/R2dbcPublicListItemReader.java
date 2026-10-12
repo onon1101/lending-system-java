@@ -30,6 +30,8 @@ public class R2dbcPublicListItemReader implements PublicListItemReader {
                 ON cover.item_id = item.id
                 AND cover.sort_order = 0
                 AND cover.media_type = 'image'
+            WHERE item.status = 'available'
+                AND owner.status = 'active'
             ORDER BY item.created_at DESC, item.public_id DESC
             LIMIT :limit
             OFFSET :offset
@@ -45,8 +47,8 @@ public class R2dbcPublicListItemReader implements PublicListItemReader {
     public Flux<PublicListedItem> findAllPublicItems(PublicListItemsQuery query) {
         return databaseClient
                 .sql(FIND_ALL_PUBLIC_ITEMS)
-                .bind("limit", query.fetchLimit())
-                .bind("offset", query.offset())
+                .bind("limit", query.pagination().fetchLimit())
+                .bind("offset", query.pagination().offset())
                 .map((row, metadata) -> mapItem(row))
                 .all();
     }

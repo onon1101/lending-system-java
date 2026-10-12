@@ -1,4 +1,5 @@
 package onon1101.lendingsystem.item.publicList;
+import onon1101.lendingsystem.shared.pagination.Slice;
 
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -19,19 +20,19 @@ public class PublicListItemService {
         return itemReader
                 .findAllPublicItems(query)
                 .collectList()
-                .map(items -> PublicListItemsResult.Slice.from(items, query))
+                .map(items -> Slice.from(items, query.pagination()))
                 .flatMap(slice -> resolvePreviews(slice, query));
     }
 
     private Mono<PublicListItemsResult> resolvePreviews(
-            PublicListItemsResult.Slice slice, PublicListItemsQuery query) {
+            Slice<PublicListedItem> slice, PublicListItemsQuery query) {
         return Flux.fromIterable(slice.items())
                 .concatMap(this::resolvePreview)
                 .collectList()
                 .map(
                         items ->
                                 new PublicListItemsResult(
-                                        items, query.page(), query.size(), slice.hasNext()));
+                                        items, query.pagination().page(), query.pagination().size(), slice.hasNext()));
     }
 
     private Mono<PublicListItemsResult.ItemPreview> resolvePreview(PublicListedItem item) {

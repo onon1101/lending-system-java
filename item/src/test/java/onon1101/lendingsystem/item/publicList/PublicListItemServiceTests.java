@@ -1,4 +1,5 @@
 package onon1101.lendingsystem.item.publicList;
+import onon1101.lendingsystem.shared.pagination.PageSpec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,7 +31,7 @@ class PublicListItemServiceTests {
 
     @Test
     void preservesPublicHttpContractAndIncludesEveryStatus() {
-        var query = new PublicListItemsQuery(0, 20);
+        var query = new PublicListItemsQuery(new PageSpec(0, 20));
         when(reader.findAllPublicItems(query))
                 .thenReturn(
                         Flux.just(
@@ -63,7 +64,7 @@ class PublicListItemServiceTests {
 
     @Test
     void trimsLookaheadBeforeResolvingImages() {
-        var query = new PublicListItemsQuery(2, 1);
+        var query = new PublicListItemsQuery(new PageSpec(2, 1));
         var first = item(ItemAvailability.AVAILABLE, "cover");
         when(reader.findAllPublicItems(query))
                 .thenReturn(Flux.just(first, item(ItemAvailability.UNAVAILABLE, "lookahead")));
@@ -81,7 +82,7 @@ class PublicListItemServiceTests {
 
     @Test
     void keepsItemsWithoutPreviewAndPreservesOrder() {
-        var query = new PublicListItemsQuery(0, 2);
+        var query = new PublicListItemsQuery(new PageSpec(0, 2));
         var first = item(ItemAvailability.AVAILABLE, null);
         var second = item(ItemAvailability.UNAVAILABLE, "missing");
         when(reader.findAllPublicItems(query)).thenReturn(Flux.just(first, second));
@@ -99,7 +100,7 @@ class PublicListItemServiceTests {
 
     @Test
     void returnsEmptyPageWithoutResolvingImages() {
-        var query = new PublicListItemsQuery(0, 20);
+        var query = new PublicListItemsQuery(new PageSpec(0, 20));
         when(reader.findAllPublicItems(query)).thenReturn(Flux.empty());
         var result = service.listPublic(query).block(Duration.ofSeconds(5));
         assertNotNull(result);
@@ -110,7 +111,7 @@ class PublicListItemServiceTests {
 
     @Test
     void propagatesPreviewFailures() {
-        var query = new PublicListItemsQuery(0, 1);
+        var query = new PublicListItemsQuery(new PageSpec(0, 1));
         var failure = new IllegalStateException("Storage unavailable");
         when(reader.findAllPublicItems(query))
                 .thenReturn(Flux.just(item(ItemAvailability.AVAILABLE, "cover")));

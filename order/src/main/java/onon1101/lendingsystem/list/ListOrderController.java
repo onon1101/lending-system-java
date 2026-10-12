@@ -1,4 +1,5 @@
 package onon1101.lendingsystem.list;
+import onon1101.lendingsystem.shared.pagination.PageSpec;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,8 +54,7 @@ public class ListOrderController {
         ListOrderQuery query = new ListOrderQuery(
                 ListOrderQuery.Role.valueOf(role.toUpperCase(Locale.ROOT)),
                 status,
-                pagination.page(),
-                pagination.size());
+                new PageSpec(pagination.page(), pagination.size()));
 
         return listOrderService
                 .list(query)

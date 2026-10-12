@@ -69,8 +69,8 @@ public class R2dbcListOrderReader implements ListOrderReader{
         DatabaseClient.GenericExecuteSpec statement = databaseClient
                 .sql(sql)
                 .bind("userId", userId)
-                .bind("limit", query.fetchLimit())
-                .bind("offset", query.offset());
+                .bind("limit", query.pagination().fetchLimit())
+                .bind("offset", query.pagination().offset());
 
         if (query.status() != null) {
             statement = statement.bind("status",  query.status());
@@ -112,5 +112,3 @@ public class R2dbcListOrderReader implements ListOrderReader{
         );
     }
 }
-
-
