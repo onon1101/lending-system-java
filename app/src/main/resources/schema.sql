@@ -400,7 +400,7 @@ CREATE TABLE IF NOT EXISTS loan_media
 
     CONSTRAINT ck_loan_media_updated_at
     CHECK (updated_at >= created_at)
-)
+);
 
 CREATE INDEX IF NOT EXISTS idx_loan_media_uploaded_by
     ON loan_media(uploaded_by);
